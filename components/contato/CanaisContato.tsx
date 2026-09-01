@@ -1,5 +1,6 @@
 import { empresa, linkWhatsapp } from "@/lib/empresa";
 import { Revelar } from "@/components/ui/Revelar";
+import { BotaoSeta } from "@/components/ui/Botao";
 import {
   Envelope,
   Instagram,
@@ -18,6 +19,7 @@ const canais = [
     href: linkWhatsapp(),
     externo: true,
     destaque: true,
+    compacto: false,
   },
   {
     icone: Telefone,
@@ -27,6 +29,7 @@ const canais = [
     href: `tel:${empresa.telefoneLink}`,
     externo: false,
     destaque: false,
+    compacto: false,
   },
   {
     icone: Envelope,
@@ -46,76 +49,82 @@ const canais = [
     href: empresa.instagram,
     externo: true,
     destaque: false,
+    compacto: false,
   },
 ];
 
-export function CanaisContato() {
+/**
+ * Grade hairline de canais. `celula` informa a superfície da seção que
+ * hospeda o componente, para que as células não virem cards por engano.
+ */
+export function CanaisContato({
+  celula = "var(--color-background)",
+}: {
+  celula?: string;
+}) {
   return (
-    <ul className="grid gap-px overflow-hidden rounded-[var(--raio)] border border-[var(--linha-clara)] bg-[var(--linha-clara)] sm:grid-cols-2">
+    <ul
+      className="grade-hairline sm:grid-cols-2"
+      style={{ "--celula": celula } as React.CSSProperties}
+    >
       {canais.map((canal, indice) => {
         const Icone = canal.icone;
         return (
-          <Revelar
-            como="li"
-            key={canal.rotulo}
-            atraso={indice * 70}
-            className="bg-white"
-          >
+          <Revelar como="li" key={canal.rotulo} atraso={indice * 70}>
             <a
               href={canal.href}
               target={canal.externo ? "_blank" : undefined}
               rel={canal.externo ? "noopener noreferrer" : undefined}
-              className="group flex h-full items-start gap-4 p-6 transition-colors duration-[240ms] ease-[var(--saida)] hover:bg-[var(--papel-2)]"
+              className="group flex h-full items-start gap-5 p-7 transition-colors duration-[var(--duration-medium)] ease-[var(--ease-out)] hover:bg-[var(--color-surface)]"
             >
               <span
-                className="mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-[var(--raio-sm)] transition-colors duration-[240ms]"
+                className="mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-small)] transition-colors duration-[var(--duration-medium)]"
                 style={{
                   backgroundColor: canal.destaque
-                    ? "var(--engetec-vermelho)"
-                    : "var(--papel-2)",
-                  color: canal.destaque ? "#ffffff" : "var(--texto-forte)",
+                    ? "var(--color-primary)"
+                    : "rgba(255,255,255,0.06)",
+                  color: "var(--color-text-primary)",
                 }}
               >
                 <Icone className="h-5 w-5" />
               </span>
 
               <span className="min-w-0 flex-1">
-                <span className="block font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-[var(--texto-suave)]">
+                <span className="block font-mono text-[length:var(--text-label)] font-medium uppercase tracking-[var(--tracking-label)] text-[var(--color-text-secondary)]">
                   {canal.rotulo}
                 </span>
                 <span
-                  className={`mt-1.5 block font-semibold tracking-[-0.02em] [overflow-wrap:anywhere] ${
-                    "compacto" in canal && canal.compacto
-                      ? "text-[0.9375rem]"
-                      : "text-[1.0625rem]"
+                  className={`mt-2 block font-medium text-[var(--color-text-primary)] [overflow-wrap:anywhere] ${
+                    canal.compacto
+                      ? "text-[length:var(--text-ui)]"
+                      : "text-[length:var(--text-subheading)] tracking-[var(--tracking-subheading)]"
                   }`}
                 >
                   {canal.valor}
                 </span>
-                <span className="mt-1 block text-sm text-[var(--texto-suave)]">
+                <span className="mt-2 block text-[length:var(--text-ui)] text-[var(--color-text-secondary)]">
                   {canal.detalhe}
                 </span>
               </span>
 
-              <SetaCanto
-                className="mt-1 h-5 w-5 flex-none text-[var(--texto-suave)] transition-[color,transform] duration-[220ms] ease-[var(--saida)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--engetec-vermelho)]"
-                aria-hidden="true"
-              />
+              <BotaoSeta className="mt-1">
+                <SetaCanto className="h-4 w-4" />
+              </BotaoSeta>
             </a>
           </Revelar>
         );
       })}
 
-      <Revelar como="li" atraso={280} className="bg-white sm:col-span-2">
-        <div className="flex items-start gap-4 p-6">
-          <span className="mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-[var(--raio-sm)] bg-[var(--papel-2)]">
+      <Revelar como="li" atraso={280} className="sm:col-span-2">
+        <div className="flex items-start gap-5 p-7">
+          <span className="mt-0.5 flex h-10 w-10 flex-none items-center justify-center rounded-[var(--radius-small)] bg-[rgba(255,255,255,0.06)] text-[var(--color-text-primary)]">
             <Pino className="h-5 w-5" />
           </span>
           <div>
-            <span className="block font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-[var(--texto-suave)]">
+            <span className="block font-mono text-[length:var(--text-label)] font-medium uppercase tracking-[var(--tracking-label)] text-[var(--color-text-secondary)]">
               Endereço
             </span>
-            <address className="mt-1.5 not-italic text-[1.0625rem] font-semibold leading-snug tracking-[-0.02em]">
+            <address className="mt-2 not-italic text-[length:var(--text-subheading)] font-medium leading-snug tracking-[var(--tracking-subheading)] text-[var(--color-text-primary)]">
               {empresa.endereco.logradouro}
               <br />
               {empresa.endereco.bairro}, {empresa.endereco.cidade} /{" "}

@@ -5,9 +5,15 @@ import { BotaoLink } from "@/components/ui/Botao";
 import { Revelar } from "@/components/ui/Revelar";
 import { Telefone, Whatsapp } from "@/components/ui/Icones";
 
+/**
+ * Seção de conversão. Carrega a regra de 3px com o gradiente assinatura, que é
+ * permitida uma vez por página.
+ */
 export function CtaOrcamento() {
   return (
-    <section className="secao-escura relative overflow-hidden bg-[var(--tinta)] text-white">
+    <section className="relative overflow-hidden bg-[var(--color-background)]">
+      <span className="regra-corrente absolute inset-x-0 top-0" aria-hidden="true" />
+
       <Image
         src="/img/obra-4.jpg"
         alt=""
@@ -20,24 +26,18 @@ export function CtaOrcamento() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(100deg, rgba(16,17,20,0.96) 22%, rgba(16,17,20,0.7) 62%, rgba(16,17,20,0.5) 100%)",
+            "linear-gradient(100deg, rgba(23,20,19,0.96) 24%, rgba(23,20,19,0.74) 62%, rgba(23,20,19,0.55) 100%)",
         }}
         aria-hidden="true"
       />
-      <span
-        className="absolute inset-x-0 top-0 h-[3px] bg-[var(--engetec-vermelho)]"
-        aria-hidden="true"
-      />
 
-      <div className="envoltorio relative py-20 md:py-28">
+      <div className="envoltorio relative py-16 md:py-20 lg:py-[120px]">
         <Revelar className="max-w-[46rem]">
-          <p className="rotulo rotulo-amarelo text-[var(--texto-inverso-suave)]">
-            Orçamento
-          </p>
-          <h2 className="titulo-secao mt-6 text-white">
+          <p className="rotulo">Orçamento</p>
+          <h2 className="titulo-secao mt-6">
             Seu projeto elétrico merece ser feito direito.
           </h2>
-          <p className="corpo mt-6 text-[var(--texto-inverso-suave)]">
+          <p className="corpo mt-7">
             Conte o que você precisa pelo WhatsApp. A equipe avalia o serviço e
             retorna com o orçamento.
           </p>
@@ -50,9 +50,8 @@ export function CtaOrcamento() {
 
             <BotaoLink
               href={`tel:${empresa.telefoneLink}`}
-              externo={false}
               tamanho="lg"
-              variante="contorno-claro"
+              variante="secundario"
             >
               <Telefone className="h-[18px] w-[18px]" />
               {empresa.telefone}

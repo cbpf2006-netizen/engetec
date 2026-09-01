@@ -8,6 +8,11 @@ import { useEffect, useState } from "react";
 import { empresa, linkWhatsapp, navegacao } from "@/lib/empresa";
 import { Fechar, Menu, Whatsapp } from "@/components/ui/Icones";
 
+/**
+ * Barra fixa. 88px no topo, 68px após rolagem.
+ * No topo é transparente sobre o canvas escuro. Após 16px de rolagem ganha
+ * fundo a 92% com blur, que é a única ocorrência de backdrop-filter permitida.
+ */
 export function Cabecalho() {
   const caminho = usePathname();
   const [rolou, setRolou] = useState(false);
@@ -42,17 +47,17 @@ export function Cabecalho() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-[var(--z-sticky)] transition-[background-color,border-color,backdrop-filter] duration-300 ease-[var(--saida)]"
+      className="fixed inset-x-0 top-0 z-[var(--z-sticky)] transition-[background-color,border-color,backdrop-filter] duration-300 ease-[var(--ease-out)]"
       style={{
-        backgroundColor: rolou ? "rgba(250,248,248,0.92)" : "transparent",
-        borderBottom: `1px solid ${rolou ? "var(--linha-clara)" : "transparent"}`,
-        backdropFilter: rolou ? "saturate(1.4) blur(14px)" : "none",
+        backgroundColor: rolou ? "rgba(23,20,19,0.92)" : "transparent",
+        borderBottom: `1px solid ${rolou ? "var(--color-border)" : "transparent"}`,
+        backdropFilter: rolou ? "saturate(1.3) blur(14px)" : "none",
       }}
     >
       <div className="envoltorio">
         <div
-          className="flex items-center justify-between transition-[height] duration-300 ease-[var(--saida)]"
-          style={{ height: rolou ? "4.25rem" : "5.5rem" }}
+          className="flex items-center justify-between transition-[height] duration-300 ease-[var(--ease-out)]"
+          style={{ height: rolou ? "68px" : "88px" }}
         >
           <Link
             href="/"
@@ -65,51 +70,42 @@ export function Cabecalho() {
               width={990}
               height={285}
               priority
-              className="h-9 w-auto rounded-[2px] sm:h-11"
+              className="h-9 w-auto rounded-[var(--radius-small)] sm:h-11"
             />
           </Link>
 
           <nav
             aria-label="Navegação principal"
-            className="hidden items-center gap-9 lg:flex"
+            className="hidden items-center gap-6 lg:flex"
           >
             {navegacao.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 aria-current={ativo(item.href) ? "page" : undefined}
-                className="group relative py-2 text-[0.9375rem] font-medium transition-colors duration-200"
+                className="group relative py-2 font-mono text-[length:var(--text-label)] font-medium uppercase tracking-[var(--tracking-label)] transition-colors duration-200"
                 style={{
-                  color: rolou
-                    ? ativo(item.href)
-                      ? "var(--engetec-vermelho)"
-                      : "var(--texto-forte)"
-                    : ativo(item.href)
-                      ? "var(--engetec-amarelo)"
-                      : "rgba(255,255,255,0.86)",
+                  color: ativo(item.href)
+                    ? "var(--color-text-primary)"
+                    : "var(--color-text-secondary)",
                 }}
               >
                 {item.rotulo}
                 <span
                   aria-hidden="true"
-                  className="absolute inset-x-0 -bottom-0.5 h-[2px] origin-left scale-x-0 transition-transform duration-[260ms] ease-[var(--saida)] group-hover:scale-x-100"
-                  style={{
-                    background: rolou
-                      ? "var(--engetec-vermelho)"
-                      : "var(--engetec-amarelo)",
-                    transform: ativo(item.href) ? "scaleX(1)" : undefined,
-                  }}
+                  className="absolute inset-x-0 -bottom-0.5 h-[2px] origin-left bg-[var(--color-secondary)] transition-transform duration-[var(--duration-medium)] ease-[var(--ease-out)] group-hover:scale-x-100"
+                  style={{ transform: ativo(item.href) ? "scaleX(1)" : "scaleX(0)" }}
                 />
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <a
               href={linkWhatsapp()}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden h-11 items-center gap-2.5 rounded-[var(--raio-sm)] bg-[var(--engetec-vermelho)] px-5 text-[0.9375rem] font-semibold text-white transition-[background-color,transform] duration-[160ms] ease-[var(--saida)] hover:bg-[var(--engetec-vermelho-escuro)] active:scale-[0.975] sm:inline-flex"
+              className="hidden h-11 items-center gap-2.5 rounded-[var(--radius-small)] bg-[var(--color-primary)] px-5 text-[length:var(--text-ui)] font-medium text-[var(--color-text-primary)] transition-[background-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-out)] hover:bg-[var(--color-primary-dark)] active:scale-[0.975] sm:inline-flex"
             >
               <Whatsapp className="h-[18px] w-[18px]" />
               Solicitar orçamento
@@ -120,11 +116,7 @@ export function Cabecalho() {
               onClick={() => setAberto(true)}
               aria-label="Abrir menu de navegação"
               aria-expanded={aberto}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--raio-sm)] border transition-colors duration-200 lg:hidden"
-              style={{
-                borderColor: rolou ? "var(--linha-clara)" : "rgba(255,255,255,0.28)",
-                color: rolou ? "var(--texto-forte)" : "#ffffff",
-              }}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-small)] border border-[var(--color-border-strong)] text-[var(--color-text-primary)] transition-colors duration-200 hover:border-[var(--color-secondary)] lg:hidden"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -146,26 +138,26 @@ function PainelMobile({
 }) {
   return (
     <div
-      className="fixed inset-0 z-[var(--z-menu)] flex flex-col bg-[var(--tinta)] lg:hidden"
-      style={{ animation: "escala-suave 240ms var(--saida)" }}
+      className="fixed inset-0 z-[var(--z-menu)] flex flex-col bg-[var(--color-background-deep)] lg:hidden"
+      style={{ animation: "escala-suave 240ms var(--ease-out)" }}
       role="dialog"
       aria-modal="true"
       aria-label="Menu de navegação"
     >
       <div className="envoltorio">
-        <div className="flex h-[5.5rem] items-center justify-between">
+        <div className="flex h-[88px] items-center justify-between">
           <Image
             src="/img/logo.jpg"
             alt={`${empresa.nome} ${empresa.tagline}`}
             width={990}
             height={285}
-            className="h-9 w-auto rounded-[2px]"
+            className="h-9 w-auto rounded-[var(--radius-small)]"
           />
           <button
             type="button"
             onClick={aoFechar}
             aria-label="Fechar menu de navegação"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--raio-sm)] border border-[var(--linha-escura)] text-white"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-small)] border border-[var(--color-border-strong)] text-[var(--color-text-primary)]"
           >
             <Fechar className="h-6 w-6" />
           </button>
@@ -182,13 +174,15 @@ function PainelMobile({
             href={item.href}
             onClick={aoFechar}
             aria-current={ativo(item.href) ? "page" : undefined}
-            className="flex items-baseline gap-4 border-b border-[var(--linha-escura-fraca)] py-5 text-[2rem] font-semibold tracking-[-0.035em] text-white transition-colors duration-200 hover:text-[var(--engetec-amarelo)]"
+            className="flex items-baseline gap-5 border-b border-[var(--color-border-hairline)] py-5 text-[length:var(--fluid-h3)] font-medium tracking-[var(--tracking-heading)] transition-colors duration-200 hover:text-[var(--color-secondary)]"
             style={{
-              animation: `surgir 420ms var(--saida) ${60 + indice * 55}ms backwards`,
-              color: ativo(item.href) ? "var(--engetec-amarelo)" : undefined,
+              animation: `surgir 420ms var(--ease-out) ${60 + indice * 55}ms backwards`,
+              color: ativo(item.href)
+                ? "var(--color-secondary)"
+                : "var(--color-text-primary)",
             }}
           >
-            <span className="font-mono text-xs font-medium tracking-[0.16em] text-[var(--texto-inverso-suave)]">
+            <span className="font-mono text-[length:var(--text-label)] font-medium tracking-[var(--tracking-label)] text-[var(--color-text-secondary)]">
               0{indice + 1}
             </span>
             {item.rotulo}
@@ -199,8 +193,8 @@ function PainelMobile({
           href={linkWhatsapp()}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-9 inline-flex h-14 items-center justify-center gap-2.5 rounded-[var(--raio-sm)] bg-[var(--engetec-vermelho)] px-6 font-semibold text-white"
-          style={{ animation: "surgir 420ms var(--saida) 300ms backwards" }}
+          className="mt-10 inline-flex h-[52px] items-center justify-center gap-2.5 rounded-[var(--radius-small)] bg-[var(--color-primary)] px-7 text-[length:var(--text-ui)] font-medium text-[var(--color-text-primary)]"
+          style={{ animation: "surgir 420ms var(--ease-out) 300ms backwards" }}
         >
           <Whatsapp className="h-5 w-5" />
           Solicitar orçamento
@@ -208,8 +202,8 @@ function PainelMobile({
 
         <a
           href={`tel:${empresa.telefoneLink}`}
-          className="mt-4 text-center font-mono text-sm tracking-[0.08em] text-[var(--texto-inverso-suave)] transition-colors hover:text-white"
-          style={{ animation: "surgir 420ms var(--saida) 340ms backwards" }}
+          className="mt-5 text-center font-mono text-[length:var(--text-meta)] uppercase tracking-[var(--tracking-meta)] text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
+          style={{ animation: "surgir 420ms var(--ease-out) 340ms backwards" }}
         >
           {empresa.telefone}
         </a>

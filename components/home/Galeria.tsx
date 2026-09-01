@@ -48,16 +48,12 @@ export function Galeria() {
   const foto = aberta === null ? null : galeria[aberta];
 
   return (
-    <section className="secao-escura bg-[var(--tinta-2)] py-20 text-white md:py-28">
+    <section className="bg-[var(--color-background)] py-16 md:py-20 lg:py-[120px]">
       <div className="envoltorio">
-        <Revelar className="max-w-[40rem]">
-          <p className="rotulo rotulo-amarelo text-[var(--texto-inverso-suave)]">
-            Trabalhos executados
-          </p>
-          <h2 className="titulo-secao mt-6 text-white">
-            Obras registradas em campo
-          </h2>
-          <p className="corpo mt-5 text-[var(--texto-inverso-suave)]">
+        <Revelar>
+          <p className="rotulo">Trabalhos executados</p>
+          <h2 className="titulo-secao mt-6">Obras registradas em campo</h2>
+          <p className="corpo mt-6">
             Fotografias de serviços realizados pela equipe da Engetec.
           </p>
         </Revelar>
@@ -74,7 +70,7 @@ export function Galeria() {
               <button
                 type="button"
                 onClick={() => setAberta(indice)}
-                className="group relative block h-full w-full overflow-hidden rounded-[var(--raio)] bg-[var(--grafite)] text-left"
+                className="group relative block h-full w-full overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-surface)] text-left"
                 aria-label={`Ampliar foto: ${item.legenda}`}
               >
                 <Image
@@ -82,22 +78,22 @@ export function Galeria() {
                   alt={item.alt}
                   fill
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover transition-transform duration-[700ms] ease-[var(--saida)] group-hover:scale-[1.05]"
+                  className="object-cover transition-transform duration-[var(--duration-image)] ease-[var(--ease-out)] group-hover:scale-[1.04]"
                 />
                 <div
-                  className="absolute inset-0 opacity-90 transition-opacity duration-[320ms] group-hover:opacity-100"
+                  className="absolute inset-0"
                   style={{
                     background:
-                      "linear-gradient(to top, rgba(16,17,20,0.85) 0%, rgba(16,17,20,0.15) 52%, rgba(16,17,20,0) 100%)",
+                      "linear-gradient(to top, rgba(16,13,12,0.92) 0%, rgba(16,13,12,0.15) 52%, rgba(16,13,12,0) 100%)",
                   }}
                   aria-hidden="true"
                 />
                 <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
-                  <span className="text-[0.9375rem] font-semibold leading-snug text-white">
+                  <span className="text-[length:var(--text-ui)] font-medium leading-snug text-[var(--color-text-primary)]">
                     {item.legenda}
                   </span>
                   <span
-                    className="mb-0.5 hidden h-8 w-8 flex-none items-center justify-center rounded-full border border-white/35 text-white transition-[background-color,border-color] duration-[260ms] group-hover:border-[var(--engetec-amarelo)] group-hover:bg-[var(--engetec-amarelo)] group-hover:text-[var(--tinta)] sm:flex"
+                    className="mb-0.5 hidden h-8 w-8 flex-none items-center justify-center rounded-[var(--radius-small)] bg-[rgba(224,27,34,0.14)] text-[var(--color-text-primary)] transition-colors duration-[var(--duration-medium)] group-hover:bg-[var(--color-primary)] sm:flex"
                     aria-hidden="true"
                   >
                     <MaisIcone />
@@ -115,7 +111,7 @@ export function Galeria() {
         onClick={(evento) => {
           if (evento.target === dialogo.current) fechar();
         }}
-        className="m-auto max-h-[92dvh] w-[min(94vw,68rem)] bg-transparent p-0 backdrop:bg-[rgba(10,11,13,0.9)]"
+        className="m-auto max-h-[92dvh] w-[min(94vw,68rem)] bg-transparent p-0 backdrop:bg-[rgba(16,13,12,0.92)]"
         aria-label="Foto ampliada"
       >
         {foto && (
@@ -127,17 +123,16 @@ export function Galeria() {
                 width={1400}
                 height={1400}
                 sizes="94vw"
-                className="max-h-[78dvh] w-auto rounded-[var(--raio)] object-contain"
+                className="max-h-[78dvh] w-auto rounded-[var(--radius-card)] object-contain"
               />
             </div>
 
-            <div className="mt-4 flex items-center justify-between gap-4">
-              <p className="text-sm text-white">{foto.legenda}</p>
+            <div className="mt-5 flex items-center justify-between gap-4">
+              <p className="text-[length:var(--text-ui)] text-[var(--color-text-primary)]">
+                {foto.legenda}
+              </p>
               <div className="flex items-center gap-2">
-                <BotaoDialogo
-                  rotulo="Foto anterior"
-                  aoClicar={() => navegar(-1)}
-                >
+                <BotaoDialogo rotulo="Foto anterior" aoClicar={() => navegar(-1)}>
                   <Seta className="h-5 w-5 rotate-180" />
                 </BotaoDialogo>
                 <BotaoDialogo rotulo="Próxima foto" aoClicar={() => navegar(1)}>
@@ -169,7 +164,7 @@ function BotaoDialogo({
       type="button"
       onClick={aoClicar}
       aria-label={rotulo}
-      className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--raio-sm)] border border-white/25 text-white transition-[background-color,border-color,transform] duration-[200ms] ease-[var(--saida)] hover:border-[var(--engetec-amarelo)] hover:text-[var(--engetec-amarelo)] active:scale-[0.95]"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-small)] border border-[var(--color-border-strong)] text-[var(--color-text-primary)] transition-[background-color,border-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-out)] hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)] active:scale-[0.95]"
     >
       {children}
     </button>
@@ -182,7 +177,7 @@ function MaisIcone() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.6}
+      strokeWidth={1.5}
       strokeLinecap="round"
       className="h-4 w-4"
       aria-hidden="true"

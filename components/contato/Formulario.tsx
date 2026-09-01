@@ -11,6 +11,12 @@ type Erros = Partial<Record<keyof Campos, string>>;
 
 const inicial: Campos = { nome: "", telefone: "", servico: "", mensagem: "" };
 
+const campoBase =
+  "w-full rounded-[var(--radius-small)] border bg-[var(--color-surface-raised)] " +
+  "text-[length:var(--text-ui)] text-[var(--color-text-primary)] " +
+  "placeholder:text-[var(--color-text-secondary)] transition-colors duration-200 " +
+  "hover:border-[var(--color-border-strong)] focus:border-[var(--color-primary)]";
+
 function validar(campos: Campos): Erros {
   const erros: Erros = {};
   if (campos.nome.trim().length < 2) {
@@ -69,7 +75,7 @@ export function Formulario() {
   };
 
   return (
-    <form onSubmit={aoEnviar} noValidate className="flex flex-col gap-5">
+    <form onSubmit={aoEnviar} noValidate className="flex flex-col gap-6">
       <Campo
         id={`${id}-nome`}
         rotulo="Nome"
@@ -95,10 +101,10 @@ export function Formulario() {
         auxilio="Opcional. Ajuda caso precisemos retornar por ligação."
       />
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         <label
           htmlFor={`${id}-servico`}
-          className="text-sm font-semibold tracking-[-0.01em]"
+          className="text-[length:var(--text-ui)] font-medium text-[var(--color-text-primary)]"
         >
           Serviço
         </label>
@@ -106,7 +112,7 @@ export function Formulario() {
           id={`${id}-servico`}
           value={campos.servico}
           onChange={(evento) => atualizar("servico", evento.target.value)}
-          className="h-12 w-full rounded-[var(--raio-sm)] border border-[var(--linha-clara)] bg-white px-3.5 text-[0.9375rem] text-[var(--texto-forte)] transition-colors duration-200 hover:border-[var(--texto-suave)] focus:border-[var(--engetec-vermelho)]"
+          className={`${campoBase} h-12 border-[var(--color-border)] px-3.5`}
         >
           <option value="">Selecione (opcional)</option>
           {servicos.map((servico) => (
@@ -118,13 +124,13 @@ export function Formulario() {
         </select>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2.5">
         <label
           htmlFor={`${id}-mensagem`}
-          className="text-sm font-semibold tracking-[-0.01em]"
+          className="text-[length:var(--text-ui)] font-medium text-[var(--color-text-primary)]"
         >
           O que você precisa
-          <span className="ml-1 text-[var(--engetec-vermelho)]" aria-hidden="true">
+          <span className="ml-1 text-[var(--color-primary-light)]" aria-hidden="true">
             *
           </span>
         </label>
@@ -140,18 +146,18 @@ export function Formulario() {
             tocados.mensagem && erros.mensagem ? `${id}-mensagem-erro` : undefined
           }
           placeholder="Descreva o serviço, o local e o prazo desejado."
-          className="w-full resize-y rounded-[var(--raio-sm)] border bg-white p-3.5 text-[0.9375rem] leading-relaxed text-[var(--texto-forte)] transition-colors duration-200 placeholder:text-[var(--texto-suave)] hover:border-[var(--texto-suave)] focus:border-[var(--engetec-vermelho)]"
+          className={`${campoBase} resize-y p-3.5 leading-[var(--leading-body)]`}
           style={{
             borderColor:
               tocados.mensagem && erros.mensagem
-                ? "var(--engetec-vermelho)"
-                : "var(--linha-clara)",
+                ? "var(--color-primary)"
+                : "var(--color-border)",
           }}
         />
         {tocados.mensagem && erros.mensagem && (
           <p
             id={`${id}-mensagem-erro`}
-            className="text-sm text-[var(--engetec-vermelho)]"
+            className="text-[length:var(--text-ui)] text-[var(--color-primary-light)]"
           >
             {erros.mensagem}
           </p>
@@ -163,7 +169,7 @@ export function Formulario() {
         {enviando ? "Abrindo o WhatsApp" : "Enviar pelo WhatsApp"}
       </Botao>
 
-      <p className="text-sm leading-relaxed text-[var(--texto-suave)]">
+      <p className="text-[length:var(--text-ui)] leading-[var(--leading-body)] text-[var(--color-text-secondary)]">
         Ao enviar, a conversa abre no WhatsApp com a mensagem já preenchida. Você
         confere tudo antes de mandar.
       </p>
@@ -203,11 +209,14 @@ function Campo({
   const descrito = [idErro, idAuxilio].filter(Boolean).join(" ") || undefined;
 
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-sm font-semibold tracking-[-0.01em]">
+    <div className="flex flex-col gap-2.5">
+      <label
+        htmlFor={id}
+        className="text-[length:var(--text-ui)] font-medium text-[var(--color-text-primary)]"
+      >
         {rotulo}
         {obrigatorio && (
-          <span className="ml-1 text-[var(--engetec-vermelho)]" aria-hidden="true">
+          <span className="ml-1 text-[var(--color-primary-light)]" aria-hidden="true">
             *
           </span>
         )}
@@ -223,18 +232,21 @@ function Campo({
         onBlur={aoSair}
         aria-invalid={erro ? true : undefined}
         aria-describedby={descrito}
-        className="h-12 w-full rounded-[var(--raio-sm)] border bg-white px-3.5 text-[0.9375rem] text-[var(--texto-forte)] transition-colors duration-200 placeholder:text-[var(--texto-suave)] hover:border-[var(--texto-suave)] focus:border-[var(--engetec-vermelho)]"
+        className={`${campoBase} h-12 px-3.5`}
         style={{
-          borderColor: erro ? "var(--engetec-vermelho)" : "var(--linha-clara)",
+          borderColor: erro ? "var(--color-primary)" : "var(--color-border)",
         }}
       />
       {erro && (
-        <p id={idErro} className="text-sm text-[var(--engetec-vermelho)]">
+        <p id={idErro} className="text-[length:var(--text-ui)] text-[var(--color-primary-light)]">
           {erro}
         </p>
       )}
       {auxilio && !erro && (
-        <p id={idAuxilio} className="text-sm text-[var(--texto-suave)]">
+        <p
+          id={idAuxilio}
+          className="text-[length:var(--text-ui)] text-[var(--color-text-secondary)]"
+        >
           {auxilio}
         </p>
       )}

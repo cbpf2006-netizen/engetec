@@ -59,8 +59,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#101114",
-  colorScheme: "light",
+  themeColor: "#171413",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -73,7 +73,7 @@ export default function RootLayout({
       <body className="flex min-h-dvh flex-col antialiased">
         <a
           href="#conteudo"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[var(--z-modal)] focus:rounded-[var(--raio-sm)] focus:bg-[var(--engetec-vermelho)] focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[var(--z-modal)] focus:rounded-[var(--radius-small)] focus:bg-[var(--color-primary)] focus:px-5 focus:py-3 focus:text-[length:var(--text-ui)] focus:font-medium focus:text-[var(--color-text-primary)]"
         >
           Ir para o conteúdo
         </a>

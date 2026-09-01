@@ -12,35 +12,21 @@ const fatos = [
 
 export function Hero() {
   return (
-    <section className="secao-escura relative overflow-hidden bg-[var(--tinta)] text-white">
+    <section className="relative overflow-hidden bg-[var(--color-background)]">
       <div className="malha absolute inset-0" aria-hidden="true" />
-      <div
-        className="pointer-events-none absolute -left-48 top-8 h-[34rem] w-[34rem] rounded-full opacity-[0.1] blur-[130px]"
-        style={{ background: "var(--engetec-vermelho)" }}
-        aria-hidden="true"
-      />
 
       <div className="envoltorio relative">
-        <div className="grid items-center gap-12 pb-16 pt-32 sm:pt-36 lg:grid-cols-12 lg:gap-14 lg:pb-24 lg:pt-40">
+        <div className="grid items-center gap-12 pb-20 pt-[136px] lg:grid-cols-12 lg:gap-10 lg:pb-[120px] lg:pt-[176px]">
           <div className="entrada-hero lg:col-span-7">
-            <p
-              className="rotulo text-[var(--texto-inverso-suave)]"
-              style={{ animationDelay: "60ms" }}
-            >
+            <p className="rotulo" style={{ animationDelay: "60ms" }}>
               Instalações elétricas / {empresa.cidade} · {empresa.estado}
             </p>
 
-            <h1
-              className="titulo-hero mt-7 max-w-[17ch] text-white"
-              style={{ animationDelay: "140ms" }}
-            >
+            <h1 className="titulo-hero mt-6" style={{ animationDelay: "140ms" }}>
               Instalação elétrica feita com norma, não com improviso.
             </h1>
 
-            <p
-              className="corpo mt-7 max-w-[52ch] text-[var(--texto-inverso-suave)]"
-              style={{ animationDelay: "220ms" }}
-            >
+            <p className="corpo mt-7" style={{ animationDelay: "220ms" }}>
               Projetos residenciais e comerciais em {empresa.regiao}. Mais de{" "}
               {empresa.clientes} clientes atendidos em {empresa.anosAtuacao} anos
               de atuação.
@@ -50,28 +36,23 @@ export function Hero() {
               className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
               style={{ animationDelay: "300ms" }}
             >
-              <BotaoLink
-                href={linkWhatsapp()}
-                externo
-                tamanho="lg"
-                variante="primario"
-              >
+              <BotaoLink href={linkWhatsapp()} externo tamanho="lg">
                 <Whatsapp className="h-5 w-5" />
                 Solicitar orçamento
               </BotaoLink>
 
-              <BotaoLink href="/servicos" tamanho="lg" variante="contorno-claro">
+              <BotaoLink href="/servicos" tamanho="lg" variante="secundario">
                 Ver serviços
-                <Seta className="h-[18px] w-[18px] transition-transform duration-[220ms] ease-[var(--saida)] group-hover:translate-x-1" />
+                <Seta className="h-[18px] w-[18px] transition-transform duration-[var(--duration-medium)] ease-[var(--ease-out)] group-hover:translate-x-1" />
               </BotaoLink>
             </div>
           </div>
 
           <div
             className="cantos relative lg:col-span-5"
-            style={{ animation: "escala-suave 900ms var(--saida) 200ms backwards" }}
+            style={{ animation: "escala-suave 900ms var(--ease-out) 200ms backwards" }}
           >
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--grafite)] sm:aspect-[16/10] lg:aspect-[4/5]">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-surface)] sm:aspect-[16/10] lg:aspect-[4/5]">
               <Image
                 src="/img/obra-3.jpg"
                 alt="Equipe da Engetec instalando um poste de energia elétrica"
@@ -84,33 +65,29 @@ export function Hero() {
                 className="absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(200deg, rgba(16,17,20,0) 45%, rgba(16,17,20,0.55) 100%)",
+                    "linear-gradient(200deg, rgba(16,13,12,0) 48%, rgba(16,13,12,0.55) 100%)",
                 }}
                 aria-hidden="true"
               />
             </div>
-            <span
-              className="absolute -left-px bottom-0 top-0 w-[3px] bg-[var(--engetec-vermelho)]"
-              aria-hidden="true"
-            />
           </div>
         </div>
 
-        <dl className="grid grid-cols-1 border-t border-[var(--linha-escura-fraca)] sm:grid-cols-3">
+        <dl className="grid grid-cols-1 border-t border-[var(--color-border-hairline)] sm:grid-cols-3">
           {fatos.map((fato, indice) => (
             <div
               key={fato.rotulo}
-              className="border-b border-[var(--linha-escura-fraca)] py-6 sm:border-b-0 sm:py-8 sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:border-l-[var(--linha-escura-fraca)] sm:[&:not(:first-child)]:pl-8"
+              className="border-b border-[var(--color-border-hairline)] py-7 sm:border-b-0 sm:py-9 sm:[&:not(:first-child)]:border-l sm:[&:not(:first-child)]:border-l-[var(--color-border-hairline)] sm:[&:not(:first-child)]:pl-8"
               style={{
-                animation: `surgir 640ms var(--saida) ${420 + indice * 90}ms backwards`,
+                animation: `surgir 640ms var(--ease-out) ${420 + indice * 90}ms backwards`,
               }}
             >
               <dt className="sr-only">{fato.rotulo}</dt>
               <dd>
-                <span className="block text-2xl font-bold tracking-[-0.03em] text-[var(--engetec-amarelo)] sm:text-[1.75rem]">
+                <span className="block text-[length:var(--text-subheading)] font-medium leading-none tracking-[var(--tracking-subheading)] text-[var(--color-text-primary)]">
                   {fato.valor}
                 </span>
-                <span className="mt-1 block font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-[var(--texto-inverso-suave)]">
+                <span className="estatistica-rotulo mt-2 block">
                   {fato.rotulo}
                 </span>
               </dd>

@@ -11,7 +11,6 @@ const indicadores = [
   },
   {
     valor: empresa.anosAtuacao,
-    sufixo: "",
     rotulo: "anos de atuação",
     nota: "no mercado de instalações elétricas",
   },
@@ -22,41 +21,45 @@ const indicadores = [
   },
 ];
 
-export function Numeros() {
+/**
+ * Statistic Counter: único lugar do sistema onde o amarelo aparece em escala.
+ * Três colunas divididas por hairline, contagem ao entrar na viewport.
+ */
+export function Numeros({
+  superficie = "profunda",
+}: {
+  superficie?: "base" | "profunda";
+}) {
   return (
     <section
-      className="secao-escura relative overflow-hidden bg-[var(--engetec-vermelho)] text-white"
+      className="py-16 md:py-20 lg:py-[120px]"
+      style={{
+        backgroundColor:
+          superficie === "profunda"
+            ? "var(--color-background-deep)"
+            : "var(--color-background)",
+      }}
       aria-label="Números da Engetec"
     >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.14]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(115deg, rgba(255,255,255,0.5) 0 1px, transparent 1px 46px)",
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="envoltorio relative">
-        <dl className="grid grid-cols-1 divide-y divide-white/20 md:grid-cols-3 md:divide-x md:divide-y-0">
+      <div className="envoltorio">
+        <dl className="grid grid-cols-1 divide-y divide-[var(--color-border)] md:grid-cols-3 md:divide-x md:divide-y-0">
           {indicadores.map((indicador, indice) => (
             <Revelar
               key={indicador.rotulo}
               atraso={indice * 110}
-              className="py-10 md:py-14 md:[&:not(:first-child)]:pl-10"
+              className="py-10 md:py-0 md:[&:not(:first-child)]:pl-10"
             >
               <dt className="sr-only">{indicador.rotulo}</dt>
               <dd>
                 <Contador
                   valor={indicador.valor}
                   prefixo={indicador.prefixo}
-                  sufixo={indicador.sufixo}
-                  className="block text-[3.25rem] font-extrabold leading-none tracking-[-0.045em] md:text-[4.25rem]"
+                  className="estatistica block"
                 />
-                <span className="mt-4 block text-lg font-semibold tracking-[-0.02em]">
+                <span className="mt-5 block text-[length:var(--text-subheading)] font-medium tracking-[var(--tracking-subheading)] text-[var(--color-text-primary)]">
                   {indicador.rotulo}
                 </span>
-                <span className="mt-1.5 block font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-white/75">
+                <span className="estatistica-rotulo mt-2 block">
                   {indicador.nota}
                 </span>
               </dd>

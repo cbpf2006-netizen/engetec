@@ -1,25 +1,27 @@
 import { processo } from "@/lib/empresa";
 import { Revelar } from "@/components/ui/Revelar";
 
+/**
+ * O trilho horizontal é uma das ocorrências permitidas do gradiente assinatura:
+ * fio de 2px que se desenha da esquerda para a direita ao entrar na viewport.
+ */
 export function Processo() {
   return (
-    <section className="bg-[var(--papel)] py-20 md:py-28">
+    <section className="bg-[var(--color-background-deep)] py-16 md:py-20 lg:py-[120px]">
       <div className="envoltorio">
-        <Revelar className="max-w-[36rem]">
-          <p className="rotulo text-[var(--texto-suave)]">Como funciona</p>
+        <Revelar>
+          <p className="rotulo">Como funciona</p>
           <h2 className="titulo-secao mt-6">Do primeiro contato à execução</h2>
         </Revelar>
 
         <div className="relative mt-14">
-          {/* A trilha vai do centro do primeiro número ao centro do último:
-              3 colunas de largura + 3 gaps (2rem) * 0.75 + meio círculo. */}
           <span
-            className="absolute left-0 top-[1.375rem] hidden h-px w-[calc(75%+2.875rem)] bg-[var(--linha-clara)] lg:block"
+            className="absolute left-0 top-[22px] hidden h-px w-[calc(75%+2.875rem)] bg-[var(--color-border)] lg:block"
             aria-hidden="true"
           />
           <Revelar
             tipo="traco"
-            className="absolute left-0 top-[1.375rem] hidden h-[2px] w-[calc(75%+2.875rem)] bg-[var(--engetec-vermelho)] lg:block"
+            className="absolute left-0 top-[22px] hidden h-[2px] w-[calc(75%+2.875rem)] bg-[image:var(--gradient-corrente)] lg:block"
           >
             <span className="sr-only" />
           </Revelar>
@@ -33,14 +35,14 @@ export function Processo() {
                 className="relative lg:pr-6"
               >
                 <div className="flex items-center gap-4 lg:block">
-                  <span className="relative z-10 flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[var(--tinta)] font-mono text-[0.8125rem] font-medium text-[var(--engetec-amarelo)]">
+                  <span className="relative z-10 flex h-11 w-11 flex-none items-center justify-center rounded-[var(--radius-small)] bg-[var(--color-surface)] font-mono text-[length:var(--text-meta)] font-medium tracking-[var(--tracking-meta)] text-[var(--color-secondary)]">
                     {etapa.numero}
                   </span>
-                  <h3 className="text-[1.125rem] font-bold tracking-[-0.02em] lg:mt-6">
+                  <h3 className="text-[length:var(--text-subheading)] font-medium tracking-[var(--tracking-subheading)] text-[var(--color-text-primary)] lg:mt-7">
                     {etapa.titulo}
                   </h3>
                 </div>
-                <p className="mt-3 text-[0.9375rem] leading-relaxed text-[var(--texto-suave)]">
+                <p className="corpo mt-4 text-[length:var(--text-ui)]">
                   {etapa.texto}
                 </p>
               </Revelar>

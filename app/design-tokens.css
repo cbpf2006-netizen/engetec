@@ -1,11 +1,10 @@
 /* =============================================================================
    Engetec Design System — tokens canônicos
-   Cópia de referência da skill `engetec-design-system`.
+   Implementação canônica. Espelho de .claude/skills/engetec-design-system/reference/tokens.css
 
-   Esta é a FONTE ÚNICA de valores visuais. Ao implementar no projeto, copie
-   este arquivo para `app/design-tokens.css` e importe em `app/globals.css`.
-   Nenhum outro arquivo pode declarar token de cor, tipografia, espaçamento,
-   raio, movimento ou layout.
+   Esta é a FONTE ÚNICA de valores visuais do projeto. Nenhum outro arquivo
+   pode declarar token de cor, tipografia, espaçamento, raio, movimento ou
+   layout. Ao alterar algo aqui, atualize também a cópia na skill.
    ========================================================================== */
 
 :root {

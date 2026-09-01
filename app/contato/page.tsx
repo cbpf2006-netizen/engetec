@@ -33,43 +33,47 @@ export default function PaginaContato() {
         }
       />
 
-      <section className="bg-[var(--papel)] py-20 md:py-28">
+      <section className="bg-[var(--color-background-deep)] py-16 md:py-20 lg:py-[120px]">
+        <div className="envoltorio">
+          <Revelar className="max-w-[36rem]">
+            <p className="rotulo">Canais diretos</p>
+            <h2 className="titulo-secao mt-6">
+              Escolha como prefere falar com a gente
+            </h2>
+          </Revelar>
+
+          <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
+              <CanaisContato celula="var(--color-background-deep)" />
+            </div>
+            <Revelar atraso={140} className="lg:col-span-5">
+              <Mapa className="h-full min-h-[22rem]" />
+            </Revelar>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[var(--color-background)] py-16 md:py-20 lg:py-[120px]">
         <div className="envoltorio">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-7">
-              <Revelar>
-                <p className="rotulo text-[var(--texto-suave)]">Canais diretos</p>
-                <h2 className="titulo-secao mt-6 max-w-[16ch]">
-                  Escolha como prefere falar com a gente
-                </h2>
-              </Revelar>
+            <Revelar className="lg:col-span-5">
+              <p className="rotulo">Orçamento</p>
+              <h2 className="titulo-secao mt-6">
+                Descreva o serviço e receba o orçamento
+              </h2>
+              <p className="corpo mt-6">
+                Preencha os campos e a mensagem abre pronta no WhatsApp, com tudo
+                que a equipe precisa saber para avaliar.
+              </p>
+            </Revelar>
 
-              <div className="mt-10">
-                <CanaisContato />
-              </div>
-
-              <Revelar atraso={140} className="mt-8">
-                <Mapa className="h-[22rem]" />
-              </Revelar>
-            </div>
-
-            <div className="lg:col-span-5">
-              <Revelar
-                tipo="escala"
-                className="rounded-[var(--raio)] border border-[var(--linha-clara)] bg-white p-6 md:p-8"
-              >
-                <h2 className="text-[1.5rem] font-bold tracking-[-0.03em]">
-                  Solicitar orçamento
-                </h2>
-                <p className="mt-2 text-[0.9375rem] leading-relaxed text-[var(--texto-suave)]">
-                  Preencha os campos e a mensagem abre pronta no WhatsApp.
-                </p>
-
-                <div className="mt-7">
-                  <Formulario />
-                </div>
-              </Revelar>
-            </div>
+            <Revelar
+              tipo="escala"
+              atraso={120}
+              className="rounded-[var(--radius-card)] bg-[var(--color-surface)] p-7 md:p-12 lg:col-span-7"
+            >
+              <Formulario />
+            </Revelar>
           </div>
         </div>
       </section>
