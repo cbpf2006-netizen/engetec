@@ -29,7 +29,9 @@ export const empresa = {
     completo:
       "Estrada Araruama Rio Bonito, Lot 11A, Paracatu, Araruama - RJ",
   },
-  site: "https://engetec.vercel.app",
+  // engetec.vercel.app já está tomado por outra conta Vercel, então a URL
+  // pública do projeto é esta. Trocar quando o domínio próprio for apontado.
+  site: "https://engetec-caua18.vercel.app",
 } as const;
 
 export const mensagemPadraoWhatsapp =
