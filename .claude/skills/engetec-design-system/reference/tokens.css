@@ -1,0 +1,519 @@
+/* =============================================================================
+   Engetec Design System — tokens canônicos
+   Cópia de referência da skill `engetec-design-system`.
+
+   Esta é a FONTE ÚNICA de valores visuais. Ao implementar no projeto, copie
+   este arquivo para `app/design-tokens.css` e importe em `app/globals.css`.
+   Nenhum outro arquivo pode declarar token de cor, tipografia, espaçamento,
+   raio, movimento ou layout.
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------------
+     COR — Marca
+     Vermelho domina, amarelo pontua. Âmbar existe só dentro de gradiente.
+     --------------------------------------------------------------------- */
+  --color-primary: #e01b22;
+  --color-primary-dark: #b01218;
+  --color-primary-light: #ff4b4f;
+
+  --color-secondary: #ffc400;
+  --color-secondary-dark: #d9a600;
+  --color-secondary-light: #ffdb5c;
+
+  --color-accent: #f7941d;
+
+  /* ---------------------------------------------------------------------
+     COR — Superfícies
+     Pilha de grafite com viés quente. Profundidade vem daqui, nunca de sombra.
+     --------------------------------------------------------------------- */
+  --color-background-deep: #100d0c;
+  --color-background: #171413;
+  --color-surface: #221d1b;
+  --color-surface-raised: #2e2724;
+  --color-surface-inactive: #6e6866;
+
+  /* ---------------------------------------------------------------------
+     COR — Texto
+     Conteúdo é acromático. Cor cromática não carrega leitura.
+     --------------------------------------------------------------------- */
+  --color-text-primary: #ffffff;
+  --color-text-emphasis: #fbf6f4;
+  --color-text-secondary: #b6adab;
+  --color-text-tertiary: #efedec;
+  --color-text-muted: #6e6866;
+
+  /* ---------------------------------------------------------------------
+     COR — Bordas
+     --------------------------------------------------------------------- */
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-border-hairline: rgba(255, 255, 255, 0.055);
+
+  /* ---------------------------------------------------------------------
+     COR — Gradientes
+     Só fio, aresta, trilho e regra de até 4px. Nunca fundo, botão ou texto.
+     Máximo três ocorrências por página.
+     --------------------------------------------------------------------- */
+  --gradient-corrente: linear-gradient(
+    90deg,
+    #e01b22 0%,
+    #f7941d 58%,
+    #ffc400 100%
+  );
+  --gradient-descarga: linear-gradient(
+    90deg,
+    #ffc400 0%,
+    #ffdb5c 40%,
+    #fff3c4 100%
+  );
+
+  /* ---------------------------------------------------------------------
+     TIPOGRAFIA — Famílias
+     Duas famílias. Nunca uma terceira.
+     --------------------------------------------------------------------- */
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* ---------------------------------------------------------------------
+     TIPOGRAFIA — Pesos
+     Só 400 e 500 existem. 600+ e 300- são banidos.
+     --------------------------------------------------------------------- */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+
+  /* ---------------------------------------------------------------------
+     TIPOGRAFIA — Escala
+     Tracking positivo só em MAIÚSCULA. line-height 1 acima de 36px.
+     --------------------------------------------------------------------- */
+  --text-caption: 10px;
+  --leading-caption: 1.4;
+  --tracking-caption: 0.15em;
+
+  --text-label: 12px;
+  --leading-label: 1.4;
+  --tracking-label: 0.12em;
+
+  --text-meta: 13px;
+  --leading-meta: 1.4;
+  --tracking-meta: 0.055em;
+
+  --text-ui: 14px;
+  --leading-ui: 1.43;
+
+  --text-body: 16px;
+  --leading-body: 1.4;
+
+  --text-label-lg: 20px;
+  --leading-label-lg: 1.4;
+  --tracking-label-lg: 0.08em;
+
+  --text-subheading: 24px;
+  --leading-subheading: 1.3;
+  --tracking-subheading: -0.02em;
+
+  --text-heading: 36px;
+  --leading-heading: 1;
+  --tracking-heading: -0.03em;
+
+  --text-heading-lg: 61px;
+  --leading-heading-lg: 1;
+  --tracking-heading-lg: -0.04em;
+
+  --text-display: 96px;
+  --leading-display: 1;
+  --tracking-display: -0.04em;
+
+  --text-kinetic: 240px;
+  --leading-kinetic: 1;
+  --tracking-kinetic: -0.046em;
+
+  /* Escala fluida — títulos nunca são tamanho fixo */
+  --fluid-h1: clamp(2.5rem, 1.4rem + 4.6vw, 6rem);
+  --fluid-h2: clamp(2rem, 1.3rem + 2.9vw, 3.8rem);
+  --fluid-h3: clamp(1.5rem, 1.2rem + 1.3vw, 2.25rem);
+  --fluid-stat: clamp(3rem, 2rem + 4vw, 5.4rem);
+  --fluid-kinetic: clamp(4.5rem, 2rem + 12vw, 15rem);
+
+  /* Largura de linha */
+  --measure-prose: 68ch;
+  --measure-title: 17ch;
+
+  /* ---------------------------------------------------------------------
+     ESPAÇAMENTO — base 4px, densidade spacious
+     Só estes valores existem. Nada de 18, 30, 52.
+     --------------------------------------------------------------------- */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-28: 28px;
+  --spacing-32: 32px;
+  --spacing-36: 36px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-120: 120px;
+  --spacing-140: 140px;
+  --spacing-160: 160px;
+
+  /* ---------------------------------------------------------------------
+     LAYOUT
+     --------------------------------------------------------------------- */
+  --page-max-width: 1440px;
+  --content-max-width: 1140px;
+  --prose-max-width: 600px;
+  --section-gap: 68px;
+  --gutter-desktop: 40px;
+  --gutter-tablet: 32px;
+  --gutter-mobile: 20px;
+
+  --section-padding-desktop: var(--spacing-120);
+  --section-padding-tablet: var(--spacing-80);
+  --section-padding-mobile: var(--spacing-64);
+
+  --card-padding: var(--spacing-48);
+  --card-padding-compact: var(--spacing-36);
+  --element-gap: var(--spacing-20);
+
+  /* ---------------------------------------------------------------------
+     RAIO — vocabulário completo de forma, exatamente dois valores
+     --------------------------------------------------------------------- */
+  --radius-card: 16px;
+  --radius-small: 6px;
+
+  /* ---------------------------------------------------------------------
+     MOVIMENTO
+     Anime só transform e opacity. UI abaixo de 300ms.
+     --------------------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 160ms;
+  --duration-medium: 260ms;
+  --duration-slow: 620ms;
+  --duration-image: 700ms;
+  --stagger-step: 70ms;
+
+  /* ---------------------------------------------------------------------
+     CAMADAS — escala semântica, nunca 999 ou 9999
+     --------------------------------------------------------------------- */
+  --z-base: 0;
+  --z-sticky: 40;
+  --z-floating: 50;
+  --z-menu: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+
+  /* ---------------------------------------------------------------------
+     FOCO
+     --------------------------------------------------------------------- */
+  --focus-ring: 2px solid var(--color-secondary);
+  --focus-offset: 3px;
+}
+
+/* =============================================================================
+   Ponte para o Tailwind v4
+   Copie este bloco para `app/globals.css` logo abaixo de `@import "tailwindcss"`.
+   ========================================================================== */
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-primary-light: var(--color-primary-light);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-dark: var(--color-secondary-dark);
+  --color-secondary-light: var(--color-secondary-light);
+  --color-accent: var(--color-accent);
+
+  --color-background-deep: var(--color-background-deep);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-emphasis: var(--color-text-emphasis);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --radius-card: var(--radius-card);
+  --radius-small: var(--radius-small);
+}
+
+/* =============================================================================
+   Primitivas obrigatórias
+   Estas classes implementam padrões que a skill exige em toda página.
+   ========================================================================== */
+
+/* Container de página */
+.envoltorio {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter-mobile);
+}
+
+@media (min-width: 640px) {
+  .envoltorio {
+    padding-inline: var(--gutter-tablet);
+  }
+}
+
+@media (min-width: 1280px) {
+  .envoltorio {
+    padding-inline: var(--gutter-desktop);
+  }
+}
+
+/* Rótulo de seção — assinatura do sistema, abre toda seção estruturada */
+.rotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.rotulo::before {
+  content: "";
+  flex: none;
+  width: 28px;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+@media (max-width: 420px) {
+  .rotulo {
+    font-size: var(--text-caption);
+    letter-spacing: 0.11em;
+    gap: 8px;
+  }
+
+  .rotulo::before {
+    width: 18px;
+  }
+}
+
+/* Escala de título */
+.titulo-hero {
+  font-size: var(--fluid-h1);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  max-width: var(--measure-title);
+  text-wrap: balance;
+}
+
+.titulo-secao {
+  font-size: var(--fluid-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-heading-lg);
+  letter-spacing: var(--tracking-heading-lg);
+  max-width: var(--measure-title);
+  text-wrap: balance;
+}
+
+.titulo-card {
+  font-size: var(--fluid-h3);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+/* Corpo */
+.corpo {
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-body);
+  max-width: var(--measure-prose);
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+
+/* Estatística — único uso de amarelo em escala */
+.estatistica {
+  font-size: var(--fluid-stat);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  letter-spacing: var(--tracking-kinetic);
+  color: var(--color-secondary);
+}
+
+.estatistica-rotulo {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  letter-spacing: var(--tracking-meta);
+  text-transform: uppercase;
+  color: var(--color-text-emphasis);
+}
+
+/* Malha técnica de fundo */
+.malha {
+  background-image:
+    linear-gradient(var(--color-border-hairline) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border-hairline) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+
+/* Grade hairline — agrupa sem elevar e sem borda por célula */
+.grade-hairline {
+  display: grid;
+  gap: 1px;
+  background: var(--color-border-hairline);
+}
+
+.grade-hairline > * {
+  background: var(--color-background);
+}
+
+/* Regra de assinatura — única superfície onde o gradiente aparece */
+.regra-corrente {
+  height: 3px;
+  background: var(--gradient-corrente);
+}
+
+/* Cantos técnicos do Photo Frame */
+.cantos {
+  position: relative;
+}
+
+.cantos::before,
+.cantos::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border-style: solid;
+  border-color: var(--color-secondary);
+  pointer-events: none;
+}
+
+.cantos::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+
+.cantos::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Foco */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* =============================================================================
+   Revelação por scroll
+   Estado inicial no CSS para que reduced-motion nunca esconda conteúdo.
+   ========================================================================== */
+
+[data-revelar] {
+  opacity: 0;
+}
+
+[data-revelar="baixo"] {
+  transform: translate3d(0, 18px, 0);
+}
+
+[data-revelar="lado"] {
+  transform: translate3d(-18px, 0, 0);
+}
+
+[data-revelar="escala"] {
+  transform: scale(0.965);
+}
+
+[data-revelar="traco"] {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+[data-revelar][data-visivel="true"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+  transition-delay: var(--atraso, 0ms);
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes escala-suave {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulso-corrente {
+  0% {
+    opacity: 0;
+    offset-distance: 0%;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    offset-distance: 100%;
+  }
+}
+
+/* =============================================================================
+   Reduced motion — obrigatório, sem exceção
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-revelar] {
+    opacity: 1;
+    transform: none;
+  }
+}
