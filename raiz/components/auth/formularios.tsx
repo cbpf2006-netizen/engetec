@@ -1,0 +1,213 @@
+"use client";
+
+import { useActionState } from "react";
+import Link from "next/link";
+
+import { Aviso, BotaoEnviar, CampoSenha, CampoTexto } from "./campos";
+import {
+  cadastrar,
+  definirNovaSenha,
+  entrar,
+  pedirRecuperacao,
+  type EstadoFormulario,
+} from "@/lib/acoes/autenticacao";
+
+/* =============================================================================
+   Formulários de acesso
+
+   Todos usam `useActionState` com a Server Action como `action` do <form>:
+   o envio funciona mesmo antes do JavaScript hidratar, e o estado de erro
+   volta do servidor já pronto para exibir.
+   ========================================================================== */
+
+const ERRO_INICIAL: EstadoFormulario = null;
+
+export function FormularioEntrar({
+  destino,
+  linkInvalido,
+}: {
+  destino?: string;
+  linkInvalido?: boolean;
+}) {
+  const [estado, acao] = useActionState(entrar, ERRO_INICIAL);
+
+  return (
+    <form action={acao} className="flex flex-col gap-4">
+      {linkInvalido && !estado?.erro && (
+        <Aviso tipo="erro">
+          Esse link já foi usado ou expirou. Peça um novo e-mail para continuar.
+        </Aviso>
+      )}
+      {estado?.erro && <Aviso tipo="erro">{estado.erro}</Aviso>}
+
+      {destino && <input type="hidden" name="destino" value={destino} />}
+
+      <CampoTexto
+        id="email"
+        rotulo="E-mail"
+        type="email"
+        autoComplete="email"
+        placeholder="voce@exemplo.com"
+        required
+        autoFocus
+        erro={estado?.campo === "email" ? estado.erro : undefined}
+      />
+
+      <CampoSenha
+        autoComplete="current-password"
+        required
+        acao={
+          <Link
+            href="/recuperar"
+            className="rounded text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            Esqueci a senha
+          </Link>
+        }
+      />
+
+      <BotaoEnviar carregando="Entrando…">Entrar</BotaoEnviar>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Ainda não tem conta?{" "}
+        <Link
+          href="/cadastro"
+          className="rounded font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          Criar conta
+        </Link>
+      </p>
+    </form>
+  );
+}
+
+export function FormularioCadastro() {
+  const [estado, acao] = useActionState(cadastrar, ERRO_INICIAL);
+
+  if (estado?.aviso) {
+    return (
+      <div className="flex flex-col gap-4">
+        <Aviso tipo="sucesso">{estado.aviso}</Aviso>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Depois de confirmar, volte aqui e entre com seu e-mail e senha.
+        </p>
+        <Link
+          href="/login"
+          className="rounded text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          Ir para a tela de entrada
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <form action={acao} className="flex flex-col gap-4">
+      {estado?.erro && <Aviso tipo="erro">{estado.erro}</Aviso>}
+
+      <CampoTexto
+        id="nome"
+        rotulo="Nome"
+        autoComplete="name"
+        placeholder="Como podemos te chamar"
+        required
+        autoFocus
+        maxLength={60}
+        erro={estado?.campo === "nome" ? estado.erro : undefined}
+      />
+
+      <CampoTexto
+        id="email"
+        rotulo="E-mail"
+        type="email"
+        autoComplete="email"
+        placeholder="voce@exemplo.com"
+        required
+        erro={estado?.campo === "email" ? estado.erro : undefined}
+      />
+
+      <CampoSenha
+        autoComplete="new-password"
+        required
+        minLength={8}
+        dica="Pelo menos 8 caracteres."
+        erro={estado?.campo === "senha" ? estado.erro : undefined}
+      />
+
+      <BotaoEnviar carregando="Criando conta…">Criar conta</BotaoEnviar>
+
+      <p className="text-center text-sm text-muted-foreground">
+        Já tem conta?{" "}
+        <Link
+          href="/login"
+          className="rounded font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          Entrar
+        </Link>
+      </p>
+    </form>
+  );
+}
+
+export function FormularioRecuperar() {
+  const [estado, acao] = useActionState(pedirRecuperacao, ERRO_INICIAL);
+
+  return (
+    <form action={acao} className="flex flex-col gap-4">
+      {estado?.erro && <Aviso tipo="erro">{estado.erro}</Aviso>}
+      {estado?.aviso && <Aviso tipo="sucesso">{estado.aviso}</Aviso>}
+
+      <CampoTexto
+        id="email"
+        rotulo="E-mail da conta"
+        type="email"
+        autoComplete="email"
+        placeholder="voce@exemplo.com"
+        required
+        autoFocus
+      />
+
+      <BotaoEnviar carregando="Enviando…">Enviar link de recuperação</BotaoEnviar>
+
+      <p className="text-center text-sm text-muted-foreground">
+        <Link
+          href="/login"
+          className="rounded font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          Voltar para a entrada
+        </Link>
+      </p>
+    </form>
+  );
+}
+
+export function FormularioNovaSenha() {
+  const [estado, acao] = useActionState(definirNovaSenha, ERRO_INICIAL);
+
+  return (
+    <form action={acao} className="flex flex-col gap-4">
+      {estado?.erro && <Aviso tipo="erro">{estado.erro}</Aviso>}
+
+      <CampoSenha
+        rotulo="Nova senha"
+        autoComplete="new-password"
+        required
+        minLength={8}
+        autoFocus
+        dica="Pelo menos 8 caracteres."
+        erro={estado?.campo === "senha" ? estado.erro : undefined}
+      />
+
+      <CampoSenha
+        id="confirmacao"
+        rotulo="Repita a nova senha"
+        autoComplete="new-password"
+        required
+        minLength={8}
+        erro={estado?.campo === "confirmacao" ? estado.erro : undefined}
+      />
+
+      <BotaoEnviar carregando="Salvando…">Salvar nova senha</BotaoEnviar>
+    </form>
+  );
+}
