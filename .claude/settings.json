@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(vercel whoami *)",
+      "Bash(supabase projects *)",
+      "Bash(npm list *)",
+      "Bash(env)",
+      "Bash(vercel login *)",
+      "Bash(vercel projects *)"
+    ]
+  }
+}
