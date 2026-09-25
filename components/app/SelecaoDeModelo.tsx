@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icone, SeloModelo } from "@/components/Icone";
-import { CORES, ICONES, corDoModelo } from "@/lib/catalogo";
+import { CORES, ICONES_POR_FLUXO, corDoModelo } from "@/lib/catalogo";
 import { criarModelo } from "@/lib/acoes/modelos";
 import { ROTULO_FLUXO, type Fluxo, type Modelo } from "@/lib/tipos";
 
@@ -179,7 +179,7 @@ function CriacaoRapida({
         </Button>
       </div>
 
-      <EscolhaDeIcone valor={icone} aoMudar={setIcone} />
+      <EscolhaDeIcone fluxo={fluxo} valor={icone} aoMudar={setIcone} />
       <EscolhaDeCor valor={cor} aoMudar={setCor} />
 
       <Button type="button" size="lg" disabled={!nome.trim() || enviando} onClick={salvar}>
@@ -190,17 +190,20 @@ function CriacaoRapida({
 }
 
 export function EscolhaDeIcone({
+  fluxo,
   valor,
   aoMudar,
 }: {
+  fluxo: Fluxo;
   valor: string;
   aoMudar: (icone: string) => void;
 }) {
+  const icones = ICONES_POR_FLUXO[fluxo];
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-muted-foreground">Ícone</span>
       <div className="rolagem-fina flex max-h-24 flex-wrap gap-1 overflow-y-auto">
-        {ICONES.map((apelido) => (
+        {icones.map((apelido) => (
           <button
             key={apelido}
             type="button"

@@ -90,6 +90,12 @@ export const ICONES = [
   "circulo",
 ] as const;
 
+export const ICONES_POR_FLUXO = {
+  entrada: ["salario", "presente", "notebook", "moeda", "banco"] as const,
+  saida: ["mercado", "casa", "saude", "educacao", "lazer", "combustivel", "restaurante", "roupa", "internet", "cartao"] as const,
+  investimento: ICONES,
+} as const;
+
 export type ApelidoIcone = (typeof ICONES)[number];
 
 export function ehIcone(valor: string): valor is ApelidoIcone {

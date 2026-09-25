@@ -115,11 +115,6 @@ export async function PaginaDeFluxo({
           rotulo: "vs. período anterior",
           melhorSubindo: textos.melhorSubindo,
         }}
-        contexto={
-          lancamentos.length === 0
-            ? "Nenhum lançamento no período."
-            : `${lancamentos.length} lançamento${lancamentos.length > 1 ? "s" : ""} em ${distribuicao.length} modelo${distribuicao.length > 1 ? "s" : ""}.`
-        }
       />
 
       {distribuicao.length > 0 && (
@@ -127,7 +122,6 @@ export async function PaginaDeFluxo({
           <Bloco
             className="lg:col-span-3"
             titulo={textos.distribuicaoTitulo}
-            descricao="Do maior para o menor, com a fatia de cada modelo."
           >
             <Distribuicao fatias={distribuicao} />
           </Bloco>
@@ -135,7 +129,6 @@ export async function PaginaDeFluxo({
           <Bloco
             className="lg:col-span-2"
             titulo="Visão geral"
-            descricao={`Participação de cada modelo nas ${ROTULO_FLUXO_PLURAL[fluxo].toLowerCase()}.`}
           >
             <RoscaDeDistribuicao
               fatias={distribuicao}

@@ -3,6 +3,7 @@ import { Inter, IBM_Plex_Mono } from "next/font/google";
 
 import { TemaProvedor } from "@/components/TemaProvedor";
 import { Toaster } from "@/components/ui/sonner";
+import { RegistroServiceWorker } from "@/components/RegistroServiceWorker";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   description:
     "Acompanhe entradas, saídas, investimentos e contas a pagar em um só lugar, com o saldo sempre em dia.",
   applicationName: "Raiz",
-  // Dados financeiros pessoais não têm nada a fazer em buscador.
+  manifest: "/manifest.json",
   robots: { index: false, follow: false },
 };
 
@@ -53,6 +54,7 @@ export default function LayoutRaiz({ children }: { children: React.ReactNode }) 
         <TemaProvedor>
           {children}
           <Toaster position="top-center" offset={16} mobileOffset={12} />
+          <RegistroServiceWorker />
         </TemaProvedor>
       </body>
     </html>

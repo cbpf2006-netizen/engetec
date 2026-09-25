@@ -1,0 +1,33 @@
+{
+  "name": "Raiz — organização financeira pessoal",
+  "short_name": "Raiz",
+  "description": "Acompanhe entradas, saídas, investimentos e contas a pagar em um só lugar.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#15803d",
+  "background_color": "#f4f7f5",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "270x270",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "270x270",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["finance"],
+  "screenshots": [
+    {
+      "src": "/icon.png",
+      "sizes": "270x270",
+      "form_factor": "narrow"
+    }
+  ]
+}

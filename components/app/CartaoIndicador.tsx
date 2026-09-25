@@ -135,7 +135,7 @@ function Comparacao({
   melhorSubindo?: boolean;
 }) {
   if (fracao === null) {
-    return <p className="text-xs text-muted-foreground">Sem período anterior para comparar</p>;
+    return null;
   }
 
   const subiu = fracao > 0;

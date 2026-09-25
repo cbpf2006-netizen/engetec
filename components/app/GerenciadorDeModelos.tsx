@@ -104,6 +104,7 @@ export function GerenciadorDeModelos({
           {[...ativos, ...arquivados].map((modelo) => (
             <Linha
               key={modelo.id}
+              fluxo={fluxo}
               modelo={modelo}
               usos={usoPorModelo[modelo.id] ?? 0}
               aoEditar={() => setEmEdicao(modelo)}
@@ -162,11 +163,13 @@ export function GerenciadorDeModelos({
 }
 
 function Linha({
+  fluxo,
   modelo,
   usos,
   aoEditar,
   aoExcluir,
 }: {
+  fluxo: Fluxo;
   modelo: Modelo;
   usos: number;
   aoEditar: () => void;
@@ -225,10 +228,12 @@ function Linha({
             <Pencil />
             Editar
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={alternarArquivo}>
-            {modelo.arquivado ? <ArchiveRestore /> : <Archive />}
-            {modelo.arquivado ? "Reativar" : "Arquivar"}
-          </DropdownMenuItem>
+          {fluxo === "investimento" && (
+            <DropdownMenuItem onClick={alternarArquivo}>
+              {modelo.arquivado ? <ArchiveRestore /> : <Archive />}
+              {modelo.arquivado ? "Reativar" : "Arquivar"}
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem variant="destructive" onClick={aoExcluir}>
             <Trash2 />
             Excluir
@@ -344,7 +349,7 @@ function FormularioDeModelo({
         {erro && <p className="text-xs text-destructive">{erro}</p>}
       </div>
 
-      <EscolhaDeIcone valor={icone} aoMudar={setIcone} />
+      <EscolhaDeIcone fluxo={fluxo} valor={icone} aoMudar={setIcone} />
       <EscolhaDeCor valor={cor} aoMudar={setCor} />
 
       <DialogFooter className="-mx-5 -mb-5 px-5 py-4">

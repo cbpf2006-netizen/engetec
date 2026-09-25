@@ -119,7 +119,7 @@ export function BarraDePeriodo({ periodo }: { periodo: Periodo }) {
               aria-selected={periodo.preset === preset.valor}
               onClick={() => irPara(trocarPreset(periodo, preset.valor))}
               className={cn(
-                "flex-1 rounded-[0.625rem] px-3 py-1.5 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
+                "min-w-fit rounded-[0.625rem] px-3 py-1.5 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                 periodo.preset === preset.valor
                   ? "bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.06)]"
