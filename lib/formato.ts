@@ -30,6 +30,8 @@ export function moeda(valor: number): string {
   return MOEDA.format(valor);
 }
 
+export const formatBRL = moeda;
+
 /** R$ 1,3 mil — só para eixos de gráfico, onde o rótulo longo não cabe. */
 export function moedaCompacta(valor: number): string {
   return MOEDA_COMPACTA.format(valor);

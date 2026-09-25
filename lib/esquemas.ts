@@ -18,25 +18,25 @@ import { falha, type Falha } from "./tipos";
 export const valor = z
   .union([z.string(), z.number()])
   .transform((entrada) => paraNumero(entrada))
-  .refine((n) => Number.isFinite(n), { error: "Informe um valor." })
-  .refine((n) => n > 0, { error: "O valor precisa ser maior que zero." })
-  .refine((n) => n <= 999_999_999.99, { error: "Valor acima do limite." })
+  .refine((n) => Number.isFinite(n), "Informe um valor.")
+  .refine((n) => n > 0, "O valor precisa ser maior que zero.")
+  .refine((n) => n <= 999_999_999.99, "Valor acima do limite.")
   .transform((n) => Math.round(n * 100) / 100);
 
 export const dataIso = z
   .string()
-  .refine(ehDataValida, { error: "Informe uma data válida." });
+  .refine(ehDataValida, "Informe uma data válida.");
 
 export const observacao = z
   .string()
   .trim()
-  .max(280, { error: "A observação passou de 280 caracteres." })
+  .max(280, "A observação passou de 280 caracteres.")
   .transform((texto) => texto || null)
   .nullable()
   .catch(null);
 
 export const modeloId = z
-  .union([z.uuid({ error: "Escolha um modelo." }), z.literal("")])
+  .union([z.string().uuid(), z.literal("")])
   .transform((v) => (v === "" ? null : v));
 
 export const fluxoTransacao = z.enum(["entrada", "saida"]);
@@ -47,7 +47,7 @@ export const fluxoTransacao = z.enum(["entrada", "saida"]);
 
 export const esquemaTransacao = z.object({
   fluxo: fluxoTransacao,
-  modelo_id: z.uuid({ error: "Escolha um modelo." }),
+  modelo_id: z.string().uuid(),
   valor,
   data: dataIso,
   observacao,
@@ -55,7 +55,7 @@ export const esquemaTransacao = z.object({
 
 export const esquemaInvestimento = z.object({
   operacao: z.enum(["aporte", "resgate"]).default("aporte"),
-  modelo_id: z.uuid({ error: "Escolha um tipo de investimento." }),
+  modelo_id: z.string().uuid(),
   valor,
   data: dataIso,
   observacao,
@@ -65,8 +65,8 @@ export const esquemaConta = z.object({
   nome: z
     .string()
     .trim()
-    .min(1, { error: "Dê um nome para a conta." })
-    .max(60, { error: "O nome passou de 60 caracteres." }),
+    .min(1, "Dê um nome para a conta.")
+    .max(60, "O nome passou de 60 caracteres."),
   modelo_id: modeloId,
   valor,
   vencimento: dataIso,
@@ -85,15 +85,15 @@ export const esquemaModelo = z.object({
   nome: z
     .string()
     .trim()
-    .min(1, { error: "Dê um nome ao modelo." })
-    .max(40, { error: "O nome passou de 40 caracteres." }),
+    .min(1, "Dê um nome ao modelo.")
+    .max(40, "O nome passou de 40 caracteres."),
   icone: z
     .string()
-    .refine((v) => apelidosDeIcone.includes(v), { error: "Ícone inválido." })
+    .refine((v) => apelidosDeIcone.includes(v), "Ícone inválido.")
     .catch("circulo"),
   cor: z
     .string()
-    .refine((v) => apelidosDeCor.includes(v), { error: "Cor inválida." })
+    .refine((v) => apelidosDeCor.includes(v), "Cor inválida.")
     .catch("verde"),
 });
 
@@ -105,24 +105,24 @@ export const esquemaEmail = z
   .string()
   .trim()
   .toLowerCase()
-  .pipe(z.email({ error: "Informe um e-mail válido." }));
+  .email("Informe um e-mail válido.");
 
 export const esquemaSenha = z
   .string()
-  .min(8, { error: "A senha precisa de pelo menos 8 caracteres." })
-  .max(72, { error: "A senha passou de 72 caracteres." });
+  .min(8, "A senha precisa de pelo menos 8 caracteres.")
+  .max(72, "A senha passou de 72 caracteres.");
 
 export const esquemaEntrar = z.object({
   email: esquemaEmail,
-  senha: z.string().min(1, { error: "Informe sua senha." }),
+  senha: z.string().min(1, "Informe sua senha."),
 });
 
 export const esquemaCadastro = z.object({
   nome: z
     .string()
     .trim()
-    .min(2, { error: "Informe seu nome." })
-    .max(60, { error: "O nome passou de 60 caracteres." }),
+    .min(2, "Informe seu nome.")
+    .max(60, "O nome passou de 60 caracteres."),
   email: esquemaEmail,
   senha: esquemaSenha,
 });
@@ -131,8 +131,8 @@ export const esquemaPerfil = z.object({
   nome: z
     .string()
     .trim()
-    .min(2, { error: "Informe seu nome." })
-    .max(60, { error: "O nome passou de 60 caracteres." }),
+    .min(2, "Informe seu nome.")
+    .max(60, "O nome passou de 60 caracteres."),
 });
 
 /** Primeira mensagem de erro de um safeParse, já no formato de resposta das
