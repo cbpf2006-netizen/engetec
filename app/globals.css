@@ -1,46 +1,302 @@
 @import "tailwindcss";
-@import "./design-tokens.css";
+@import "tw-animate-css";
+
+/* =============================================================================
+   Raiz — sistema de tokens
+
+   Claro por padrão, escuro como segundo tema completo (não uma inversão
+   automática: cada passo do modo escuro foi escolhido e validado contra a
+   superfície escura).
+
+   Os nomes em inglês (--background, --primary, --border...) existem porque
+   os primitivos em components/ui os consomem. Os nomes em português são os
+   papéis do produto (entrada, saída, investimento, séries de gráfico).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Superfícies: fundo levemente esverdeado, cartão quase branco. A
+     diferença entre os dois é o que dá relevo aos cartões sem sombra. */
+  --background: #f4f7f5;
+  --foreground: #16211c;
+
+  --card: #fcfdfc;
+  --card-foreground: #16211c;
+
+  --popover: #fcfdfc;
+  --popover-foreground: #16211c;
+
+  --primary: #15803d;
+  --primary-foreground: #fcfdfc;
+
+  --secondary: #eaf0ec;
+  --secondary-foreground: #16211c;
+
+  --muted: #eef2ef;
+  --muted-foreground: #5a6b63;
+
+  --accent: #e7f4ec;
+  --accent-foreground: #14532d;
+
+  --destructive: #c2410c;
+  --destructive-foreground: #fcfdfc;
+
+  --border: #e2e8e4;
+  --input: #d8e0da;
+  --ring: #16a34a;
+
+  /* ---------------------------------------------------------------------
+     Papéis do produto. Verde = dinheiro que entra; coral = dinheiro que
+     sai; índigo = dinheiro que virou patrimônio.
+
+     Verde x coral é justamente o par que o daltonismo deutan não separa
+     (ΔE 5.3, abaixo do alvo 8). É convenção forte demais em finanças para
+     abandonar, então em TODO lugar onde a cor distingue entrada de saída
+     há codificação secundária obrigatória: ícone de seta, rótulo textual e
+     o valor com sinal. Cor nunca é o único canal.
+     --------------------------------------------------------------------- */
+  --entrada: #16a34a;
+  --entrada-texto: #15803d;
+  --entrada-suave: #e7f4ec;
+
+  --saida: #e85d3d;
+  --saida-texto: #c2410c;
+  --saida-suave: #fdeee9;
+
+  --investimento: #4f46e5;
+  --investimento-texto: #4338ca;
+  --investimento-suave: #ecebfd;
+
+  --alerta: #d97706;
+  --alerta-texto: #b45309;
+  --alerta-suave: #fdf3e4;
+
+  /* Paleta categórica (distribuição por modelo). Ordem fixa, nunca
+     ciclada: o 9º modelo cai em "Outros" na visualização. Validada para
+     daltonismo com scripts/validate_palette.js da skill dataviz. */
+  --serie-1: #16a34a;
+  --serie-2: #0891b2;
+  --serie-3: #7c3aed;
+  --serie-4: #d97706;
+  --serie-5: #0d9488;
+  --serie-6: #e11d48;
+  --serie-7: #4f46e5;
+  --serie-8: #65a30d;
+
+  --grade: #e6ece8;
+
+  --radius: 0.875rem;
+
+  /* Curvas fortes: as embutidas do CSS são fracas demais para leitura. */
+  --saida-suave-curva: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: #0e1412;
+  --foreground: #e8efea;
+
+  --card: #151b18;
+  --card-foreground: #e8efea;
+
+  --popover: #1a221e;
+  --popover-foreground: #e8efea;
+
+  --primary: #20ab50;
+  --primary-foreground: #06120b;
+
+  --secondary: #1c2420;
+  --secondary-foreground: #e8efea;
+
+  --muted: #1a221e;
+  --muted-foreground: #96a69d;
+
+  --accent: #17301f;
+  --accent-foreground: #d7f0df;
+
+  --destructive: #e75c3c;
+  --destructive-foreground: #120805;
+
+  --border: #232d28;
+  --input: #2c3832;
+  --ring: #20ab50;
+
+  --entrada: #20ab50;
+  --entrada-texto: #45c97a;
+  --entrada-suave: #12271a;
+
+  --saida: #e75c3c;
+  --saida-texto: #f38868;
+  --saida-suave: #2a1611;
+
+  --investimento: #7170ff;
+  --investimento-texto: #9b9aff;
+  --investimento-suave: #1b1b33;
+
+  --alerta: #cf7000;
+  --alerta-texto: #e9a13c;
+  --alerta-suave: #2a1d0a;
+
+  --serie-1: #1ca74d;
+  --serie-2: #199bbd;
+  --serie-3: #9958ff;
+  --serie-4: #cf7000;
+  --serie-5: #1fa194;
+  --serie-6: #f83155;
+  --serie-7: #6e6dff;
+  --serie-8: #63a008;
+
+  --grade: #202a25;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-entrada: var(--entrada);
+  --color-entrada-texto: var(--entrada-texto);
+  --color-entrada-suave: var(--entrada-suave);
+
+  --color-saida: var(--saida);
+  --color-saida-texto: var(--saida-texto);
+  --color-saida-suave: var(--saida-suave);
+
+  --color-investimento: var(--investimento);
+  --color-investimento-texto: var(--investimento-texto);
+  --color-investimento-suave: var(--investimento-suave);
+
+  --color-alerta: var(--alerta);
+  --color-alerta-texto: var(--alerta-texto);
+  --color-alerta-suave: var(--alerta-suave);
+
+  --color-grade: var(--grade);
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
 
 /* =============================================================================
    Base
-   Todo valor visual vem de design-tokens.css. Este arquivo só aplica.
    ========================================================================== */
 
 * {
+  border-color: var(--border);
   min-width: 0;
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 96px;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-text-secondary);
-  font-family: var(--font-display);
-  font-weight: var(--font-weight-regular);
-  font-size: var(--text-body);
-  line-height: var(--leading-body);
-  font-synthesis-weight: none;
-  overflow-x: clip;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  overscroll-behavior-y: none;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 h1,
 h2,
-h3,
-h4 {
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
+h3 {
   text-wrap: balance;
+  letter-spacing: -0.02em;
 }
 
-p {
-  text-wrap: pretty;
+/* Livro-caixa: todo valor monetário do app passa por esta classe — mono com
+   largura tabular, para uma coluna de números alinhar dígito com dígito em
+   vez de "dançar" conforme a largura de cada glifo. */
+.numero {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: -0.02em;
 }
 
-::selection {
-  background: var(--color-secondary);
-  color: var(--color-background-deep);
+/* Barra de rolagem discreta — some do caminho, aparece ao passar o mouse. */
+.rolagem-fina {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =============================================================================
+   Animações de entrada — usadas com moderação, só em conteúdo que chega
+   (linhas de lista, cartões do painel). Só transform e opacity.
+   ========================================================================== */
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.surgir {
+  animation: surgir 320ms var(--ease-out) both;
+}
+
+/* Recharts injeta um outline no wrapper ao focar; e a superfície do
+   tooltip é desenhada por nós, não pela biblioteca. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
 }
