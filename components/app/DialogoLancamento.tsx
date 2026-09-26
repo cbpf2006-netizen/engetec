@@ -275,18 +275,26 @@ function Formulario({
           {[
             { rotulo: "Hoje", valor: agora },
             { rotulo: "Ontem", valor: somarDias(agora, -1) },
-          ].map((atalho) => (
-            <Button
-              key={atalho.rotulo}
-              type="button"
-              variant={data === atalho.valor ? "secondary" : "ghost"}
-              size="sm"
-              className="rounded-lg"
-              onClick={() => setData(atalho.valor)}
-            >
-              {atalho.rotulo}
-            </Button>
-          ))}
+          ].map((atalho) => {
+            const ativo = data === atalho.valor;
+            return (
+              <button
+                key={atalho.rotulo}
+                type="button"
+                aria-pressed={ativo}
+                onClick={() => setData(atalho.valor)}
+                className={cn(
+                  "h-10 rounded-xl border bg-card px-3.5 text-[0.8125rem] font-medium shadow-cartao transition-all duration-150 active:scale-[0.98]",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  ativo
+                    ? "border-transparent bg-accent text-accent-foreground ring-2 ring-primary"
+                    : "border-input text-muted-foreground hover:border-foreground/20 hover:bg-secondary/60 hover:text-foreground"
+                )}
+              >
+                {atalho.rotulo}
+              </button>
+            );
+          })}
         </div>
         {erros.data && <p className="text-xs text-destructive">{erros.data}</p>}
       </div>

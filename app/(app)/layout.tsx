@@ -64,6 +64,7 @@ export default async function LayoutDoApp({ children }: { children: React.ReactN
         <BotoesFlutuantes
           modelosDeEntrada={modelos.entrada}
           modelosDeSaida={modelos.saida}
+          modelosDeInvestimento={modelos.investimento}
         />
       </div>
     </CarteirasProvider>

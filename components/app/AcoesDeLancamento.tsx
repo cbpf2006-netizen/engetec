@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, TrendingUp } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -60,15 +60,18 @@ export function BotaoNovoLancamento({
    Ficam acima da barra de navegação do celular (nunca cobrindo um alvo de
    toque) e no canto inferior direito no desktop. Entrada é a ação primária,
    em verde cheio; saída vem em coral, com ícone de menos — sinal, cor e
-   rótulo, para o par não depender de distinguir verde de coral.
+   rótulo, para o par não depender de distinguir verde de coral. Investir
+   completa a pilha, menor que as duas: o tamanho decresce com a frequência.
    ========================================================================== */
 
 export function BotoesFlutuantes({
   modelosDeEntrada,
   modelosDeSaida,
+  modelosDeInvestimento,
 }: {
   modelosDeEntrada: Modelo[];
   modelosDeSaida: Modelo[];
+  modelosDeInvestimento: Modelo[];
 }) {
   const [aberto, setAberto] = useState<Fluxo | null>(null);
 
@@ -80,6 +83,20 @@ export function BotoesFlutuantes({
           "bottom-[calc(3.75rem+env(safe-area-inset-bottom))]"
         )}
       >
+        <button
+          type="button"
+          onClick={() => setAberto("investimento")}
+          className={cn(
+            "flex h-10 items-center gap-2 rounded-full bg-card pr-3.5 pl-2.5 text-[0.8125rem] font-semibold text-investimento-texto ring-1 ring-border",
+            "shadow-flutuante transition-transform duration-150",
+            "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          )}
+        >
+          <TrendingUp className="size-3.5" />
+          Investir
+        </button>
+
         <button
           type="button"
           onClick={() => setAberto("saida")}
@@ -120,6 +137,12 @@ export function BotoesFlutuantes({
         modelos={modelosDeSaida}
         aberto={aberto === "saida"}
         aoMudarAberto={(estaAberto) => setAberto(estaAberto ? "saida" : null)}
+      />
+      <DialogoLancamento
+        fluxo="investimento"
+        modelos={modelosDeInvestimento}
+        aberto={aberto === "investimento"}
+        aoMudarAberto={(estaAberto) => setAberto(estaAberto ? "investimento" : null)}
       />
     </>
   );
