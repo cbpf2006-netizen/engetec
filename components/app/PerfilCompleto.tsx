@@ -289,19 +289,18 @@ function BlocoDoEmail({ email }: { email: string }) {
 function BlocoDaSenha() {
   const [atual, setAtual] = useState("");
   const [nova, setNova] = useState("");
-  const [confirmacao, setConfirmacao] = useState("");
-  const [erros, setErros] = useState<{ atual?: string; nova?: string; confirmacao?: string }>({});
+  const [erros, setErros] = useState<{ atual?: string; nova?: string }>({});
   const [enviando, iniciar] = useTransition();
 
   function salvar() {
     setErros({});
 
     iniciar(async () => {
-      const resultado = await alterarSenha({ atual, nova, confirmacao });
+      const resultado = await alterarSenha({ atual, nova });
 
       if (!resultado.ok) {
-        const campo = resultado.campo as "atual" | "nova" | "confirmacao" | undefined;
-        if (campo === "atual" || campo === "nova" || campo === "confirmacao") {
+        const campo = resultado.campo as "atual" | "nova" | undefined;
+        if (campo === "atual" || campo === "nova") {
           setErros({ [campo]: resultado.erro });
         } else {
           toast.error(resultado.erro);
@@ -311,13 +310,12 @@ function BlocoDaSenha() {
 
       setAtual("");
       setNova("");
-      setConfirmacao("");
       toast.success("Senha alterada.");
     });
   }
 
   return (
-    <Bloco titulo="Senha" descricao="Para trocar, informe primeiro a senha atual.">
+    <Bloco titulo="Senha" descricao="Informe a senha atual e a nova. Não enviamos nenhum e-mail.">
       <form
         className="flex flex-col gap-4"
         onSubmit={(evento) => {
@@ -342,20 +340,11 @@ function BlocoDaSenha() {
           dica="Pelo menos 8 caracteres."
           erro={erros.nova}
         />
-        <CampoSenha
-          id="senha-confirmacao"
-          rotulo="Repita a nova senha"
-          autoComplete="new-password"
-          value={confirmacao}
-          onChange={(evento) => setConfirmacao(evento.target.value)}
-          erro={erros.confirmacao}
-        />
-
         <div>
           <Button
             type="submit"
             size="lg"
-            disabled={enviando || !atual || !nova || !confirmacao}
+            disabled={enviando || !atual || !nova}
           >
             {enviando ? "Alterando…" : "Alterar senha"}
           </Button>

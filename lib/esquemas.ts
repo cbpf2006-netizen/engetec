@@ -185,17 +185,13 @@ export const esquemaPerfil = z.object({
     .max(60, "O nome passou de 60 caracteres."),
 });
 
-/** Troca de senha: a atual é exigida para provar que quem está na tela é o
-    dono da conta, não só quem achou o celular desbloqueado. */
+/** Troca de senha: só a senha ATUAL e a nova. A atual prova que quem está na
+    tela é o dono da conta, não só quem achou o celular desbloqueado; nenhum
+    e-mail, código ou link entra no caminho. */
 export const esquemaTrocaDeSenha = z
   .object({
     atual: z.string().min(1, "Informe sua senha atual."),
     nova: esquemaSenha,
-    confirmacao: z.string(),
-  })
-  .refine((dados) => dados.nova === dados.confirmacao, {
-    message: "As duas senhas não são iguais.",
-    path: ["confirmacao"],
   })
   .refine((dados) => dados.nova !== dados.atual, {
     message: "A nova senha precisa ser diferente da atual.",
