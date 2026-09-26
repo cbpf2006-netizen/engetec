@@ -17,7 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CampoValor } from "./CampoValor";
+import { SelecaoDeCarteira } from "./SelecaoDeCarteira";
 import { SelecaoDeModelo } from "./SelecaoDeModelo";
+import { useCarteiras } from "./CarteirasProvider";
 import { mascaraMoeda, moeda, paraNumero } from "@/lib/formato";
 import { hoje, somarDias } from "@/lib/periodo";
 import {
@@ -43,6 +45,7 @@ import type { Fluxo, Modelo, OperacaoInvestimento } from "@/lib/tipos";
 export type LancamentoParaEditar = {
   id: string;
   modelo_id: string | null;
+  carteira_id: string | null;
   valor: number;
   data: string;
   observacao: string | null;
@@ -105,7 +108,7 @@ export function DialogoLancamento({
   );
 }
 
-type Erros = Partial<Record<"valor" | "modelo_id" | "data", string>>;
+type Erros = Partial<Record<"valor" | "modelo_id" | "carteira_id" | "data", string>>;
 
 function Formulario({
   fluxo,
@@ -119,12 +122,16 @@ function Formulario({
   aoConcluir: () => void;
 }) {
   const agora = hoje();
+  const carteiras = useCarteiras();
 
   const [valor, setValor] = useState(
     lancamento ? mascaraMoeda(String(Math.round(lancamento.valor * 100))) : ""
   );
   const [modeloId, setModeloId] = useState<string | null>(
     lancamento?.modelo_id ?? (modelos.length === 1 ? modelos[0].id : null)
+  );
+  const [carteiraId, setCarteiraId] = useState<string | null>(
+    lancamento?.carteira_id ?? (carteiras.length === 1 ? carteiras[0].id : null)
   );
   const [data, setData] = useState(lancamento?.data ?? agora);
   const [observacao, setObservacao] = useState(lancamento?.observacao ?? "");
@@ -145,6 +152,7 @@ function Formulario({
       problemas.modelo_id =
         fluxo === "investimento" ? "Escolha o tipo de investimento." : "Escolha um modelo.";
     }
+    if (!carteiraId) problemas.carteira_id = "Escolha a carteira.";
     if (!data) problemas.data = "Informe a data.";
 
     return problemas;
@@ -157,6 +165,7 @@ function Formulario({
 
     const dados = {
       modelo_id: modeloId,
+      carteira_id: carteiraId,
       valor: paraNumero(valor),
       data,
       observacao: observacao.trim() || null,
@@ -237,6 +246,16 @@ function Formulario({
           setErros((atual) => ({ ...atual, modelo_id: undefined }));
         }}
         erro={erros.modelo_id}
+      />
+
+      <SelecaoDeCarteira
+        carteiras={carteiras}
+        selecionada={carteiraId}
+        aoSelecionar={(id) => {
+          setCarteiraId(id);
+          setErros((atual) => ({ ...atual, carteira_id: undefined }));
+        }}
+        erro={erros.carteira_id}
       />
 
       <div className="flex flex-col gap-2">

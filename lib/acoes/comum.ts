@@ -18,6 +18,7 @@ export const ROTAS_COM_NUMEROS = [
   "/saidas",
   "/investimentos",
   "/contas",
+  "/carteira",
 ] as const;
 
 export function revalidarNumeros(): void {

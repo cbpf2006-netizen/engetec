@@ -45,9 +45,14 @@ export const fluxoTransacao = z.enum(["entrada", "saida"]);
    Lançamentos
    ========================================================================== */
 
+/** Obrigatória em todo lançamento: saber quanto entrou sem saber onde o
+    dinheiro ficou deixa o saldo por carteira impossível de reconstruir. */
+export const carteiraId = z.string().uuid("Escolha a carteira.");
+
 export const esquemaTransacao = z.object({
   fluxo: fluxoTransacao,
   modelo_id: z.string().uuid(),
+  carteira_id: carteiraId,
   valor,
   data: dataIso,
   observacao,
@@ -56,6 +61,7 @@ export const esquemaTransacao = z.object({
 export const esquemaInvestimento = z.object({
   operacao: z.enum(["aporte", "resgate"]).default("aporte"),
   modelo_id: z.string().uuid(),
+  carteira_id: carteiraId,
   valor,
   data: dataIso,
   observacao,
@@ -71,6 +77,18 @@ export const esquemaConta = z.object({
   valor,
   vencimento: z.union([dataIso, z.literal("")]).transform((v) => (v === "" ? null : v)).nullable(),
   observacao,
+});
+
+/* =============================================================================
+   Carteiras
+   ========================================================================== */
+
+export const esquemaCarteira = z.object({
+  nome: z
+    .string()
+    .trim()
+    .min(1, "Dê um nome à carteira.")
+    .max(40, "O nome passou de 40 caracteres."),
 });
 
 /* =============================================================================

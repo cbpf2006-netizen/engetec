@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Receipt,
   TrendingUp,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ export const SECOES: Secao[] = [
   { href: "/saidas", rotulo: "Saídas", curto: "Saídas", icone: ArrowDownLeft },
   { href: "/investimentos", rotulo: "Investimentos", curto: "Investir", icone: TrendingUp },
   { href: "/contas", rotulo: "Contas a pagar", curto: "Contas", icone: Receipt },
+  { href: "/carteira", rotulo: "Carteira", curto: "Carteira", icone: Wallet },
 ];
 
 /** A raiz só está ativa em correspondência exata; as outras seções aceitam

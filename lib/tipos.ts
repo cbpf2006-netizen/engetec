@@ -35,10 +35,21 @@ export type Modelo = {
   arquivado: boolean;
 };
 
+/** Onde o dinheiro está: "Mão", "Santander", "Bradesco". Só um nome — o saldo
+    de uma carteira é a soma dos lançamentos que apontam para ela. */
+export type Carteira = {
+  id: string;
+  nome: string;
+  ordem: number;
+};
+
 export type Transacao = {
   id: string;
   fluxo: Extract<Fluxo, "entrada" | "saida">;
   modelo_id: string | null;
+  /** Nulo só nos lançamentos anteriores à criação das carteiras: a interface
+      exige a carteira em todo lançamento novo. */
+  carteira_id: string | null;
   valor: number;
   data: string; // "AAAA-MM-DD"
   observacao: string | null;
@@ -48,6 +59,7 @@ export type Transacao = {
 /** Transação já com o modelo resolvido — o que as listas exibem. */
 export type TransacaoComModelo = Transacao & {
   modelo: Modelo | null;
+  carteira: Carteira | null;
 };
 
 /** Aporte ou resgate. Guardar as duas operações desde a v1 é o que permite
@@ -59,6 +71,7 @@ export type Investimento = {
   id: string;
   operacao: OperacaoInvestimento;
   modelo_id: string | null;
+  carteira_id: string | null;
   valor: number;
   data: string;
   observacao: string | null;
@@ -67,6 +80,7 @@ export type Investimento = {
 
 export type InvestimentoComModelo = Investimento & {
   modelo: Modelo | null;
+  carteira: Carteira | null;
 };
 
 /** Conta a pagar. `status` no banco só tem dois estados reais: pendente e

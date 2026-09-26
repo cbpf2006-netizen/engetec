@@ -151,6 +151,7 @@ export default async function PaginaDeInvestimentos({
             itens={doPeriodo.map((item) => ({
               id: item.id,
               modelo: item.modelo,
+              carteira: item.carteira,
               valor: item.valor,
               data: item.data,
               observacao: item.observacao,

@@ -233,6 +233,8 @@ export function serieDoPeriodo(
     sozinha quando o dia vira, sem depender de job nenhum. */
 export function situacaoDaConta(conta: Pick<Conta, "status" | "vencimento">, hoje: string): SituacaoConta {
   if (conta.status === "pago") return "pago";
+  // Sem vencimento não há prazo a perder: a conta fica pendente até ser paga.
+  if (!conta.vencimento) return "pendente";
   return conta.vencimento < hoje ? "atrasado" : "pendente";
 }
 
@@ -251,8 +253,11 @@ export function resumirContas(
   limiteDoAviso: string
 ): ResumoContas {
   const pendentes = contas.filter((c) => c.status === "pendente");
-  const atrasadas = pendentes.filter((c) => c.vencimento < hoje);
-  const emBreve = pendentes.filter((c) => c.vencimento >= hoje && c.vencimento <= limiteDoAviso);
+  // Conta sem vencimento entra no total a pagar, mas nunca atrasa nem "vence
+  // em breve" — os dois conceitos dependem de uma data.
+  const comPrazo = pendentes.filter((c) => c.vencimento !== null);
+  const atrasadas = comPrazo.filter((c) => c.vencimento! < hoje);
+  const emBreve = comPrazo.filter((c) => c.vencimento! >= hoje && c.vencimento! <= limiteDoAviso);
 
   return {
     aPagar: somar(pendentes),

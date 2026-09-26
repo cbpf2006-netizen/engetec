@@ -279,7 +279,9 @@ function Linha({
           <span>
             {paga && conta.pago_em
               ? `Pago em ${formatarData(conta.pago_em)}`
-              : `Vence ${formatarData(conta.vencimento)}`}
+              : conta.vencimento
+                ? `Vence ${formatarData(conta.vencimento)}`
+                : "Sem vencimento"}
           </span>
           {conta.observacao && <span className="truncate">· {conta.observacao}</span>}
         </span>

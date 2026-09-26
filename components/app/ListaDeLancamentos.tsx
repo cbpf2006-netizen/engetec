@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Wallet } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import { DialogoLancamento } from "./DialogoLancamento";
 import { capitalizar, data as formatarData, dataPorExtenso, diaDaSemana } from "@/lib/formato";
 import { hoje, somarDias } from "@/lib/periodo";
 import { excluirInvestimento, excluirTransacao } from "@/lib/acoes/lancamentos";
-import type { Fluxo, Modelo, OperacaoInvestimento } from "@/lib/tipos";
+import type { Carteira, Fluxo, Modelo, OperacaoInvestimento } from "@/lib/tipos";
 
 /* =============================================================================
    Lista de lançamentos
@@ -35,6 +35,7 @@ import type { Fluxo, Modelo, OperacaoInvestimento } from "@/lib/tipos";
 export type ItemDaLista = {
   id: string;
   modelo: Modelo | null;
+  carteira: Carteira | null;
   valor: number;
   data: string;
   observacao: string | null;
@@ -94,6 +95,7 @@ export function ListaDeLancamentos({
             ? {
                 id: emEdicao.id,
                 modelo_id: emEdicao.modelo?.id ?? null,
+                carteira_id: emEdicao.carteira?.id ?? null,
                 valor: emEdicao.valor,
                 data: emEdicao.data,
                 observacao: emEdicao.observacao,
@@ -169,11 +171,18 @@ function Linha({
           )}
         </div>
 
-        {item.observacao ? (
-          <p className="truncate text-xs text-muted-foreground">{item.observacao}</p>
-        ) : (
-          <p className="text-xs text-muted-foreground">{capitalizar(diaDaSemana(item.data))}</p>
-        )}
+        <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+          {item.carteira && (
+            <>
+              <Wallet className="size-3 shrink-0" aria-hidden="true" />
+              <span className="shrink-0">{item.carteira.nome}</span>
+              <span aria-hidden="true">·</span>
+            </>
+          )}
+          <span className="truncate">
+            {item.observacao ?? capitalizar(diaDaSemana(item.data))}
+          </span>
+        </p>
       </div>
 
       <Valor

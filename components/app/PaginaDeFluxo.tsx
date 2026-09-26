@@ -159,6 +159,7 @@ export async function PaginaDeFluxo({
             itens={lancamentos.map((lancamento) => ({
               id: lancamento.id,
               modelo: lancamento.modelo,
+              carteira: lancamento.carteira,
               valor: lancamento.valor,
               data: lancamento.data,
               observacao: lancamento.observacao,

@@ -2,6 +2,7 @@ import "server-only";
 import { erroDeConsulta } from "./erros";
 import { exigirContexto } from "./sessao";
 import type {
+  Carteira,
   Fluxo,
   Investimento,
   InvestimentoComModelo,
@@ -30,19 +31,33 @@ import type { MovimentoInvestimento, MovimentoTransacao } from "@/lib/financas";
      no Postgres substitui estas duas consultas sem tocar em nenhuma tela.
    ========================================================================== */
 
-const CAMPOS_TRANSACAO = "id, fluxo, modelo_id, valor, data, observacao, criado_em";
+const CAMPOS_TRANSACAO =
+  "id, fluxo, modelo_id, carteira_id, valor, data, observacao, criado_em";
 const CAMPOS_INVESTIMENTO =
-  "id, operacao, modelo_id, valor, data, observacao, criado_em";
+  "id, operacao, modelo_id, carteira_id, valor, data, observacao, criado_em";
 const CAMPOS_MODELO = "modelo:modelos (id, fluxo, nome, icone, cor, ordem, arquivado)";
+const CAMPOS_CARTEIRA = "carteira:carteiras (id, nome, ordem)";
 
-type LinhaComModelo = { valor: number | string; modelo: Modelo | Modelo[] | null };
+type LinhaComRelacoes = {
+  valor: number | string;
+  modelo: Modelo | Modelo[] | null;
+  carteira: Carteira | Carteira[] | null;
+};
 
 /** PostgREST devolve o relacionamento como objeto ou array conforme a
     cardinalidade que inferiu. Normalizar aqui evita `Array.isArray` espalhado
     pelos componentes. */
-function normalizar<T extends LinhaComModelo>(linha: T) {
-  const modelo = Array.isArray(linha.modelo) ? (linha.modelo[0] ?? null) : linha.modelo;
-  return { ...linha, valor: Number(linha.valor), modelo };
+function umOuNulo<T>(valor: T | T[] | null): T | null {
+  return Array.isArray(valor) ? (valor[0] ?? null) : valor;
+}
+
+function normalizar<T extends LinhaComRelacoes>(linha: T) {
+  return {
+    ...linha,
+    valor: Number(linha.valor),
+    modelo: umOuNulo(linha.modelo),
+    carteira: umOuNulo(linha.carteira),
+  };
 }
 
 export type FiltroLancamentos = {
@@ -60,7 +75,7 @@ export async function listarTransacoes(
 
   let consulta = supabase
     .from("transacoes")
-    .select(`${CAMPOS_TRANSACAO}, ${CAMPOS_MODELO}`)
+    .select(`${CAMPOS_TRANSACAO}, ${CAMPOS_MODELO}, ${CAMPOS_CARTEIRA}`)
     .eq("usuario_id", usuario.id)
     .order("data", { ascending: false })
     .order("criado_em", { ascending: false });
@@ -75,7 +90,7 @@ export async function listarTransacoes(
   if (error) throw erroDeConsulta("Falha ao carregar lançamentos", error);
 
   return (data ?? []).map((linha) =>
-    normalizar(linha as unknown as Transacao & LinhaComModelo)
+    normalizar(linha as unknown as Transacao & LinhaComRelacoes)
   ) as TransacaoComModelo[];
 }
 
@@ -86,7 +101,7 @@ export async function listarInvestimentos(
 
   let consulta = supabase
     .from("investimentos")
-    .select(`${CAMPOS_INVESTIMENTO}, ${CAMPOS_MODELO}`)
+    .select(`${CAMPOS_INVESTIMENTO}, ${CAMPOS_MODELO}, ${CAMPOS_CARTEIRA}`)
     .eq("usuario_id", usuario.id)
     .order("data", { ascending: false })
     .order("criado_em", { ascending: false });
@@ -100,7 +115,7 @@ export async function listarInvestimentos(
   if (error) throw erroDeConsulta("Falha ao carregar investimentos", error);
 
   return (data ?? []).map((linha) =>
-    normalizar(linha as unknown as Investimento & LinhaComModelo)
+    normalizar(linha as unknown as Investimento & LinhaComRelacoes)
   ) as InvestimentoComModelo[];
 }
 

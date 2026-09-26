@@ -9,7 +9,7 @@ import { SECOES, secaoAtiva } from "@/lib/navegacao";
 /* =============================================================================
    Navegação inferior (celular)
 
-   A barra lateral não vira "hambúrguer": as cinco seções são o app inteiro e
+   A barra lateral não vira "hambúrguer": as seções são o app inteiro e
    merecem estar a um toque, na parte da tela que o polegar alcança. O menu
    escondido ficaria a dois toques de tudo.
 
@@ -25,7 +25,7 @@ export function NavegacaoInferior() {
       aria-label="Seções"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
     >
-      <ul className="grid grid-cols-5">
+      <ul className="grid grid-cols-6">
         {SECOES.map((secao) => {
           const ativa = secaoAtiva(caminho, secao.href);
 

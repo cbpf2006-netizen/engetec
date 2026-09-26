@@ -37,7 +37,10 @@ import { listarModelosPorFluxo } from "./modelos";
    escrito e testado.
    ========================================================================== */
 
-export type PagamentoProximo = Pick<Conta, "id" | "nome" | "valor" | "vencimento"> & {
+export type PagamentoProximo = Pick<Conta, "id" | "nome" | "valor"> & {
+  /** Não é nullable como em `Conta`: a fila é ordenada por prazo, e conta sem
+      vencimento não entra nela. */
+  vencimento: string;
   situacao: SituacaoConta;
   diasRestantes: number;
 };
@@ -141,14 +144,16 @@ function proximosPagamentos(
   agora: string
 ): PagamentoProximo[] {
   return contas
-    .filter((conta) => conta.status === "pendente")
+    // Sem vencimento não há "próximo": a conta não tem lugar numa fila
+    // ordenada por prazo.
+    .filter((conta) => conta.status === "pendente" && conta.vencimento !== null)
     .map((conta) => ({
       id: conta.id,
       nome: conta.nome,
       valor: conta.valor,
-      vencimento: conta.vencimento,
+      vencimento: conta.vencimento!,
       situacao: situacaoDaConta(conta, agora),
-      diasRestantes: diasEntre(agora, conta.vencimento),
+      diasRestantes: diasEntre(agora, conta.vencimento!),
     }))
     .sort((a, b) => a.vencimento.localeCompare(b.vencimento))
     .slice(0, 5);
