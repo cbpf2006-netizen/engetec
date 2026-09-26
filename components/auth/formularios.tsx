@@ -147,7 +147,7 @@ export function FormularioCadastro() {
         required
         value={email}
         onChange={(evento) => setEmail(evento.target.value)}
-        dica="É por ele que você confirma a conta."
+        dica="É com ele que você entra e recupera a senha."
         erro={estado?.campo === "email" ? estado.erro : undefined}
       />
 
@@ -161,7 +161,7 @@ export function FormularioCadastro() {
         required
         value={telefone}
         onChange={(evento) => setTelefone(mascaraTelefone(evento.target.value))}
-        dica="Só para contato — não usamos o telefone para confirmar a conta."
+        dica="Só para contato."
         erro={estado?.campo === "telefone" ? estado.erro : undefined}
       />
 

@@ -187,19 +187,20 @@ export async function alterarSenha(entrada: unknown): Promise<Resultado> {
 }
 
 /* =============================================================================
-   E-mail — confirmação por link, só no endereço NOVO
+   E-mail
 
-   O Supabase manda o link para o novo e-mail e a troca só vale quando ele é
-   aberto; até lá o e-mail antigo continua sendo o da conta. O endereço antigo
-   não é consultado (é o que se pediu), e por isso a senha atual é exigida
+   Sem confirmação por e-mail (a opção "Confirm email" desligada no Supabase),
+   a troca vale na hora. Se a opção for religada, o Supabase manda um link só
+   para o endereço NOVO e o e-mail antigo segue valendo até o link ser aberto —
+   o código lida com os dois casos.
+
+   O endereço antigo nunca é consultado, e por isso a senha atual é exigida
    aqui: é ela que impede que uma sessão esquecida aberta redirecione a conta.
-
-   Requer "Secure email change" DESLIGADO no Supabase (Authentication →
-   Sign In / Providers → Email). Ligado, o projeto exige também o link do
-   endereço antigo.
    ========================================================================== */
 
-export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
+export async function pedirTrocaDeEmail(
+  entrada: unknown
+): Promise<Resultado<{ efetivado: boolean }>> {
   const analise = esquemaNovoEmail.safeParse(entrada);
   if (!analise.success) return erroDeValidacao(analise.error);
 
@@ -225,7 +226,7 @@ export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
     return falha("A senha atual não confere.", "senha");
   }
 
-  const { error } = await supabase.auth.updateUser(
+  const { data, error } = await supabase.auth.updateUser(
     { email: analise.data.email },
     { emailRedirectTo: `${await urlBase()}/auth/confirmar?destino=/perfil` }
   );
@@ -239,9 +240,14 @@ export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
       return falha("Muitos e-mails enviados seguidos. Espere alguns minutos e tente de novo.");
     }
     console.error("[raiz] troca de e-mail:", error.code, error.message);
-    return falha("Não foi possível enviar o link agora. Tente de novo em instantes.");
+    return falha("Não foi possível alterar o e-mail agora. Tente de novo em instantes.");
   }
 
+  // Com a confirmação por e-mail desligada no projeto, a troca já vale aqui.
+  // Com ela ligada, o e-mail só muda quando o link enviado ao endereço novo for
+  // aberto. A resposta do Supabase diz qual dos dois casos aconteceu.
+  const efetivado = data.user?.email?.toLowerCase() === analise.data.email;
+
   revalidarPerfil();
-  return sucesso();
+  return sucesso({ efetivado });
 }

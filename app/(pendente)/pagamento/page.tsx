@@ -16,9 +16,8 @@ export const metadata: Metadata = { title: "Falta só o pagamento" };
 /* =============================================================================
    Tela de acesso pendente
 
-   Aonde a pessoa chega depois de confirmar o e-mail. A conta existe e o e-mail
-   está provado, mas o acesso só é liberado quando o administrador confirmar o
-   pagamento — e ele libera à mão. Por isso a tela não tem "botão de
+   Aonde a pessoa chega logo depois de criar a conta. A conta existe, mas o
+   acesso só é liberado quando o administrador confirmar o pagamento — e ele libera à mão. Por isso a tela não tem "botão de
    continuar": o único caminho para dentro é a liberação.
 
    Quem já foi liberado é devolvido ao app: esta rota não deve virar um beco
@@ -44,7 +43,7 @@ export default async function PaginaDePagamento() {
         <div className="flex flex-col items-center gap-6 rounded-2xl bg-card p-6 text-center shadow-cartao ring-1 ring-border sm:p-8">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-entrada-suave px-3 py-1 text-xs font-medium text-entrada-texto">
             <MailCheck className="size-3.5" aria-hidden="true" />
-            E-mail confirmado
+            Conta criada
           </span>
 
           <div className="flex flex-col gap-2">

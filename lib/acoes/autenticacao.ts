@@ -131,15 +131,17 @@ export async function cadastrar(
         telefone: analise.data.telefone,
         indicado_por: analise.data.indicado_por,
       },
-      // Depois de confirmar o e-mail, quem ainda não pagou cai na tela de
-      // pagamento; quem já foi liberado é devolvido ao app por ela.
+      // Quem ainda não pagou cai na tela de pagamento; quem já foi liberado é
+      // devolvido ao app por ela.
       emailRedirectTo: `${await urlBase()}/auth/confirmar?destino=/pagamento`,
     },
   });
 
   if (error) return { erro: traduzirErro(error.message, error.code) };
 
-  // Com confirmação de e-mail ligada no projeto, signUp não abre sessão.
+  // Com a confirmação por e-mail desligada no projeto, signUp já abre a sessão
+  // e a pessoa segue para a tela de pagamento. Ligada, ele não abre sessão e
+  // resta o aviso do link.
   if (!data.session) {
     return {
       aviso: `Enviamos um link de confirmação para ${analise.data.email}. Abra o e-mail e clique no link — a confirmação é feita só por ele.`,
@@ -147,7 +149,8 @@ export async function cadastrar(
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  // Conta nova nasce pendente: o lugar dela é a tela de pagamento.
+  redirect("/pagamento");
 }
 
 export async function sair(): Promise<void> {

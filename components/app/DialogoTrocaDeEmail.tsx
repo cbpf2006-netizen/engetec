@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { MailCheck } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +22,9 @@ import { pedirTrocaDeEmail } from "@/lib/acoes/conta";
 /* =============================================================================
    Troca de e-mail
 
-   Um passo só, mais o aviso de que o link foi enviado. A confirmação é por
-   link e vai APENAS para o endereço novo: o e-mail da conta só muda quando esse
-   link é aberto. O endereço antigo não é consultado.
+   Um passo só: novo endereço e senha atual. A troca vale na hora. (Se a
+   confirmação por e-mail for religada no Supabase, o link vai só para o
+   endereço novo e a tela avisa — ver `pedirTrocaDeEmail`.)
 
    A senha atual entra aqui porque, sem confirmação no endereço antigo, ela é
    o que separa o dono da conta de quem só achou uma sessão aberta.
@@ -45,6 +47,7 @@ export function DialogoTrocaDeEmail({
 }
 
 function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erros, setErros] = useState<{ email?: string; senha?: string; geral?: string }>({});
@@ -65,6 +68,14 @@ function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
       }
 
       setSenha("");
+
+      if (resultado.dados.efetivado) {
+        toast.success("E-mail alterado.");
+        router.refresh();
+        aoConcluir();
+        return;
+      }
+
       setEnviadoPara(email.trim().toLowerCase());
     });
   }
@@ -100,8 +111,7 @@ function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
       <DialogHeader>
         <DialogTitle>Alterar e-mail</DialogTitle>
         <DialogDescription>
-          Enviaremos um link de confirmação para o novo endereço. O e-mail só muda depois que você
-          clicar nele.
+          Informe o novo endereço e sua senha atual.
         </DialogDescription>
       </DialogHeader>
 
@@ -154,7 +164,7 @@ function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
             Cancelar
           </Button>
           <Button type="submit" size="lg" disabled={enviando || !email.trim() || !senha}>
-            {enviando ? "Enviando…" : "Enviar link"}
+            {enviando ? "Alterando…" : "Alterar e-mail"}
           </Button>
         </DialogFooter>
       </form>

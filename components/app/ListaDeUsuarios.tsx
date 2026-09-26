@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, type ReactNode } from "react";
-import { BadgeCheck, MailWarning, Phone, ShieldCheck, UserRoundCheck, Users } from "lucide-react";
+import { BadgeCheck, Phone, ShieldCheck, UserRoundCheck, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
@@ -25,8 +25,7 @@ import type { UsuarioAdmin } from "@/lib/dados/admin";
 
    Linhas em vez de tabela: no celular uma tabela de sete colunas viraria
    rolagem lateral. Cada linha traz o que o administrador precisa para decidir
-   — quem é, como falar com a pessoa, quem indicou e se o e-mail foi
-   confirmado — e, nos pendentes, a ação de liberar.
+   — quem é, como falar com a pessoa e quem indicou — e, nos pendentes, a ação de liberar.
 
    Liberar pede confirmação porque é o passo que dá acesso ao produto: a
    pergunta lembra de conferir o pagamento antes.
@@ -90,11 +89,6 @@ function Linha({ usuario, aoLiberar }: { usuario: UsuarioAdmin; aoLiberar: () =>
             ) : (
               <Selo tom="entrada" icone={BadgeCheck}>
                 Liberado
-              </Selo>
-            )}
-            {!usuario.email_confirmado && (
-              <Selo tom="saida" icone={MailWarning}>
-                E-mail não confirmado
               </Selo>
             )}
           </span>

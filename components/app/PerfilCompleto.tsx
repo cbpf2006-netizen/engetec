@@ -259,7 +259,7 @@ function BlocoDoEmail({ email, pendente }: { email: string; pendente: string | n
   return (
     <Bloco
       titulo="E-mail"
-      descricao="Ao trocar, enviamos um link de confirmação para o novo endereço."
+      descricao="O endereço que você usa para entrar."
       acao={
         <Button type="button" variant="outline" size="sm" onClick={() => setAberto(true)}>
           Alterar e-mail
