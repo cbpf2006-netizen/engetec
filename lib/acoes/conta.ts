@@ -2,11 +2,9 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import { contextoOuNulo } from "@/lib/dados/sessao";
 import {
   erroDeValidacao,
-  esquemaCodigo,
   esquemaNovoEmail,
   esquemaTelefone,
   esquemaTrocaDeSenha,
@@ -189,30 +187,17 @@ export async function alterarSenha(entrada: unknown): Promise<Resultado> {
 }
 
 /* =============================================================================
-   E-mail — código no endereço antigo e depois no novo
+   E-mail — confirmação por link, só no endereço NOVO
 
-   Usa o "secure email change" do Supabase: o pedido dispara um código para o
-   e-mail atual e outro para o novo, e a troca só vale depois que os dois
-   forem confirmados. A tela pede um de cada vez, na ordem: antigo, novo.
+   O Supabase manda o link para o novo e-mail e a troca só vale quando ele é
+   aberto; até lá o e-mail antigo continua sendo o da conta. O endereço antigo
+   não é consultado (é o que se pediu), e por isso a senha atual é exigida
+   aqui: é ela que impede que uma sessão esquecida aberta redirecione a conta.
 
-   Requer que o modelo do e-mail "Change Email Address" mostre `{{ .Token }}`
-   (ver a mensagem de entrega desta funcionalidade).
+   Requer "Secure email change" DESLIGADO no Supabase (Authentication →
+   Sign In / Providers → Email). Ligado, o projeto exige também o link do
+   endereço antigo.
    ========================================================================== */
-
-function traduzirErroDeEmail(erro: { code?: string; message: string }): string {
-  if (erro.code === "email_exists") return "Esse e-mail já tem uma conta.";
-  if (erro.code === "over_email_send_rate_limit" || erro.message.toLowerCase().includes("rate limit")) {
-    return "Muitos e-mails enviados seguidos. Espere alguns minutos e tente de novo.";
-  }
-  if (erro.code === "otp_expired" || erro.message.toLowerCase().includes("expired")) {
-    return "O código expirou. Volte e peça um novo.";
-  }
-  if (erro.code === "validation_failed" || erro.message.toLowerCase().includes("invalid")) {
-    return "Código incorreto.";
-  }
-  console.error("[raiz] troca de e-mail:", erro.code, erro.message);
-  return "Não foi possível concluir agora. Tente de novo em instantes.";
-}
 
 export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
   const analise = esquemaNovoEmail.safeParse(entrada);
@@ -222,8 +207,22 @@ export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
   if (!contexto) return falha(SEM_SESSAO);
   const { supabase, usuario } = contexto;
 
-  if (analise.data.email === usuario.email?.toLowerCase()) {
+  if (!usuario.email) return falha("Sua conta não tem um e-mail atual.");
+
+  if (analise.data.email === usuario.email.toLowerCase()) {
     return falha("Esse já é o seu e-mail atual.", "email");
+  }
+
+  const conferencia = await supabase.auth.signInWithPassword({
+    email: usuario.email,
+    password: analise.data.senha,
+  });
+
+  if (conferencia.error) {
+    if (conferencia.error.code === "over_request_rate_limit") {
+      return falha("Muitas tentativas seguidas. Espere um minuto e tente de novo.");
+    }
+    return falha("A senha atual não confere.", "senha");
   }
 
   const { error } = await supabase.auth.updateUser(
@@ -231,50 +230,17 @@ export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
     { emailRedirectTo: `${await urlBase()}/auth/confirmar?destino=/perfil` }
   );
 
-  if (error) return falha(traduzirErroDeEmail(error), "email");
-  return sucesso();
-}
-
-/** Passo 1: código que chegou no e-mail ANTIGO. */
-export async function confirmarCodigoDoEmailAntigo(codigo: string): Promise<Resultado> {
-  const analise = esquemaCodigo.safeParse(codigo);
-  if (!analise.success) return erroDeValidacao(analise.error);
-
-  const contexto = await contextoOuNulo();
-  if (!contexto) return falha(SEM_SESSAO);
-  const { supabase, usuario } = contexto;
-
-  if (!usuario.email) return falha("Sua conta não tem um e-mail atual.");
-
-  const { error } = await supabase.auth.verifyOtp({
-    email: usuario.email,
-    token: analise.data,
-    type: "email_change",
-  });
-
-  if (error) return falha(traduzirErroDeEmail(error), "codigo");
-  return sucesso();
-}
-
-/** Passo 2: código que chegou no e-mail NOVO. Conclui a troca. */
-export async function confirmarCodigoDoEmailNovo(
-  novoEmail: string,
-  codigo: string
-): Promise<Resultado> {
-  const email = esquemaNovoEmail.safeParse({ email: novoEmail });
-  if (!email.success) return erroDeValidacao(email.error);
-  const analise = esquemaCodigo.safeParse(codigo);
-  if (!analise.success) return erroDeValidacao(analise.error);
-
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.verifyOtp({
-    email: email.data.email,
-    token: analise.data,
-    type: "email_change",
-  });
-
-  if (error) return falha(traduzirErroDeEmail(error), "codigo");
+  if (error) {
+    if (error.code === "email_exists") return falha("Esse e-mail já tem uma conta.", "email");
+    if (
+      error.code === "over_email_send_rate_limit" ||
+      error.message.toLowerCase().includes("rate limit")
+    ) {
+      return falha("Muitos e-mails enviados seguidos. Espere alguns minutos e tente de novo.");
+    }
+    console.error("[raiz] troca de e-mail:", error.code, error.message);
+    return falha("Não foi possível enviar o link agora. Tente de novo em instantes.");
+  }
 
   revalidarPerfil();
   return sucesso();

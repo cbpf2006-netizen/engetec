@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { LogOut, Monitor, Moon, Settings, Sun, UserRound } from "lucide-react";
+import { LogOut, Monitor, Moon, Settings, ShieldCheck, Sun, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -110,6 +110,15 @@ export function MenuDoUsuario({
           <UserRound />
           Perfil
         </DropdownMenuItem>
+
+        {/* Só o administrador vê esta opção. A área em si também recusa os
+            demais (404 na página, erro de permissão no banco). */}
+        {perfil.papel === "admin" && (
+          <DropdownMenuItem render={<Link href="/administrar" />}>
+            <ShieldCheck />
+            Administrar
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem render={<Link href="/ajustes" />}>
           <Settings />

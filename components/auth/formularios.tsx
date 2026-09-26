@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useSyncExternalStore } from "react";
+import { useActionState, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 import { Aviso, BotaoEnviar, CampoSenha, CampoTexto } from "./campos";
 import { lerEmailSalvo } from "@/lib/login-salvo";
+import { mascaraTelefone } from "@/lib/formato";
 import {
   cadastrar,
   definirNovaSenha,
@@ -96,12 +97,19 @@ export function FormularioEntrar({
 export function FormularioCadastro() {
   const [estado, acao] = useActionState(cadastrar, ERRO_INICIAL);
 
+  // Controlados: o React 19 limpa os campos não controlados depois de cada
+  // envio, e errar a confirmação da senha não pode apagar o resto do cadastro.
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [indicadoPor, setIndicadoPor] = useState("");
+
   if (estado?.aviso) {
     return (
       <div className="flex flex-col gap-4">
         <Aviso tipo="sucesso">{estado.aviso}</Aviso>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Depois de confirmar, volte aqui e entre com seu e-mail e senha.
+          Depois de confirmar, o acesso é liberado assim que o pagamento for confirmado.
         </p>
         <Link
           href="/login"
@@ -125,6 +133,8 @@ export function FormularioCadastro() {
         required
         autoFocus
         maxLength={60}
+        value={nome}
+        onChange={(evento) => setNome(evento.target.value)}
         erro={estado?.campo === "nome" ? estado.erro : undefined}
       />
 
@@ -135,7 +145,24 @@ export function FormularioCadastro() {
         autoComplete="email"
         placeholder="voce@exemplo.com"
         required
+        value={email}
+        onChange={(evento) => setEmail(evento.target.value)}
+        dica="É por ele que você confirma a conta."
         erro={estado?.campo === "email" ? estado.erro : undefined}
+      />
+
+      <CampoTexto
+        id="telefone"
+        rotulo="Telefone"
+        type="tel"
+        inputMode="tel"
+        autoComplete="tel-national"
+        placeholder="(11) 91234-5678"
+        required
+        value={telefone}
+        onChange={(evento) => setTelefone(mascaraTelefone(evento.target.value))}
+        dica="Só para contato — não usamos o telefone para confirmar a conta."
+        erro={estado?.campo === "telefone" ? estado.erro : undefined}
       />
 
       <CampoSenha
@@ -144,6 +171,26 @@ export function FormularioCadastro() {
         minLength={8}
         dica="Pelo menos 8 caracteres."
         erro={estado?.campo === "senha" ? estado.erro : undefined}
+      />
+
+      <CampoSenha
+        id="confirmacao"
+        rotulo="Confirmar senha"
+        autoComplete="new-password"
+        required
+        minLength={8}
+        erro={estado?.campo === "confirmacao" ? estado.erro : undefined}
+      />
+
+      <CampoTexto
+        id="indicado_por"
+        rotulo="Quem te indicou?"
+        placeholder="Nome de quem indicou o Raiz"
+        maxLength={80}
+        value={indicadoPor}
+        onChange={(evento) => setIndicadoPor(evento.target.value)}
+        dica="Se ninguém indicou, deixe em branco."
+        erro={estado?.campo === "indicado_por" ? estado.erro : undefined}
       />
 
       <BotaoEnviar carregando="Criando conta…">Criar conta</BotaoEnviar>

@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { BarraLateral, CabecalhoMobile } from "@/components/app/BarraLateral";
 import { NavegacaoInferior } from "@/components/app/NavegacaoInferior";
 import { BotoesFlutuantes } from "@/components/app/AcoesDeLancamento";
@@ -42,6 +43,10 @@ export default async function LayoutDoApp({ children }: { children: React.ReactN
     if (schemaAusente(erro)) return <ConfiguracaoPendente />;
     throw erro;
   }
+
+  // Conta sem acesso liberado não usa o app: vai para a tela de pagamento.
+  // (O banco também recusa — esta é só a parte que o usuário enxerga.)
+  if (perfil && perfil.acesso !== "liberado") redirect("/pagamento");
 
   // `perfilAtual` redireciona quem não está autenticado; o null aqui é só
   // para o TypeScript.

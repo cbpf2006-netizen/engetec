@@ -107,7 +107,10 @@ export async function cadastrar(
   const analise = esquemaCadastro.safeParse({
     nome: formulario.get("nome"),
     email: formulario.get("email"),
+    telefone: formulario.get("telefone") ?? "",
     senha: formulario.get("senha"),
+    confirmacao: formulario.get("confirmacao") ?? "",
+    indicado_por: formulario.get("indicado_por") ?? "",
   });
 
   if (!analise.success) {
@@ -120,9 +123,17 @@ export async function cadastrar(
     email: analise.data.email,
     password: analise.data.senha,
     options: {
-      // Lido pelo trigger `ao_criar_usuario` para preencher o perfil.
-      data: { nome: analise.data.nome },
-      emailRedirectTo: `${await urlBase()}/auth/confirmar`,
+      // Lido pelo trigger `ao_criar_usuario` para preencher o perfil. Só nome,
+      // telefone e indicação: papel e acesso jamais vêm daqui (o cliente
+      // escreve estes metadados, então não podem conceder privilégio).
+      data: {
+        nome: analise.data.nome,
+        telefone: analise.data.telefone,
+        indicado_por: analise.data.indicado_por,
+      },
+      // Depois de confirmar o e-mail, quem ainda não pagou cai na tela de
+      // pagamento; quem já foi liberado é devolvido ao app por ela.
+      emailRedirectTo: `${await urlBase()}/auth/confirmar?destino=/pagamento`,
     },
   });
 
@@ -131,7 +142,7 @@ export async function cadastrar(
   // Com confirmação de e-mail ligada no projeto, signUp não abre sessão.
   if (!data.session) {
     return {
-      aviso: `Enviamos um link de confirmação para ${analise.data.email}. Abra o e-mail para ativar sua conta.`,
+      aviso: `Enviamos um link de confirmação para ${analise.data.email}. Abra o e-mail e clique no link — a confirmação é feita só por ele.`,
     };
   }
 

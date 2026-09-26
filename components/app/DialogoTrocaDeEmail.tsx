@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { MailCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,189 +14,147 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  confirmarCodigoDoEmailAntigo,
-  confirmarCodigoDoEmailNovo,
-  pedirTrocaDeEmail,
-} from "@/lib/acoes/conta";
+import { CampoSenha } from "@/components/auth/campos";
+import { pedirTrocaDeEmail } from "@/lib/acoes/conta";
 
 /* =============================================================================
-   Troca de e-mail em três passos
+   Troca de e-mail
 
-   1. Novo endereço — o pedido dispara um código para o e-mail ANTIGO e outro
-      para o NOVO.
-   2. Código do e-mail antigo — prova que quem está trocando ainda tem acesso
-      à conta atual (protege contra alguém que só achou o celular aberto).
-   3. Código do e-mail novo — prova que o endereço novo é de quem pediu, e só
-      aí a troca vale.
+   Um passo só, mais o aviso de que o link foi enviado. A confirmação é por
+   link e vai APENAS para o endereço novo: o e-mail da conta só muda quando esse
+   link é aberto. O endereço antigo não é consultado.
 
-   Os dois códigos saem juntos, mas a tela pede um de cada vez, na ordem.
+   A senha atual entra aqui porque, sem confirmação no endereço antigo, ela é
+   o que separa o dono da conta de quem só achou uma sessão aberta.
    ========================================================================== */
 
-type Passo = "novo" | "antigo" | "confirmar";
-
 export function DialogoTrocaDeEmail({
-  emailAtual,
   aberto,
   aoMudarAberto,
 }: {
-  emailAtual: string;
   aberto: boolean;
   aoMudarAberto: (aberto: boolean) => void;
 }) {
   return (
     <Dialog open={aberto} onOpenChange={aoMudarAberto}>
       <DialogContent className="gap-5 p-5 sm:max-w-md">
-        {aberto && (
-          <Passos emailAtual={emailAtual} aoConcluir={() => aoMudarAberto(false)} />
-        )}
+        {aberto && <Formulario aoConcluir={() => aoMudarAberto(false)} />}
       </DialogContent>
     </Dialog>
   );
 }
 
-function Passos({ emailAtual, aoConcluir }: { emailAtual: string; aoConcluir: () => void }) {
-  const router = useRouter();
-  const [passo, setPasso] = useState<Passo>("novo");
-  const [novoEmail, setNovoEmail] = useState("");
-  const [codigo, setCodigo] = useState("");
-  const [erro, setErro] = useState<string | undefined>();
+function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erros, setErros] = useState<{ email?: string; senha?: string; geral?: string }>({});
+  const [enviadoPara, setEnviadoPara] = useState<string | null>(null);
   const [enviando, iniciar] = useTransition();
 
-  function falhou(mensagem: string) {
-    setErro(mensagem);
-  }
+  function enviar() {
+    setErros({});
 
-  function pedir() {
-    setErro(undefined);
     iniciar(async () => {
-      const resultado = await pedirTrocaDeEmail({ email: novoEmail });
-      if (!resultado.ok) return falhou(resultado.erro);
-      setCodigo("");
-      setPasso("antigo");
+      const resultado = await pedirTrocaDeEmail({ email, senha });
+
+      if (!resultado.ok) {
+        if (resultado.campo === "email") setErros({ email: resultado.erro });
+        else if (resultado.campo === "senha") setErros({ senha: resultado.erro });
+        else setErros({ geral: resultado.erro });
+        return;
+      }
+
+      setSenha("");
+      setEnviadoPara(email.trim().toLowerCase());
     });
   }
 
-  function confirmarAntigo() {
-    setErro(undefined);
-    iniciar(async () => {
-      const resultado = await confirmarCodigoDoEmailAntigo(codigo);
-      if (!resultado.ok) return falhou(resultado.erro);
-      setCodigo("");
-      setPasso("confirmar");
-    });
-  }
+  if (enviadoPara) {
+    return (
+      <>
+        <DialogHeader>
+          <DialogTitle>Confirme pelo link</DialogTitle>
+          <DialogDescription>
+            Enviamos um link de confirmação para{" "}
+            <strong className="font-medium text-foreground">{enviadoPara}</strong>. Abra o e-mail
+            e clique no link. Até lá, seu e-mail continua o mesmo.
+          </DialogDescription>
+        </DialogHeader>
 
-  function confirmarNovo() {
-    setErro(undefined);
-    iniciar(async () => {
-      const resultado = await confirmarCodigoDoEmailNovo(novoEmail, codigo);
-      if (!resultado.ok) return falhou(resultado.erro);
-      toast.success("E-mail alterado.");
-      router.refresh();
-      aoConcluir();
-    });
-  }
+        <p className="flex items-start gap-2.5 rounded-xl bg-accent px-3.5 py-3 text-sm text-accent-foreground">
+          <MailCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          Não chegou? Veja a caixa de spam e confira se digitou o endereço certo.
+        </p>
 
-  const emailDoPasso = passo === "antigo" ? emailAtual : novoEmail.trim().toLowerCase();
+        <DialogFooter className="-mx-5 -mb-5 px-5 py-4">
+          <Button type="button" size="lg" onClick={aoConcluir}>
+            Entendi
+          </Button>
+        </DialogFooter>
+      </>
+    );
+  }
 
   return (
     <>
       <DialogHeader>
         <DialogTitle>Alterar e-mail</DialogTitle>
         <DialogDescription>
-          {passo === "novo" && "Informe o novo e-mail. Vamos enviar um código para o atual e outro para o novo."}
-          {passo === "antigo" && (
-            <>
-              Passo 1 de 2. Digite o código que enviamos para o e-mail{" "}
-              <strong className="font-medium text-foreground">atual</strong>, {emailAtual}.
-            </>
-          )}
-          {passo === "confirmar" && (
-            <>
-              Passo 2 de 2. Agora digite o código que enviamos para o e-mail{" "}
-              <strong className="font-medium text-foreground">novo</strong>, {emailDoPasso}.
-            </>
-          )}
+          Enviaremos um link de confirmação para o novo endereço. O e-mail só muda depois que você
+          clicar nele.
         </DialogDescription>
       </DialogHeader>
 
       <form
-        className="flex flex-col gap-5"
+        className="flex flex-col gap-4"
         onSubmit={(evento) => {
           evento.preventDefault();
-          if (passo === "novo") pedir();
-          else if (passo === "antigo") confirmarAntigo();
-          else confirmarNovo();
+          enviar();
         }}
       >
-        {passo === "novo" ? (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="troca-email">Novo e-mail</Label>
-            <Input
-              id="troca-email"
-              type="email"
-              autoComplete="email"
-              autoFocus
-              value={novoEmail}
-              onChange={(evento) => {
-                setNovoEmail(evento.target.value);
-                setErro(undefined);
-              }}
-              placeholder="voce@exemplo.com"
-              aria-invalid={erro ? true : undefined}
-            />
-            {erro && <p className="text-xs text-destructive">{erro}</p>}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="troca-codigo">Código</Label>
-            <Input
-              id="troca-codigo"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              autoFocus
-              value={codigo}
-              maxLength={10}
-              onChange={(evento) => {
-                setCodigo(evento.target.value.replace(/\D/g, ""));
-                setErro(undefined);
-              }}
-              placeholder="000000"
-              className="numero tracking-[0.3em]"
-              aria-invalid={erro ? true : undefined}
-            />
-            {erro && <p className="text-xs text-destructive">{erro}</p>}
-
-            {passo === "antigo" && (
-              <button
-                type="button"
-                disabled={enviando}
-                onClick={pedir}
-                className="w-fit rounded text-xs font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50"
-              >
-                Não chegou? Enviar de novo
-              </button>
-            )}
-          </div>
+        {erros.geral && (
+          <p role="alert" className="rounded-xl bg-saida-suave px-3.5 py-3 text-sm text-saida-texto">
+            {erros.geral}
+          </p>
         )}
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="troca-email">Novo e-mail</Label>
+          <Input
+            id="troca-email"
+            type="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(evento) => {
+              setEmail(evento.target.value);
+              setErros((atual) => ({ ...atual, email: undefined }));
+            }}
+            placeholder="voce@exemplo.com"
+            aria-invalid={erros.email ? true : undefined}
+          />
+          {erros.email && <p className="text-xs text-destructive">{erros.email}</p>}
+        </div>
+
+        <CampoSenha
+          id="troca-senha"
+          rotulo="Sua senha atual"
+          autoComplete="current-password"
+          value={senha}
+          onChange={(evento) => {
+            setSenha(evento.target.value);
+            setErros((atual) => ({ ...atual, senha: undefined }));
+          }}
+          dica="Pedimos a senha para confirmar que é você."
+          erro={erros.senha}
+        />
 
         <DialogFooter className="-mx-5 -mb-5 px-5 py-4">
           <Button type="button" variant="outline" size="lg" onClick={aoConcluir} disabled={enviando}>
             Cancelar
           </Button>
-          <Button
-            type="submit"
-            size="lg"
-            disabled={enviando || (passo === "novo" ? !novoEmail.trim() : codigo.length < 6)}
-          >
-            {enviando
-              ? "Aguarde…"
-              : passo === "novo"
-                ? "Enviar códigos"
-                : passo === "antigo"
-                  ? "Continuar"
-                  : "Confirmar troca"}
+          <Button type="submit" size="lg" disabled={enviando || !email.trim() || !senha}>
+            {enviando ? "Enviando…" : "Enviar link"}
           </Button>
         </DialogFooter>
       </form>

@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import type { Perfil } from "@/lib/tipos";
@@ -62,7 +62,7 @@ export async function perfilAtual(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("perfis")
-    .select("id, nome, telefone, foto_path")
+    .select("id, nome, telefone, foto_path, papel, acesso")
     .eq("id", usuario.id)
     .maybeSingle();
 
@@ -75,8 +75,23 @@ export async function perfilAtual(): Promise<Perfil | null> {
     // criadas antes da migration rodar.
     nome: data?.nome ?? (usuario.user_metadata?.nome as string | undefined) ?? null,
     telefone: (data?.telefone as string | null | undefined) ?? null,
+    // Falha fechada: sem linha de perfil, ou com valor desconhecido, é o menor
+    // privilégio — usuário comum, acesso pendente.
+    papel: data?.papel === "admin" ? "admin" : "usuario",
+    acesso: data?.acesso === "liberado" ? "liberado" : "pendente",
+    email_pendente: usuario.new_email ?? null,
     foto_url: fotoPath
       ? supabase.storage.from("avatars").getPublicUrl(fotoPath).data.publicUrl
       : null,
   };
+}
+
+/** Para páginas do administrador. `notFound` em vez de redirecionar: quem não é
+    administrador não deve nem descobrir que a rota existe. A checagem que
+    protege de verdade é a das funções no banco (`e_admin()`); esta só poupa
+    a ida até lá. */
+export async function exigirAdmin(): Promise<Perfil> {
+  const perfil = await perfilAtual();
+  if (!perfil || perfil.papel !== "admin" || perfil.acesso !== "liberado") notFound();
+  return perfil;
 }

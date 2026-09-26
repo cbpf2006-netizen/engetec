@@ -29,7 +29,7 @@ export function PerfilCompleto({ perfil }: { perfil: Perfil }) {
     <>
       <BlocoDaFoto perfil={perfil} />
       <BlocoDosDados perfil={perfil} />
-      <BlocoDoEmail email={perfil.email} />
+      <BlocoDoEmail email={perfil.email} pendente={perfil.email_pendente} />
       <BlocoDaSenha />
     </>
   );
@@ -253,13 +253,13 @@ function BlocoDosDados({ perfil }: { perfil: Perfil }) {
    E-mail
    ========================================================================== */
 
-function BlocoDoEmail({ email }: { email: string }) {
+function BlocoDoEmail({ email, pendente }: { email: string; pendente: string | null }) {
   const [aberto, setAberto] = useState(false);
 
   return (
     <Bloco
       titulo="E-mail"
-      descricao="Trocar o e-mail pede um código enviado ao endereço antigo e outro ao novo."
+      descricao="Ao trocar, enviamos um link de confirmação para o novo endereço."
       acao={
         <Button type="button" variant="outline" size="sm" onClick={() => setAberto(true)}>
           Alterar e-mail
@@ -267,7 +267,14 @@ function BlocoDoEmail({ email }: { email: string }) {
       }
     >
       <p className="truncate text-sm font-medium">{email}</p>
-      <DialogoTrocaDeEmail emailAtual={email} aberto={aberto} aoMudarAberto={setAberto} />
+      {pendente && (
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Aguardando a confirmação de{" "}
+          <span className="font-medium text-foreground">{pendente}</span>. Abra o link que enviamos
+          para esse endereço; até lá, seu e-mail continua o mesmo.
+        </p>
+      )}
+      <DialogoTrocaDeEmail aberto={aberto} aoMudarAberto={setAberto} />
     </Bloco>
   );
 }
