@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
@@ -94,10 +95,14 @@ export function MenuDoUsuario({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" side="top" className="w-60">
-        <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
-          <span className="text-sm font-medium text-foreground">{nome}</span>
-          <span className="truncate text-xs font-normal">{perfil.email}</span>
-        </DropdownMenuLabel>
+        {/* O rótulo do Base UI só existe dentro de um grupo: fora dele, abrir o
+            menu lança "MenuGroupContext is missing". */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
+            <span className="text-sm font-medium text-foreground">{nome}</span>
+            <span className="truncate text-xs font-normal">{perfil.email}</span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
@@ -113,11 +118,11 @@ export function MenuDoUsuario({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>Aparência</DropdownMenuLabel>
         <DropdownMenuRadioGroup
           value={theme ?? "system"}
           onValueChange={(valor) => setTheme(String(valor))}
         >
+          <DropdownMenuLabel>Aparência</DropdownMenuLabel>
           <DropdownMenuRadioItem value="light">
             <Sun />
             Claro
