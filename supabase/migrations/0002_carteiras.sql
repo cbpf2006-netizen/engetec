@@ -30,20 +30,20 @@ create index if not exists carteiras_usuario_idx
 
 alter table public.carteiras enable row level security;
 
-create policy "carteiras: ler as próprias"
+create policy "carteiras: ler as proprias"
   on public.carteiras for select to authenticated
   using (usuario_id = (select auth.uid()));
 
-create policy "carteiras: criar as próprias"
+create policy "carteiras: criar as proprias"
   on public.carteiras for insert to authenticated
   with check (usuario_id = (select auth.uid()));
 
-create policy "carteiras: atualizar as próprias"
+create policy "carteiras: atualizar as proprias"
   on public.carteiras for update to authenticated
   using (usuario_id = (select auth.uid()))
   with check (usuario_id = (select auth.uid()));
 
-create policy "carteiras: excluir as próprias"
+create policy "carteiras: excluir as proprias"
   on public.carteiras for delete to authenticated
   using (usuario_id = (select auth.uid()));
 
