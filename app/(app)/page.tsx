@@ -5,15 +5,17 @@ import { BarraDePeriodo } from "@/components/app/BarraDePeriodo";
 import { Bloco, TituloDaPagina } from "@/components/app/Bloco";
 import { CartaoIndicador } from "@/components/app/CartaoIndicador";
 import { EstadoVazio } from "@/components/app/EstadoVazio";
+import { Quantia } from "@/components/app/Quantia";
 import { PrimeiroAcesso } from "@/components/app/PrimeiroAcesso";
 import { ProximosPagamentos } from "@/components/app/ProximosPagamentos";
 import { BarrasDeFluxo } from "@/components/graficos/BarrasDeFluxo";
 import { RoscaDeDistribuicao } from "@/components/graficos/RoscaDeDistribuicao";
+import { listarCarteiras, saldoPorCarteira } from "@/lib/dados/carteiras";
 import { contaVazia } from "@/lib/dados/lancamentos";
 import { listarModelosPorFluxo } from "@/lib/dados/modelos";
 import { montarResumoDoPainel } from "@/lib/dados/painel";
 import { perfilAtual } from "@/lib/dados/sessao";
-import { data as formatarData, moeda, saudacao } from "@/lib/formato";
+import { moeda, saudacao } from "@/lib/formato";
 import { resolverPeriodo } from "@/lib/periodo";
 
 export const metadata: Metadata = { title: "Início" };
@@ -41,7 +43,11 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
     );
   }
 
-  const resumo = await montarResumoDoPainel(periodo);
+  const [resumo, carteiras, saldos] = await Promise.all([
+    montarResumoDoPainel(periodo),
+    listarCarteiras(),
+    saldoPorCarteira(),
+  ]);
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
@@ -59,14 +65,27 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
           ------------------------------------------------------------------ */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <CartaoIndicador
-          rotulo="Saldo em caixa"
+          rotulo="Saldo total"
           quantia={resumo.saldoEmCaixa}
           icone={Wallet}
           destaque
           contexto={
-            <>
-              Acumulado até {formatarData(periodo.ate)}, já descontando aportes.
-            </>
+            <span className="flex flex-col gap-1.5">
+              <span className="font-medium text-foreground/80">Valor nas carteiras</span>
+              {carteiras.length === 0 ? (
+                <span>Nenhuma carteira cadastrada.</span>
+              ) : (
+                carteiras.map((carteira) => (
+                  <span key={carteira.id} className="flex items-baseline justify-between gap-3">
+                    <span className="truncate">{carteira.nome}</span>
+                    <Quantia
+                      valor={saldos[carteira.id] ?? 0}
+                      className="shrink-0 font-semibold text-foreground"
+                    />
+                  </span>
+                ))
+              )}
+            </span>
           }
         />
 
