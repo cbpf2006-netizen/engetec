@@ -12,6 +12,7 @@ import type { Perfil } from "@/lib/tipos";
 
 const TAMANHOS = {
   sm: "size-9 text-[0.8125rem]",
+  md: "size-11 text-base",
   lg: "size-24 text-3xl",
 } as const;
 

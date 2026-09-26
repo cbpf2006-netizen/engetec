@@ -32,18 +32,23 @@ export default function LogoRaiz({
   tamanho = "md",
   className,
 }: {
-  tamanho?: "sm" | "md";
+  tamanho?: "sm" | "md" | "lg";
   className?: string;
 }) {
   return (
     <span
       className={cn(
         "inline-flex items-center gap-2 font-semibold tracking-tight text-foreground",
-        tamanho === "md" ? "text-xl" : "text-base",
+        tamanho === "lg" ? "text-2xl" : tamanho === "md" ? "text-xl" : "text-base",
         className
       )}
     >
-      <GlifoRaiz className={cn("text-primary", tamanho === "md" ? "size-6" : "size-5")} />
+      <GlifoRaiz
+        className={cn(
+          "text-primary",
+          tamanho === "lg" ? "size-7" : tamanho === "md" ? "size-6" : "size-5"
+        )}
+      />
       Raiz
     </span>
   );

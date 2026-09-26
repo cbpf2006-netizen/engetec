@@ -81,12 +81,12 @@ export function MenuDoUsuario({
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
               variante === "lateral"
                 ? "w-full px-2 py-2 hover:bg-secondary"
-                : "p-0.5 hover:opacity-80"
+                : "rounded-full hover:opacity-80"
             )}
           />
         }
       >
-        <Avatar perfil={perfil} />
+        <Avatar perfil={perfil} tamanho={variante === "compacta" ? "md" : "sm"} />
 
         {variante === "lateral" && (
           <span className="flex min-w-0 flex-1 flex-col">

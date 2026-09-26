@@ -44,12 +44,12 @@ export function BarraLateral({ perfil }: { perfil: Perfil }) {
 
 export function CabecalhoMobile({ perfil }: { perfil: Perfil }) {
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/90 px-4 py-3 backdrop-blur-md lg:hidden">
+    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-background/90 px-4 py-2.5 backdrop-blur-md lg:hidden">
       <Link
         href="/"
         className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
-        <LogoRaiz tamanho="sm" />
+        <LogoRaiz tamanho="lg" />
       </Link>
 
       <MenuDoUsuario perfil={perfil} variante="compacta" />
