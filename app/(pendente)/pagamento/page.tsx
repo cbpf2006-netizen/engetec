@@ -4,7 +4,6 @@ import { Clock, MailCheck, MessageCircle } from "lucide-react";
 
 import LogoRaiz from "@/components/marca/LogoRaiz";
 import { SeletorDeTema } from "@/components/app/MenuDoUsuario";
-import { BotaoExcluirConta } from "@/components/app/ExcluirConta";
 import { ChavePixCopiavel } from "@/components/app/ChavePixCopiavel";
 import { QrCodeDePagamento } from "@/components/app/QrCodeDePagamento";
 import { Button } from "@/components/ui/button";
@@ -89,11 +88,6 @@ export default async function PaginaDePagamento() {
               </Button>
             </form>
 
-            <BotaoExcluirConta
-              rotulo="Excluir minha conta"
-              variante="ghost"
-              className="w-full text-destructive hover:text-destructive"
-            />
           </div>
         </div>
       </main>

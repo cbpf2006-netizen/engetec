@@ -18,8 +18,8 @@ import { excluirMinhaConta } from "@/lib/acoes/conta";
 /* =============================================================================
    Excluir a própria conta
 
-   Vale para quem já usa o app (na página Perfil) e para quem ainda está
-   pendente (na tela de pagamento) — toda conta pode ser encerrada pelo dono.
+   Fica só na página Perfil, ou seja, só para quem já tem acesso. Quem está
+   pendente vê apenas a tela de pagamento, sem essa opção.
 
    Apaga a conta e todos os dados, sem volta. Por isso o diálogo diz o que vai
    embora e pede a senha: uma sessão esquecida aberta não basta para isso. Ao
