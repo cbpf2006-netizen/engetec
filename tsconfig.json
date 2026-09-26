@@ -31,5 +31,5 @@
     "**/*.mts"
   ],
   "//": "raiz/ é um projeto Next.js separado (app financeiro), com tsconfig próprio — deixá-lo aqui faria o build do site institucional checar arquivos que não são dele.",
-  "exclude": ["node_modules", "raiz"]
+  "exclude": ["node_modules", "raiz", "supabase/functions"]
 }
