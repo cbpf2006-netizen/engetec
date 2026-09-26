@@ -274,6 +274,13 @@ h3 {
   letter-spacing: -0.015em;
 }
 
+/* Bloqueio do app (lib/bloqueio.ts): um script marca o <html> antes da primeira
+   pintura quando o app deve abrir trancado, e isto esconde o conteúdo até o
+   React assumir e mostrar a tela de desbloqueio. */
+html[data-bloqueado="1"] [data-protegido] {
+  visibility: hidden;
+}
+
 /* Barra de rolagem discreta — some do caminho, aparece ao passar o mouse. */
 .rolagem-fina {
   scrollbar-width: thin;

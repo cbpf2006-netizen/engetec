@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, Trash2 } from "lucide-react";
+import { Camera, ScanFace, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,13 @@ import { Bloco } from "./Bloco";
 import { DialogoTrocaDeEmail } from "./DialogoTrocaDeEmail";
 import { BotaoExcluirConta } from "./ExcluirConta";
 import { mascaraTelefone, soDigitos } from "@/lib/formato";
+import {
+  ativarBloqueio,
+  bloqueioAtivo,
+  bloqueioSuportado,
+  desativarBloqueio,
+  verificarBloqueio,
+} from "@/lib/bloqueio";
 import { atualizarPerfil } from "@/lib/acoes/perfil";
 import { alterarSenha, atualizarTelefone, enviarFoto, removerFoto } from "@/lib/acoes/conta";
 import type { Perfil } from "@/lib/tipos";
@@ -32,6 +39,7 @@ export function PerfilCompleto({ perfil }: { perfil: Perfil }) {
       <BlocoDosDados perfil={perfil} />
       <BlocoDoEmail email={perfil.email} />
       <BlocoDaSenha />
+      <BlocoDoBloqueio perfil={perfil} />
       <BlocoDaExclusao ehAdmin={perfil.papel === "admin"} />
     </>
   );
@@ -379,6 +387,93 @@ function BlocoDaExclusao({ ehAdmin }: { ehAdmin: boolean }) {
         <div>
           <BotaoExcluirConta />
         </div>
+      )}
+    </Bloco>
+  );
+}
+
+/* =============================================================================
+   Bloqueio do app neste aparelho
+
+   Liga o pedido de Face ID / digital / senha do aparelho ao voltar ao app
+   depois de 5 minutos fora. É por aparelho (fica no navegador), não por conta:
+   ligar no celular não liga no computador. Ver lib/bloqueio.ts.
+   ========================================================================== */
+
+function BlocoDoBloqueio({ perfil }: { perfil: Perfil }) {
+  const [suportado, setSuportado] = useState<boolean | null>(null);
+  const [ativo, setAtivo] = useState(false);
+  const [ocupado, setOcupado] = useState(false);
+
+  useEffect(() => {
+    let vivo = true;
+    bloqueioSuportado().then((ok) => {
+      if (!vivo) return;
+      setSuportado(ok);
+      setAtivo(bloqueioAtivo());
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  async function ligar() {
+    setOcupado(true);
+    const ok = await ativarBloqueio({
+      id: perfil.id,
+      email: perfil.email,
+      nome: perfil.nome ?? "",
+    });
+    setOcupado(false);
+
+    if (ok) {
+      setAtivo(true);
+      toast.success("Bloqueio ativado neste aparelho.");
+    } else {
+      toast.error("Não foi possível ativar. Confirme com o Face ID ou a senha do aparelho e tente de novo.");
+    }
+  }
+
+  async function desligar() {
+    setOcupado(true);
+    // Desligar também pede a confirmação do aparelho: sem isso, quem pegasse o
+    // celular aberto poderia simplesmente tirar o bloqueio.
+    const passou = await verificarBloqueio();
+    setOcupado(false);
+
+    if (!passou) {
+      toast.error("Confirme com o Face ID ou a senha do aparelho para desativar.");
+      return;
+    }
+    desativarBloqueio();
+    setAtivo(false);
+    toast.success("Bloqueio desativado neste aparelho.");
+  }
+
+  return (
+    <Bloco
+      titulo="Bloqueio do app"
+      descricao="Pede o Face ID, a digital ou a senha do aparelho ao voltar ao Raiz depois de 5 minutos fora."
+    >
+      {suportado === null ? null : suportado ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant={ativo ? "outline" : "default"}
+            disabled={ocupado}
+            onClick={ativo ? desligar : ligar}
+          >
+            <ScanFace />
+            {ocupado ? "Aguarde…" : ativo ? "Desativar bloqueio" : "Ativar bloqueio"}
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            {ativo ? "Ativo neste aparelho." : "Desativado neste aparelho."}
+          </span>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Este aparelho ou navegador não oferece Face ID, digital nem senha para o bloqueio.
+        </p>
       )}
     </Bloco>
   );

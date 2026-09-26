@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar } from "./Avatar";
 import { esquecerEmail, salvarEmail } from "@/lib/login-salvo";
+import { esquecerUltimoUso } from "@/lib/bloqueio";
 import { sair } from "@/lib/acoes/autenticacao";
 import type { Perfil } from "@/lib/tipos";
 
@@ -61,6 +62,7 @@ export function MenuDoUsuario({
   function sairDaConta(lembrar: boolean) {
     if (lembrar) salvarEmail(perfil.email);
     else esquecerEmail();
+    esquecerUltimoUso();
     iniciar(() => void sair());
   }
 
