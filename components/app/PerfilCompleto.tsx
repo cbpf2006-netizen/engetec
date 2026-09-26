@@ -121,7 +121,7 @@ function BlocoDaFoto({ perfil }: { perfil: Perfil }) {
   }
 
   return (
-    <Bloco titulo="Foto de perfil" descricao="Sem foto, aparecem as iniciais do seu nome.">
+    <Bloco titulo="Foto de perfil">
       <div className="flex flex-wrap items-center gap-5">
         <Avatar perfil={perfil} tamanho="lg" />
 

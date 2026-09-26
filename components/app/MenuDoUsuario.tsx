@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { LogOut, Monitor, Moon, Settings, ShieldCheck, Sun, UserRound } from "lucide-react";
+import { LogOut, Monitor, Moon, ShieldCheck, Sun, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ import type { Perfil } from "@/lib/tipos";
    Menu do usuário
 
    Fica no rodapé da barra lateral no desktop e no topo no celular. Reúne o
-   que é "sobre você e o app", não sobre dinheiro: perfil, ajustes, tema e
+   que é "sobre você e o app", não sobre dinheiro: perfil, tema e
    sair.
 
    Sair pergunta antes se o e-mail deve ficar salvo neste aparelho para o
@@ -119,11 +119,6 @@ export function MenuDoUsuario({
             Administrar
           </DropdownMenuItem>
         )}
-
-        <DropdownMenuItem render={<Link href="/ajustes" />}>
-          <Settings />
-          Ajustes
-        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
