@@ -22,7 +22,7 @@ export function EstadoVazio({
 }: {
   icone: LucideIcon;
   titulo: string;
-  descricao?: string;
+  descricao?: ReactNode;
   acao?: ReactNode;
   compacto?: boolean;
   className?: string;

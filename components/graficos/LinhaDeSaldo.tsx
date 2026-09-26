@@ -12,7 +12,7 @@ import {
 } from "recharts";
 
 import type { PontoDaSerie } from "@/lib/financas";
-import { CaixaDeTooltip, EIXO, eixoDeValor } from "./base";
+import { CaixaDeTooltip, EIXO, useEixoDeValor } from "./base";
 
 /* =============================================================================
    Evolução do saldo
@@ -33,6 +33,7 @@ export function LinhaDeSaldo({
   serie: PontoDaSerie[];
   altura?: number;
 }) {
+  const eixoDeValor = useEixoDeValor();
   const cruzaZero = serie.some((ponto) => ponto.acumulado < 0);
 
   return (

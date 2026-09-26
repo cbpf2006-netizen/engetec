@@ -10,9 +10,9 @@ import {
   YAxis,
 } from "recharts";
 
-import { moeda } from "@/lib/formato";
+import { useMoeda } from "@/lib/valores-ocultos";
 import type { PontoDaSerie } from "@/lib/financas";
-import { CaixaDeTooltip, EIXO, Legenda, eixoDeValor } from "./base";
+import { CaixaDeTooltip, EIXO, Legenda, useEixoDeValor } from "./base";
 
 /* =============================================================================
    Entradas x saídas ao longo do período
@@ -38,6 +38,9 @@ export function BarrasDeFluxo({
   serie: PontoDaSerie[];
   altura?: number;
 }) {
+  const moeda = useMoeda();
+  const eixoDeValor = useEixoDeValor();
+
   return (
     <div className="flex flex-col gap-4">
       <Legenda

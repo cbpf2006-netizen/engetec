@@ -19,7 +19,7 @@ import {
   totalInvestido,
   variacaoRelativa,
 } from "@/lib/financas";
-import { moeda } from "@/lib/formato";
+import { Quantia } from "@/components/app/Quantia";
 import { periodoAnterior, resolverPeriodo } from "@/lib/periodo";
 
 export const metadata: Metadata = { title: "Investimentos" };
@@ -164,9 +164,14 @@ export default async function PaginaDeInvestimentos({
                 icone={TrendingUp}
                 titulo="Nenhuma movimentação neste período"
                 descricao={
-                  total > 0
-                    ? `Sua carteira soma ${moeda(total)} de períodos anteriores. Registre um aporte para movimentá-la.`
-                    : "Registre o primeiro aporte. Ele sai do caixa livre e passa a contar como patrimônio."
+                  total > 0 ? (
+                    <>
+                      Sua carteira soma <Quantia valor={total} className="font-semibold text-foreground" />{" "}
+                      de períodos anteriores. Registre um aporte para movimentá-la.
+                    </>
+                  ) : (
+                    "Registre o primeiro aporte. Ele sai do caixa livre e passa a contar como patrimônio."
+                  )
                 }
                 acao={
                   <BotaoNovoLancamento

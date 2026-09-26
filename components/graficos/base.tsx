@@ -3,7 +3,8 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
-import { moeda, moedaCompacta } from "@/lib/formato";
+import { moedaCompacta } from "@/lib/formato";
+import { useMoeda, useValoresOcultos } from "@/lib/valores-ocultos";
 
 /* =============================================================================
    Peças comuns dos gráficos
@@ -25,6 +26,13 @@ export function eixoDeValor(valor: number): string {
   return moedaCompacta(valor);
 }
 
+/** Rótulo do eixo de valor que respeita "ocultar valores": escondidos, o eixo
+    fica sem números (as barras continuam mostrando a proporção). */
+export function useEixoDeValor(): (valor: number) => string {
+  const ocultos = useValoresOcultos();
+  return (valor) => (ocultos ? "" : moedaCompacta(valor));
+}
+
 export type LinhaDeTooltip = {
   rotulo: string;
   valor: number;
@@ -41,6 +49,8 @@ export function CaixaDeTooltip({
   linhas: LinhaDeTooltip[];
   rodape?: ReactNode;
 }) {
+  const moeda = useMoeda();
+
   return (
     <div className="pointer-events-none min-w-44 rounded-xl bg-popover p-3 text-popover-foreground ring-1 ring-border shadow-lg">
       <p className="mb-2 text-xs font-medium text-muted-foreground">{titulo}</p>

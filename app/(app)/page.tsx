@@ -15,7 +15,8 @@ import { contaVazia } from "@/lib/dados/lancamentos";
 import { listarModelosPorFluxo } from "@/lib/dados/modelos";
 import { montarResumoDoPainel } from "@/lib/dados/painel";
 import { perfilAtual } from "@/lib/dados/sessao";
-import { moeda, saudacao } from "@/lib/formato";
+import { saudacao } from "@/lib/formato";
+import { AlternarValores } from "@/components/app/AlternarValores";
 import { resolverPeriodo } from "@/lib/periodo";
 
 export const metadata: Metadata = { title: "Início" };
@@ -54,6 +55,7 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
       <TituloDaPagina
         titulo={`${saudacao()}, ${primeiroNome}.`}
         apoio="Seu caixa, o que entrou, o que saiu e o que virou patrimônio."
+        acao={<AlternarValores />}
       />
 
       <BarraDePeriodo periodo={periodo} />
@@ -106,9 +108,10 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
             ) : (
               <>
                 {resumo.aportes > 0 ? "Aportou" : "Resgatou"}{" "}
-                <strong className="numero font-semibold text-foreground">
-                  {moeda(Math.abs(resumo.aportes))}
-                </strong>{" "}
+                <Quantia
+                  valor={Math.abs(resumo.aportes)}
+                  className="font-semibold text-foreground"
+                />{" "}
                 no período.
               </>
             )

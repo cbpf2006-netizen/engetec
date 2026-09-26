@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { AvisoDeInstalacao } from "@/components/app/AvisoDeInstalacao";
 import { BloqueioDoApp } from "@/components/app/BloqueioDoApp";
 import { SCRIPT_DE_PRE_BLOQUEIO } from "@/lib/bloqueio";
+import { SCRIPT_VALORES_OCULTOS } from "@/lib/valores-ocultos-script";
 import { BarraLateral, CabecalhoMobile } from "@/components/app/BarraLateral";
 import { NavegacaoInferior } from "@/components/app/NavegacaoInferior";
 import { BotoesFlutuantes } from "@/components/app/AcoesDeLancamento";
@@ -60,6 +61,7 @@ export default async function LayoutDoApp({ children }: { children: React.ReactN
       {/* Antes da primeira pintura: se o bloqueio está ligado e o limite de
           5 minutos estourou, esconde o conteúdo até a tela de desbloqueio. */}
       <script dangerouslySetInnerHTML={{ __html: SCRIPT_DE_PRE_BLOQUEIO }} />
+      <script dangerouslySetInnerHTML={{ __html: SCRIPT_VALORES_OCULTOS }} />
       <BloqueioDoApp>
       <div className="flex min-h-dvh lg:grid lg:grid-cols-[16.5rem_minmax(0,1fr)]">
         <BarraLateral perfil={perfil} />

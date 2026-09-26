@@ -281,6 +281,13 @@ html[data-bloqueado="1"] [data-protegido] {
   visibility: hidden;
 }
 
+/* Ocultar valores (lib/valores-ocultos.ts): antes de o React hidratar, esconde
+   cada quantia visível. Depois, o próprio componente troca por "R$ ••••" e deixa
+   de ter data-valor, então este seletor deixa de valer para ele. */
+html[data-ocultar="1"] [data-valor] {
+  visibility: hidden;
+}
+
 /* Barra de rolagem discreta — some do caminho, aparece ao passar o mouse. */
 .rolagem-fina {
   scrollbar-width: thin;
