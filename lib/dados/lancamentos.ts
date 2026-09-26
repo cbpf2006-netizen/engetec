@@ -33,16 +33,12 @@ import type { MovimentoInvestimento, MovimentoTransacao } from "@/lib/financas";
 
 const CAMPOS_TRANSACAO =
   "id, fluxo, modelo_id, carteira_id, valor, data, observacao, criado_em";
-const CAMPOS_INVESTIMENTO =
-  "id, operacao, modelo_id, carteira_id, valor, data, observacao, criado_em";
-const CAMPOS_MODELO = "modelo:modelos (id, fluxo, nome, icone, cor, ordem, arquivado)";
+const CAMPOS_INVESTIMENTO = "id, operacao, modelo_id, valor, data, observacao, criado_em";
+const CAMPOS_MODELO = "modelo:modelos (id, fluxo, nome, icone, cor, ordem, arquivado, carteira_id)";
 const CAMPOS_CARTEIRA = "carteira:carteiras (id, nome, ordem)";
 
-type LinhaComRelacoes = {
-  valor: number | string;
-  modelo: Modelo | Modelo[] | null;
-  carteira: Carteira | Carteira[] | null;
-};
+type LinhaComModelo = { valor: number | string; modelo: Modelo | Modelo[] | null };
+type LinhaComRelacoes = LinhaComModelo & { carteira: Carteira | Carteira[] | null };
 
 /** PostgREST devolve o relacionamento como objeto ou array conforme a
     cardinalidade que inferiu. Normalizar aqui evita `Array.isArray` espalhado
@@ -51,13 +47,12 @@ function umOuNulo<T>(valor: T | T[] | null): T | null {
   return Array.isArray(valor) ? (valor[0] ?? null) : valor;
 }
 
+function normalizarInvestimento<T extends LinhaComModelo>(linha: T) {
+  return { ...linha, valor: Number(linha.valor), modelo: umOuNulo(linha.modelo) };
+}
+
 function normalizar<T extends LinhaComRelacoes>(linha: T) {
-  return {
-    ...linha,
-    valor: Number(linha.valor),
-    modelo: umOuNulo(linha.modelo),
-    carteira: umOuNulo(linha.carteira),
-  };
+  return { ...normalizarInvestimento(linha), carteira: umOuNulo(linha.carteira) };
 }
 
 export type FiltroLancamentos = {
@@ -101,7 +96,7 @@ export async function listarInvestimentos(
 
   let consulta = supabase
     .from("investimentos")
-    .select(`${CAMPOS_INVESTIMENTO}, ${CAMPOS_MODELO}, ${CAMPOS_CARTEIRA}`)
+    .select(`${CAMPOS_INVESTIMENTO}, ${CAMPOS_MODELO}`)
     .eq("usuario_id", usuario.id)
     .order("data", { ascending: false })
     .order("criado_em", { ascending: false });
@@ -115,7 +110,7 @@ export async function listarInvestimentos(
   if (error) throw erroDeConsulta("Falha ao carregar investimentos", error);
 
   return (data ?? []).map((linha) =>
-    normalizar(linha as unknown as Investimento & LinhaComRelacoes)
+    normalizarInvestimento(linha as unknown as Investimento & LinhaComModelo)
   ) as InvestimentoComModelo[];
 }
 

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icone, SeloModelo } from "@/components/Icone";
+import { useCarteiras } from "./CarteirasProvider";
+import { SelecaoDeCarteira } from "./SelecaoDeCarteira";
 import { CORES, ICONES_POR_FLUXO, corDoModelo } from "@/lib/catalogo";
 import { criarModelo } from "@/lib/acoes/modelos";
 import { ROTULO_FLUXO, type Fluxo, type Modelo } from "@/lib/tipos";
@@ -136,11 +138,29 @@ function CriacaoRapida({
   const [nome, setNome] = useState("");
   const [icone, setIcone] = useState<string>("circulo");
   const [cor, setCor] = useState<string>("verde");
+  const carteiras = useCarteiras();
+  const [carteiraId, setCarteiraId] = useState<string | null>(
+    carteiras.length === 1 ? carteiras[0].id : null
+  );
+  const [erroCarteira, setErroCarteira] = useState<string | undefined>();
   const [enviando, iniciar] = useTransition();
 
+  const pedeCarteira = fluxo === "investimento";
+
   function salvar() {
+    if (pedeCarteira && !carteiraId) {
+      setErroCarteira("Escolha a carteira.");
+      return;
+    }
+
     iniciar(async () => {
-      const resultado = await criarModelo({ fluxo, nome, icone, cor });
+      const resultado = await criarModelo({
+        fluxo,
+        nome,
+        icone,
+        cor,
+        ...(pedeCarteira ? { carteira_id: carteiraId } : {}),
+      });
       if (!resultado.ok) {
         toast.error(resultado.erro);
         return;
@@ -181,6 +201,18 @@ function CriacaoRapida({
 
       <EscolhaDeIcone fluxo={fluxo} valor={icone} aoMudar={setIcone} />
       <EscolhaDeCor valor={cor} aoMudar={setCor} />
+
+      {pedeCarteira && (
+        <SelecaoDeCarteira
+          carteiras={carteiras}
+          selecionada={carteiraId}
+          aoSelecionar={(id) => {
+            setCarteiraId(id);
+            setErroCarteira(undefined);
+          }}
+          erro={erroCarteira}
+        />
+      )}
 
       <Button type="button" size="lg" disabled={!nome.trim() || enviando} onClick={salvar}>
         {enviando ? "Criando…" : "Criar e usar"}

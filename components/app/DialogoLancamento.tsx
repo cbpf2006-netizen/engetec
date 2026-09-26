@@ -152,7 +152,8 @@ function Formulario({
       problemas.modelo_id =
         fluxo === "investimento" ? "Escolha o tipo de investimento." : "Escolha um modelo.";
     }
-    if (!carteiraId) problemas.carteira_id = "Escolha a carteira.";
+    // Investimento herda a carteira do tipo, escolhida quando o tipo foi criado.
+    if (fluxo !== "investimento" && !carteiraId) problemas.carteira_id = "Escolha a carteira.";
     if (!data) problemas.data = "Informe a data.";
 
     return problemas;
@@ -165,11 +166,10 @@ function Formulario({
 
     const dados = {
       modelo_id: modeloId,
-      carteira_id: carteiraId,
       valor: paraNumero(valor),
       data,
       observacao: observacao.trim() || null,
-      ...(fluxo === "investimento" ? { operacao } : { fluxo }),
+      ...(fluxo === "investimento" ? { operacao } : { fluxo, carteira_id: carteiraId }),
     };
 
     iniciar(async () => {
@@ -248,15 +248,17 @@ function Formulario({
         erro={erros.modelo_id}
       />
 
-      <SelecaoDeCarteira
-        carteiras={carteiras}
-        selecionada={carteiraId}
-        aoSelecionar={(id) => {
-          setCarteiraId(id);
-          setErros((atual) => ({ ...atual, carteira_id: undefined }));
-        }}
-        erro={erros.carteira_id}
-      />
+      {fluxo !== "investimento" && (
+        <SelecaoDeCarteira
+          carteiras={carteiras}
+          selecionada={carteiraId}
+          aoSelecionar={(id) => {
+            setCarteiraId(id);
+            setErros((atual) => ({ ...atual, carteira_id: undefined }));
+          }}
+          erro={erros.carteira_id}
+        />
+      )}
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="campo-data">Data</Label>

@@ -23,6 +23,7 @@ export async function criarModelo(entrada: unknown): Promise<Resultado<Modelo>> 
 
   const { supabase, usuario } = contexto;
   const { fluxo, nome, icone } = analise.data;
+  const carteira_id = fluxo === "investimento" ? (analise.data.carteira_id ?? null) : null;
 
   // Sem cor explícita, segue a ordem validada da paleta em vez de sortear.
   const { data: existentes } = await supabase
@@ -39,8 +40,8 @@ export async function criarModelo(entrada: unknown): Promise<Resultado<Modelo>> 
 
   const { data, error } = await supabase
     .from("modelos")
-    .insert({ usuario_id: usuario.id, fluxo, nome, icone, cor, ordem })
-    .select("id, fluxo, nome, icone, cor, ordem, arquivado")
+    .insert({ usuario_id: usuario.id, fluxo, nome, icone, cor, ordem, carteira_id })
+    .select("id, fluxo, nome, icone, cor, ordem, arquivado, carteira_id")
     .single();
 
   if (error) return erroDeBanco(error, "criar o modelo");
@@ -56,11 +57,13 @@ export async function atualizarModelo(id: string, entrada: unknown): Promise<Res
   const contexto = await contextoOuNulo();
   if (!contexto) return falha(SEM_SESSAO);
 
-  const { nome, icone, cor } = analise.data;
+  const { fluxo, nome, icone, cor } = analise.data;
+  // Só tipos de investimento têm carteira; nos demais a coluna nunca é tocada.
+  const carteira = fluxo === "investimento" ? { carteira_id: analise.data.carteira_id ?? null } : {};
 
   const { error } = await contexto.supabase
     .from("modelos")
-    .update({ nome, icone, cor })
+    .update({ nome, icone, cor, ...carteira })
     .eq("id", id)
     .eq("usuario_id", contexto.usuario.id);
 

@@ -33,6 +33,10 @@ export type Modelo = {
   cor: string;
   ordem: number;
   arquivado: boolean;
+  /** Só tipos de investimento têm carteira: é escolhida uma vez, ao criar o
+      tipo, e todo aporte e resgate herda. Nulo nos tipos anteriores às
+      carteiras. */
+  carteira_id: string | null;
 };
 
 /** Onde o dinheiro está: "Mão", "Santander", "Bradesco". Só um nome — o saldo
@@ -71,16 +75,15 @@ export type Investimento = {
   id: string;
   operacao: OperacaoInvestimento;
   modelo_id: string | null;
-  carteira_id: string | null;
   valor: number;
   data: string;
   observacao: string | null;
   criado_em: string;
 };
 
+/** A carteira de um investimento é a do seu tipo (`modelo.carteira_id`). */
 export type InvestimentoComModelo = Investimento & {
   modelo: Modelo | null;
-  carteira: Carteira | null;
 };
 
 /** Conta a pagar. `status` no banco só tem dois estados reais: pendente e

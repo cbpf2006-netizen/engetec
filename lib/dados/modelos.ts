@@ -12,7 +12,7 @@ export async function listarModelos(fluxo: Fluxo, incluirArquivados = false): Pr
 
   let consulta = supabase
     .from("modelos")
-    .select("id, fluxo, nome, icone, cor, ordem, arquivado")
+    .select("id, fluxo, nome, icone, cor, ordem, arquivado, carteira_id")
     .eq("usuario_id", usuario.id)
     .eq("fluxo", fluxo)
     .order("ordem", { ascending: true })
@@ -34,7 +34,7 @@ export const listarModelosPorFluxo = cache(async (): Promise<Record<Fluxo, Model
 
   const { data, error } = await supabase
     .from("modelos")
-    .select("id, fluxo, nome, icone, cor, ordem, arquivado")
+    .select("id, fluxo, nome, icone, cor, ordem, arquivado, carteira_id")
     .eq("usuario_id", usuario.id)
     .eq("arquivado", false)
     .order("ordem", { ascending: true });

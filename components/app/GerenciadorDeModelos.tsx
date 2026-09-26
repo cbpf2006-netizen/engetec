@@ -25,6 +25,8 @@ import { Label } from "@/components/ui/label";
 import { SeloModelo } from "@/components/Icone";
 import { Bloco } from "./Bloco";
 import { DialogoConfirmar } from "./DialogoConfirmar";
+import { useCarteiras } from "./CarteirasProvider";
+import { SelecaoDeCarteira } from "./SelecaoDeCarteira";
 import { EscolhaDeCor, EscolhaDeIcone } from "./SelecaoDeModelo";
 import {
   alternarArquivoDoModelo,
@@ -294,6 +296,11 @@ function FormularioDeModelo({
   const [nome, setNome] = useState(modelo?.nome ?? "");
   const [icone, setIcone] = useState(modelo?.icone ?? "circulo");
   const [cor, setCor] = useState(modelo?.cor ?? "verde");
+  const carteiras = useCarteiras();
+  const [carteiraId, setCarteiraId] = useState<string | null>(
+    modelo?.carteira_id ?? (carteiras.length === 1 ? carteiras[0].id : null)
+  );
+  const [erroCarteira, setErroCarteira] = useState<string | undefined>();
   const [erro, setErro] = useState<string | undefined>();
   const [enviando, iniciar] = useTransition();
 
@@ -302,9 +309,20 @@ function FormularioDeModelo({
       setErro("Dê um nome ao modelo.");
       return;
     }
+    // A carteira só é perguntada aqui, na criação do tipo: os aportes herdam.
+    if (fluxo === "investimento" && !carteiraId) {
+      setErroCarteira("Escolha a carteira.");
+      return;
+    }
 
     iniciar(async () => {
-      const dados = { fluxo, nome, icone, cor };
+      const dados = {
+        fluxo,
+        nome,
+        icone,
+        cor,
+        ...(fluxo === "investimento" ? { carteira_id: carteiraId } : {}),
+      };
       const resultado = modelo
         ? await atualizarModelo(modelo.id, dados)
         : await criarModelo(dados);
@@ -351,6 +369,18 @@ function FormularioDeModelo({
 
       <EscolhaDeIcone fluxo={fluxo} valor={icone} aoMudar={setIcone} />
       <EscolhaDeCor valor={cor} aoMudar={setCor} />
+
+      {fluxo === "investimento" && (
+        <SelecaoDeCarteira
+          carteiras={carteiras}
+          selecionada={carteiraId}
+          aoSelecionar={(id) => {
+            setCarteiraId(id);
+            setErroCarteira(undefined);
+          }}
+          erro={erroCarteira}
+        />
+      )}
 
       <DialogFooter className="-mx-5 -mb-5 px-5 py-4">
         <Button type="button" variant="outline" size="lg" onClick={aoConcluir} disabled={enviando}>

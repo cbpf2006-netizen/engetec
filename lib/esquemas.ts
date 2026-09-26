@@ -45,8 +45,10 @@ export const fluxoTransacao = z.enum(["entrada", "saida"]);
    Lançamentos
    ========================================================================== */
 
-/** Obrigatória em todo lançamento: saber quanto entrou sem saber onde o
-    dinheiro ficou deixa o saldo por carteira impossível de reconstruir. */
+/** Obrigatória em toda entrada e saída, e na criação de um tipo de
+    investimento (que a repassa aos seus aportes): saber quanto entrou sem
+    saber onde o dinheiro ficou deixa o saldo por carteira impossível de
+    reconstruir. */
 export const carteiraId = z.string().uuid("Escolha a carteira.");
 
 export const esquemaTransacao = z.object({
@@ -61,7 +63,6 @@ export const esquemaTransacao = z.object({
 export const esquemaInvestimento = z.object({
   operacao: z.enum(["aporte", "resgate"]).default("aporte"),
   modelo_id: z.string().uuid(),
-  carteira_id: carteiraId,
   valor,
   data: dataIso,
   observacao,
@@ -113,6 +114,10 @@ export const esquemaModelo = z.object({
     .string()
     .refine((v) => apelidosDeCor.includes(v), "Cor inválida.")
     .catch("verde"),
+  carteira_id: z.string().uuid().nullable().optional(),
+}).refine((modelo) => modelo.fluxo !== "investimento" || Boolean(modelo.carteira_id), {
+  message: "Escolha a carteira.",
+  path: ["carteira_id"],
 });
 
 /* =============================================================================

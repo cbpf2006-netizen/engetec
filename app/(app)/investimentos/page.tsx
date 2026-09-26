@@ -11,6 +11,7 @@ import { GerenciadorDeModelos } from "@/components/app/GerenciadorDeModelos";
 import { ListaDeLancamentos } from "@/components/app/ListaDeLancamentos";
 import { RoscaDeDistribuicao } from "@/components/graficos/RoscaDeDistribuicao";
 import { contagemPorModelo, listarInvestimentos } from "@/lib/dados/lancamentos";
+import { listarCarteiras } from "@/lib/dados/carteiras";
 import { listarModelos } from "@/lib/dados/modelos";
 import {
   aportesDoPeriodo,
@@ -35,10 +36,11 @@ export default async function PaginaDeInvestimentos({
      estoque (soma toda a história) e "investido no período" é um fluxo
      (recorta o intervalo). Buscar as duas coisas separadamente seria duas
      idas ao banco para somar as mesmas linhas. */
-  const [modelos, historico, usoPorModelo] = await Promise.all([
+  const [modelos, historico, usoPorModelo, carteiras] = await Promise.all([
     listarModelos("investimento", true),
     listarInvestimentos({ ate: periodo.ate }),
     contagemPorModelo("investimento"),
+    listarCarteiras(),
   ]);
 
   const modelosAtivos = modelos.filter((modelo) => !modelo.arquivado);
@@ -151,7 +153,7 @@ export default async function PaginaDeInvestimentos({
             itens={doPeriodo.map((item) => ({
               id: item.id,
               modelo: item.modelo,
-              carteira: item.carteira,
+              carteira: carteiras.find((c) => c.id === item.modelo?.carteira_id) ?? null,
               valor: item.valor,
               data: item.data,
               observacao: item.observacao,

@@ -107,8 +107,8 @@ describe("taxa de poupança", () => {
 
 describe("distribuição por modelo", () => {
   const modelos: Modelo[] = [
-    { id: "m1", fluxo: "saida", nome: "Alimentação", icone: "mercado", cor: "ambar", ordem: 1, arquivado: false },
-    { id: "m2", fluxo: "saida", nome: "Moradia", icone: "casa", cor: "ciano", ordem: 2, arquivado: false },
+    { id: "m1", fluxo: "saida", nome: "Alimentação", icone: "mercado", cor: "ambar", ordem: 1, arquivado: false, carteira_id: null },
+    { id: "m2", fluxo: "saida", nome: "Moradia", icone: "casa", cor: "ciano", ordem: 2, arquivado: false, carteira_id: null },
   ];
 
   it("ordena do maior para o menor e calcula a fatia de cada um", () => {
