@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 import { Aviso, BotaoEnviar, CampoSenha, CampoTexto } from "./campos";
+import { lerEmailSalvo } from "@/lib/login-salvo";
 import {
   cadastrar,
   definirNovaSenha,
@@ -22,6 +23,10 @@ import {
 
 const ERRO_INICIAL: EstadoFormulario = null;
 
+/** O e-mail salvo só muda quando a pessoa sai da conta — em outra tela, ou
+    seja, com esta desmontada. Não há o que assinar. */
+const semAssinatura = () => () => {};
+
 export function FormularioEntrar({
   destino,
   linkInvalido,
@@ -30,6 +35,10 @@ export function FormularioEntrar({
   linkInvalido?: boolean;
 }) {
   const [estado, acao] = useActionState(entrar, ERRO_INICIAL);
+
+  // E-mail que a pessoa pediu para lembrar ao sair. O servidor não enxerga o
+  // localStorage, então renderiza vazio e o navegador preenche na hidratação.
+  const emailSalvo = useSyncExternalStore(semAssinatura, lerEmailSalvo, () => "");
 
   return (
     <form action={acao} className="flex flex-col gap-4">
@@ -43,18 +52,21 @@ export function FormularioEntrar({
       {destino && <input type="hidden" name="destino" value={destino} />}
 
       <CampoTexto
+        key={emailSalvo}
         id="email"
         rotulo="E-mail"
         type="email"
-        autoComplete="email"
+        autoComplete="username"
         placeholder="voce@exemplo.com"
+        defaultValue={emailSalvo}
         required
-        autoFocus
+        autoFocus={!emailSalvo}
         erro={estado?.campo === "email" ? estado.erro : undefined}
       />
 
       <CampoSenha
         autoComplete="current-password"
+        autoFocus={Boolean(emailSalvo)}
         required
         acao={
           <Link

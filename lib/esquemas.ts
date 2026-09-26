@@ -158,6 +158,39 @@ export const esquemaPerfil = z.object({
     .max(60, "O nome passou de 60 caracteres."),
 });
 
+/** Telefone: só os dígitos (DDD + número, 10 ou 11). Vazio limpa o campo. A
+    máscara "(11) 91234-5678" é da interface; o banco guarda o número puro. */
+export const esquemaTelefone = z
+  .string()
+  .transform((texto) => texto.replace(/\D/g, ""))
+  .refine((digitos) => digitos === "" || /^\d{10,11}$/.test(digitos), "Informe o DDD e o número.")
+  .transform((digitos) => digitos || null);
+
+/** Troca de senha: a atual é exigida para provar que quem está na tela é o
+    dono da conta, não só quem achou o celular desbloqueado. */
+export const esquemaTrocaDeSenha = z
+  .object({
+    atual: z.string().min(1, "Informe sua senha atual."),
+    nova: esquemaSenha,
+    confirmacao: z.string(),
+  })
+  .refine((dados) => dados.nova === dados.confirmacao, {
+    message: "As duas senhas não são iguais.",
+    path: ["confirmacao"],
+  })
+  .refine((dados) => dados.nova !== dados.atual, {
+    message: "A nova senha precisa ser diferente da atual.",
+    path: ["nova"],
+  });
+
+/** Código numérico do e-mail de confirmação. */
+export const esquemaCodigo = z
+  .string()
+  .trim()
+  .regex(/^\d{6,10}$/, "Digite o código de 6 dígitos que chegou no e-mail.");
+
+export const esquemaNovoEmail = z.object({ email: esquemaEmail });
+
 /** Primeira mensagem de erro de um safeParse, já no formato de resposta das
     Server Actions. Uma mensagem por vez: a interface destaca o campo culpado
     em vez de despejar a lista inteira. */

@@ -1,9 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { LogOut, Monitor, Moon, Settings, Sun } from "lucide-react";
+import { LogOut, Monitor, Moon, Settings, Sun, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { iniciais } from "@/lib/formato";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Avatar } from "./Avatar";
+import { esquecerEmail, salvarEmail } from "@/lib/login-salvo";
 import { sair } from "@/lib/acoes/autenticacao";
 import type { Perfil } from "@/lib/tipos";
 
@@ -25,8 +34,12 @@ import type { Perfil } from "@/lib/tipos";
    Menu do usuário
 
    Fica no rodapé da barra lateral no desktop e no topo no celular. Reúne o
-   que é "sobre você e o app", não sobre dinheiro: identidade, tema, ajustes e
+   que é "sobre você e o app", não sobre dinheiro: perfil, ajustes, tema e
    sair.
+
+   Sair pergunta antes se o e-mail deve ficar salvo neste aparelho para o
+   próximo login. A pergunta é do momento de sair, e não de uma configuração,
+   porque é quando a pessoa sabe se o aparelho é dela ou emprestado.
 
    O tema tem três estados (claro, escuro, sistema) em vez de um interruptor:
    "sistema" é o padrão e precisa ser escolhível de volta depois que alguém
@@ -42,10 +55,18 @@ export function MenuDoUsuario({
 }) {
   const { theme, setTheme } = useTheme();
   const [saindo, iniciar] = useTransition();
+  const [confirmandoSaida, setConfirmandoSaida] = useState(false);
+
+  function sairDaConta(lembrar: boolean) {
+    if (lembrar) salvarEmail(perfil.email);
+    else esquecerEmail();
+    iniciar(() => void sair());
+  }
 
   const nome = perfil.nome?.trim() || perfil.email.split("@")[0];
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
@@ -80,6 +101,11 @@ export function MenuDoUsuario({
 
         <DropdownMenuSeparator />
 
+        <DropdownMenuItem render={<Link href="/perfil" />}>
+          <UserRound />
+          Perfil
+        </DropdownMenuItem>
+
         <DropdownMenuItem render={<Link href="/ajustes" />}>
           <Settings />
           Ajustes
@@ -111,24 +137,52 @@ export function MenuDoUsuario({
         <DropdownMenuItem
           variant="destructive"
           disabled={saindo}
-          onClick={() => iniciar(() => void sair())}
+          onClick={() => setConfirmandoSaida(true)}
         >
           <LogOut />
-          {saindo ? "Saindo…" : "Sair"}
+          {saindo ? "Saindo…" : "Sair da conta"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
 
-function Avatar({ perfil }: { perfil: Perfil }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="grid size-9 shrink-0 place-items-center rounded-full bg-accent text-[0.8125rem] font-semibold text-accent-foreground"
-    >
-      {iniciais(perfil.nome, perfil.email)}
-    </span>
+    <Dialog open={confirmandoSaida} onOpenChange={(aberto) => !saindo && setConfirmandoSaida(aberto)}>
+      <DialogContent className="gap-5 p-5 sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Sair da conta</DialogTitle>
+          <DialogDescription>
+            Quer salvar seus dados de login neste aparelho? Guardamos só o e-mail{" "}
+            <strong className="font-medium text-foreground">{perfil.email}</strong> para
+            preencher o login da próxima vez. A senha continua com o gerenciador de senhas do
+            seu navegador — o Raiz nunca a guarda.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogFooter className="-mx-5 -mb-5 flex-col-reverse gap-2 px-5 py-4 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            disabled={saindo}
+            onClick={() => setConfirmandoSaida(false)}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            disabled={saindo}
+            onClick={() => sairDaConta(false)}
+          >
+            Sair sem salvar
+          </Button>
+          <Button type="button" size="lg" disabled={saindo} onClick={() => sairDaConta(true)}>
+            {saindo ? "Saindo…" : "Salvar e sair"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 

@@ -167,11 +167,34 @@ export function mascaraMoeda(bruto: string): string {
   });
 }
 
-/** Iniciais para o avatar: "Ana Paula Souza" → "AP". */
+/** Iniciais para o avatar: primeiro nome e sobrenome — "Ana Paula Souza" → "AS".
+    Nome de uma palavra só dá uma letra. Sem nome, cai no e-mail. */
 export function iniciais(nome: string | null, email: string): string {
-  const base = nome?.trim() || email;
-  const partes = base.split(/[\s@.]+/).filter(Boolean);
+  const partesDoNome = nome?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (partesDoNome.length > 0) {
+    const primeira = partesDoNome[0][0];
+    const ultima = partesDoNome.length > 1 ? partesDoNome[partesDoNome.length - 1][0] : "";
+    return (primeira + ultima).toUpperCase();
+  }
+
+  const partes = email.split(/[@.]+/).filter(Boolean);
   return (partes[0]?.[0] ?? "?").concat(partes[1]?.[0] ?? "").toUpperCase();
+}
+
+/** Só os dígitos, no máximo 11 (DDD + celular). */
+export function soDigitos(texto: string): string {
+  return texto.replace(/\D/g, "").slice(0, 11);
+}
+
+/** "11912345678" → "(11) 91234-5678". Aceita entrada parcial, para a máscara
+    acompanhar a digitação sem pular. */
+export function mascaraTelefone(texto: string): string {
+  const d = soDigitos(texto);
+  if (d.length === 0) return "";
+  if (d.length <= 2) return `(${d}`;
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
 /** O mesmo texto de `moeda`, separado em símbolo, inteiro e centavos — para a

@@ -129,6 +129,10 @@ export type Perfil = {
   id: string;
   nome: string | null;
   email: string;
+  /** Só os dígitos (DDD + número). A máscara é da interface. */
+  telefone: string | null;
+  /** URL pública da foto; nula quando a pessoa não enviou (ou removeu) uma. */
+  foto_url: string | null;
 };
 
 /** Retorno padrão de toda Server Action de escrita. Erros viram mensagem

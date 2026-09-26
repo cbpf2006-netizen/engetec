@@ -62,9 +62,11 @@ export async function perfilAtual(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("perfis")
-    .select("id, nome")
+    .select("id, nome, telefone, foto_path")
     .eq("id", usuario.id)
     .maybeSingle();
+
+  const fotoPath = (data?.foto_path as string | null | undefined) ?? null;
 
   return {
     id: usuario.id,
@@ -72,5 +74,9 @@ export async function perfilAtual(): Promise<Perfil | null> {
     // O perfil é criado por trigger no cadastro; o fallback cobre contas
     // criadas antes da migration rodar.
     nome: data?.nome ?? (usuario.user_metadata?.nome as string | undefined) ?? null,
+    telefone: (data?.telefone as string | null | undefined) ?? null,
+    foto_url: fotoPath
+      ? supabase.storage.from("avatars").getPublicUrl(fotoPath).data.publicUrl
+      : null,
   };
 }
