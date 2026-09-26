@@ -96,11 +96,6 @@ export default async function PaginaDeInvestimentos({
             rotulo: "vs. período anterior",
             melhorSubindo: true,
           }}
-          contexto={
-            doPeriodo.length === 0
-              ? "Nenhuma movimentação no período."
-              : `${doPeriodo.length} movimentaç${doPeriodo.length > 1 ? "ões" : "ão"} entre aportes e resgates.`
-          }
         />
 
         <CartaoIndicador
@@ -110,7 +105,6 @@ export default async function PaginaDeInvestimentos({
           tom="investimento"
           fundoSuave
           destaque
-          contexto="Soma de todos os aportes menos os resgates, desde o começo. Sem cotação de mercado."
         />
       </div>
 
@@ -127,7 +121,6 @@ export default async function PaginaDeInvestimentos({
           <Bloco
             className="lg:col-span-2"
             titulo="Composição"
-            descricao="Quanto cada tipo representa do total investido."
           >
             <RoscaDeDistribuicao
               fatias={carteiraPositiva}

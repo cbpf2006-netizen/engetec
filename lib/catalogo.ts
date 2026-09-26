@@ -93,7 +93,7 @@ export const ICONES = [
 export const ICONES_POR_FLUXO = {
   entrada: ["salario", "presente", "notebook", "moeda", "banco"] as const,
   saida: ["mercado", "casa", "saude", "educacao", "lazer", "combustivel", "restaurante", "roupa", "internet", "cartao"] as const,
-  investimento: ICONES,
+  investimento: ["grafico", "banco", "cofre", "moeda", "cartao"] as const,
 } as const;
 
 export type ApelidoIcone = (typeof ICONES)[number];
