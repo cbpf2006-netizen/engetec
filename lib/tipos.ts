@@ -137,8 +137,6 @@ export type Perfil = {
   papel: "admin" | "usuario";
   /** "pendente" até o administrador confirmar o pagamento e liberar. */
   acesso: "pendente" | "liberado";
-  /** Troca de e-mail pedida e ainda não confirmada pelo link. */
-  email_pendente: string | null;
 };
 
 /** Retorno padrão de toda Server Action de escrita. Erros viram mensagem

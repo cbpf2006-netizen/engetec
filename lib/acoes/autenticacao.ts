@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { chamarFuncao } from "@/lib/supabase/funcoes";
 import {
   erroDeValidacao,
   esquemaCadastro,
@@ -118,34 +119,30 @@ export async function cadastrar(
     return { erro: resultado.erro, campo: resultado.campo };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
+  // A conta é criada pela função `cadastrar` do Supabase, já com o e-mail
+  // marcado como confirmado: nenhum e-mail é enviado. Só nome, telefone e
+  // indicação seguem — papel e acesso jamais saem daqui (a conta nasce
+  // pendente e só o administrador libera).
+  const criada = await chamarFuncao("cadastrar", {
+    nome: analise.data.nome,
     email: analise.data.email,
-    password: analise.data.senha,
-    options: {
-      // Lido pelo trigger `ao_criar_usuario` para preencher o perfil. Só nome,
-      // telefone e indicação: papel e acesso jamais vêm daqui (o cliente
-      // escreve estes metadados, então não podem conceder privilégio).
-      data: {
-        nome: analise.data.nome,
-        telefone: analise.data.telefone,
-        indicado_por: analise.data.indicado_por,
-      },
-      // Quem ainda não pagou cai na tela de pagamento; quem já foi liberado é
-      // devolvido ao app por ela.
-      emailRedirectTo: `${await urlBase()}/auth/confirmar?destino=/pagamento`,
-    },
+    telefone: analise.data.telefone,
+    senha: analise.data.senha,
+    indicado_por: analise.data.indicado_por,
   });
 
-  if (error) return { erro: traduzirErro(error.message, error.code) };
+  if (!criada.ok) return { erro: criada.erro, campo: criada.campo };
 
-  // Com a confirmação por e-mail desligada no projeto, signUp já abre a sessão
-  // e a pessoa segue para a tela de pagamento. Ligada, ele não abre sessão e
-  // resta o aviso do link.
-  if (!data.session) {
-    return {
-      aviso: `Enviamos um link de confirmação para ${analise.data.email}. Abra o e-mail e clique no link — a confirmação é feita só por ele.`,
-    };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email: analise.data.email,
+    password: analise.data.senha,
+  });
+
+  // Conta criada mas sem sessão (raro: limite de tentativas, por exemplo): a
+  // pessoa só precisa entrar. Repetir o cadastro daria "e-mail já existe".
+  if (error) {
+    return { aviso: "Conta criada. Entre com seu e-mail e senha para continuar." };
   }
 
   revalidatePath("/", "layout");

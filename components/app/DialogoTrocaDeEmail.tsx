@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { MailCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -22,9 +21,8 @@ import { pedirTrocaDeEmail } from "@/lib/acoes/conta";
 /* =============================================================================
    Troca de e-mail
 
-   Um passo só: novo endereço e senha atual. A troca vale na hora. (Se a
-   confirmação por e-mail for religada no Supabase, o link vai só para o
-   endereço novo e a tela avisa — ver `pedirTrocaDeEmail`.)
+   Um passo só: novo endereço e senha atual. A troca vale na hora, sem e-mail
+   de confirmação.
 
    A senha atual entra aqui porque, sem confirmação no endereço antigo, ela é
    o que separa o dono da conta de quem só achou uma sessão aberta.
@@ -51,7 +49,6 @@ function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erros, setErros] = useState<{ email?: string; senha?: string; geral?: string }>({});
-  const [enviadoPara, setEnviadoPara] = useState<string | null>(null);
   const [enviando, iniciar] = useTransition();
 
   function enviar() {
@@ -67,43 +64,10 @@ function Formulario({ aoConcluir }: { aoConcluir: () => void }) {
         return;
       }
 
-      setSenha("");
-
-      if (resultado.dados.efetivado) {
-        toast.success("E-mail alterado.");
-        router.refresh();
-        aoConcluir();
-        return;
-      }
-
-      setEnviadoPara(email.trim().toLowerCase());
+      toast.success("E-mail alterado.");
+      router.refresh();
+      aoConcluir();
     });
-  }
-
-  if (enviadoPara) {
-    return (
-      <>
-        <DialogHeader>
-          <DialogTitle>Confirme pelo link</DialogTitle>
-          <DialogDescription>
-            Enviamos um link de confirmação para{" "}
-            <strong className="font-medium text-foreground">{enviadoPara}</strong>. Abra o e-mail
-            e clique no link. Até lá, seu e-mail continua o mesmo.
-          </DialogDescription>
-        </DialogHeader>
-
-        <p className="flex items-start gap-2.5 rounded-xl bg-accent px-3.5 py-3 text-sm text-accent-foreground">
-          <MailCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          Não chegou? Veja a caixa de spam e confira se digitou o endereço certo.
-        </p>
-
-        <DialogFooter className="-mx-5 -mb-5 px-5 py-4">
-          <Button type="button" size="lg" onClick={aoConcluir}>
-            Entendi
-          </Button>
-        </DialogFooter>
-      </>
-    );
   }
 
   return (

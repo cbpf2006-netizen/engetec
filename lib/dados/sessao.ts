@@ -79,7 +79,6 @@ export async function perfilAtual(): Promise<Perfil | null> {
     // privilégio — usuário comum, acesso pendente.
     papel: data?.papel === "admin" ? "admin" : "usuario",
     acesso: data?.acesso === "liberado" ? "liberado" : "pendente",
-    email_pendente: usuario.new_email ?? null,
     foto_url: fotoPath
       ? supabase.storage.from("avatars").getPublicUrl(fotoPath).data.publicUrl
       : null,

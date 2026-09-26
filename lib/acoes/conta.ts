@@ -1,8 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { contextoOuNulo } from "@/lib/dados/sessao";
+import { chamarFuncao } from "@/lib/supabase/funcoes";
 import {
   erroDeValidacao,
   esquemaNovoEmail,
@@ -32,16 +32,6 @@ const TIPOS_DE_FOTO: Record<string, string> = {
 function revalidarPerfil(): void {
   // A foto e o nome aparecem no menu de toda tela, que vive no layout.
   revalidatePath("/", "layout");
-}
-
-async function urlBase(): Promise<string> {
-  const configurada = process.env.NEXT_PUBLIC_URL_DO_APP;
-  if (configurada) return configurada.replace(/\/$/, "");
-
-  const cabecalhos = await headers();
-  const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host") ?? "localhost:3000";
-  const protocolo = host.startsWith("localhost") ? "http" : "https";
-  return `${protocolo}://${host}`;
 }
 
 /* =============================================================================
@@ -189,65 +179,39 @@ export async function alterarSenha(entrada: unknown): Promise<Resultado> {
 /* =============================================================================
    E-mail
 
-   Sem confirmação por e-mail (a opção "Confirm email" desligada no Supabase),
-   a troca vale na hora. Se a opção for religada, o Supabase manda um link só
-   para o endereço NOVO e o e-mail antigo segue valendo até o link ser aberto —
-   o código lida com os dois casos.
+   A troca vale na hora e não manda e-mail de confirmação: quem a executa é a
+   função `alterar-email`, dentro do Supabase, com a chave de serviço.
 
    O endereço antigo nunca é consultado, e por isso a senha atual é exigida
-   aqui: é ela que impede que uma sessão esquecida aberta redirecione a conta.
+   (e conferida pela própria função): é ela que impede que uma sessão
+   esquecida aberta redirecione a conta.
    ========================================================================== */
 
-export async function pedirTrocaDeEmail(
-  entrada: unknown
-): Promise<Resultado<{ efetivado: boolean }>> {
+export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
   const analise = esquemaNovoEmail.safeParse(entrada);
   if (!analise.success) return erroDeValidacao(analise.error);
 
   const contexto = await contextoOuNulo();
   if (!contexto) return falha(SEM_SESSAO);
-  const { supabase, usuario } = contexto;
+  const { supabase } = contexto;
 
-  if (!usuario.email) return falha("Sua conta não tem um e-mail atual.");
+  const { data: sessao } = await supabase.auth.getSession();
+  const token = sessao.session?.access_token;
+  if (!token) return falha(SEM_SESSAO);
 
-  if (analise.data.email === usuario.email.toLowerCase()) {
-    return falha("Esse já é o seu e-mail atual.", "email");
-  }
-
-  const conferencia = await supabase.auth.signInWithPassword({
-    email: usuario.email,
-    password: analise.data.senha,
-  });
-
-  if (conferencia.error) {
-    if (conferencia.error.code === "over_request_rate_limit") {
-      return falha("Muitas tentativas seguidas. Espere um minuto e tente de novo.");
-    }
-    return falha("A senha atual não confere.", "senha");
-  }
-
-  const { data, error } = await supabase.auth.updateUser(
-    { email: analise.data.email },
-    { emailRedirectTo: `${await urlBase()}/auth/confirmar?destino=/perfil` }
+  // A função confere o token E a senha atual por conta própria — não confia em
+  // que este app já o fez. É ela que troca o e-mail, sem enviar confirmação.
+  const resposta = await chamarFuncao(
+    "alterar-email",
+    { email: analise.data.email, senha: analise.data.senha },
+    token
   );
 
-  if (error) {
-    if (error.code === "email_exists") return falha("Esse e-mail já tem uma conta.", "email");
-    if (
-      error.code === "over_email_send_rate_limit" ||
-      error.message.toLowerCase().includes("rate limit")
-    ) {
-      return falha("Muitos e-mails enviados seguidos. Espere alguns minutos e tente de novo.");
-    }
-    console.error("[raiz] troca de e-mail:", error.code, error.message);
-    return falha("Não foi possível alterar o e-mail agora. Tente de novo em instantes.");
-  }
+  if (!resposta.ok) return falha(resposta.erro, resposta.campo);
 
-  // Com a confirmação por e-mail desligada no projeto, a troca já vale aqui.
-  // Com ela ligada, o e-mail só muda quando o link enviado ao endereço novo for
-  // aberto. A resposta do Supabase diz qual dos dois casos aconteceu.
-  const efetivado = data.user?.email?.toLowerCase() === analise.data.email;
+  // As claims da sessão ainda carregam o e-mail antigo: renova para o novo.
+  await supabase.auth.refreshSession();
 
   revalidarPerfil();
-  return sucesso({ efetivado });
+  return sucesso();
 }
