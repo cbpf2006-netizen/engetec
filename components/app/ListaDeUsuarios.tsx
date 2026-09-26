@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, type ReactNode } from "react";
-import { BadgeCheck, Phone, ShieldCheck, UserRoundCheck, Users } from "lucide-react";
+import { BadgeCheck, Phone, ShieldCheck, Trash2, UserRoundCheck, UserRoundX, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
@@ -15,20 +15,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar } from "./Avatar";
+import { DialogoConfirmar } from "./DialogoConfirmar";
 import { EstadoVazio } from "./EstadoVazio";
-import { liberarAcesso } from "@/lib/acoes/admin";
+import { liberarAcesso, removerUsuario } from "@/lib/acoes/admin";
 import { mascaraTelefone } from "@/lib/formato";
 import type { UsuarioAdmin } from "@/lib/dados/admin";
 
 /* =============================================================================
    Lista de usuários (área Administrar)
 
-   Linhas em vez de tabela: no celular uma tabela de sete colunas viraria
-   rolagem lateral. Cada linha traz o que o administrador precisa para decidir
-   — quem é, como falar com a pessoa e quem indicou — e, nos pendentes, a ação de liberar.
+   Duas listas com ações diferentes:
+     · Usuários — quem já tem acesso. A ação é REMOVER.
+     · Pendentes — quem espera o pagamento. As ações são LIBERAR e RECUSAR.
 
-   Liberar pede confirmação porque é o passo que dá acesso ao produto: a
-   pergunta lembra de conferir o pagamento antes.
+   Linhas em vez de tabela: no celular uma tabela de sete colunas viraria
+   rolagem lateral.
+
+   Remover e recusar apagam a conta e os dados dela, sem volta — por isso as
+   duas pedem confirmação e dizem o que vai embora. A própria conta e a de
+   qualquer administrador não têm o botão (a função no servidor também recusa).
    ========================================================================== */
 
 function dataDoCadastro(iso: string): string {
@@ -42,33 +47,78 @@ function dataDoCadastro(iso: string): string {
 
 export function ListaDeUsuarios({
   usuarios,
+  meuId,
+  modo,
   vazio,
 }: {
   usuarios: UsuarioAdmin[];
+  meuId: string;
+  modo: "usuarios" | "pendentes";
   vazio: { titulo: string; descricao: string };
 }) {
   const [paraLiberar, setParaLiberar] = useState<UsuarioAdmin | null>(null);
+  const [paraRemover, setParaRemover] = useState<UsuarioAdmin | null>(null);
 
   if (usuarios.length === 0) {
     return <EstadoVazio icone={Users} titulo={vazio.titulo} descricao={vazio.descricao} />;
   }
 
+  const recusando = modo === "pendentes";
+  const nomeDoAlvo = paraRemover?.nome?.trim() || paraRemover?.email || "";
+
   return (
     <>
       <ul className="divide-y divide-border">
         {usuarios.map((usuario) => (
-          <Linha key={usuario.id} usuario={usuario} aoLiberar={() => setParaLiberar(usuario)} />
+          <Linha
+            key={usuario.id}
+            usuario={usuario}
+            ehVoce={usuario.id === meuId}
+            modo={modo}
+            aoLiberar={() => setParaLiberar(usuario)}
+            aoRemover={() => setParaRemover(usuario)}
+          />
         ))}
       </ul>
 
       <DialogoDeLiberacao usuario={paraLiberar} aoFechar={() => setParaLiberar(null)} />
+
+      <DialogoConfirmar
+        aberto={paraRemover !== null}
+        aoMudarAberto={(aberto) => !aberto && setParaRemover(null)}
+        titulo={recusando ? `Recusar ${nomeDoAlvo}?` : `Remover ${nomeDoAlvo}?`}
+        descricao={
+          recusando
+            ? "A conta é removida e a pessoa não terá acesso. Se ela pagar depois, precisará se cadastrar de novo."
+            : "A conta e todos os dados dela — lançamentos, carteiras, modelos e foto — serão apagados. Não há como desfazer."
+        }
+        rotuloDoBotao={recusando ? "Recusar" : "Remover"}
+        mensagemDeSucesso={recusando ? "Cadastro recusado." : "Usuário removido."}
+        acao={async () =>
+          paraRemover
+            ? removerUsuario(paraRemover.id)
+            : { ok: false as const, erro: "Nada selecionado." }
+        }
+      />
     </>
   );
 }
 
-function Linha({ usuario, aoLiberar }: { usuario: UsuarioAdmin; aoLiberar: () => void }) {
-  const pendente = usuario.acesso === "pendente";
+function Linha({
+  usuario,
+  ehVoce,
+  modo,
+  aoLiberar,
+  aoRemover,
+}: {
+  usuario: UsuarioAdmin;
+  ehVoce: boolean;
+  modo: "usuarios" | "pendentes";
+  aoLiberar: () => void;
+  aoRemover: () => void;
+}) {
   const nome = usuario.nome?.trim() || usuario.email.split("@")[0];
+  const protegido = ehVoce || usuario.papel === "admin";
 
   return (
     <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
@@ -84,13 +134,7 @@ function Linha({ usuario, aoLiberar }: { usuario: UsuarioAdmin; aoLiberar: () =>
                 Administrador
               </Selo>
             )}
-            {pendente ? (
-              <Selo tom="alerta">Pendente</Selo>
-            ) : (
-              <Selo tom="entrada" icone={BadgeCheck}>
-                Liberado
-              </Selo>
-            )}
+            {ehVoce && <Selo tom="entrada">Você</Selo>}
           </span>
 
           <span className="truncate text-xs text-muted-foreground">{usuario.email}</span>
@@ -104,27 +148,44 @@ function Linha({ usuario, aoLiberar }: { usuario: UsuarioAdmin; aoLiberar: () =>
             )}
             {usuario.indicado_por && <span>Indicado por {usuario.indicado_por}</span>}
             <span>Cadastro em {dataDoCadastro(usuario.criado_em)}</span>
-            {!pendente && usuario.liberado_em && (
+            {modo === "usuarios" && usuario.liberado_em && (
               <span>Liberado em {dataDoCadastro(usuario.liberado_em)}</span>
             )}
           </span>
         </div>
       </div>
 
-      {pendente && (
-        <Button type="button" size="sm" className="sm:shrink-0" onClick={aoLiberar}>
-          <UserRoundCheck />
-          Liberar acesso
-        </Button>
+      {modo === "pendentes" ? (
+        <div className="flex gap-2 sm:shrink-0">
+          <Button type="button" variant="outline" size="sm" onClick={aoRemover}>
+            <UserRoundX />
+            Recusar
+          </Button>
+          <Button type="button" size="sm" onClick={aoLiberar}>
+            <UserRoundCheck />
+            Liberar acesso
+          </Button>
+        </div>
+      ) : (
+        !protegido && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="text-destructive hover:text-destructive sm:shrink-0"
+            onClick={aoRemover}
+          >
+            <Trash2 />
+            Remover
+          </Button>
+        )
       )}
     </li>
   );
 }
 
 const TONS = {
-  alerta: "bg-alerta-suave text-alerta-texto",
   entrada: "bg-entrada-suave text-entrada-texto",
-  saida: "bg-saida-suave text-saida-texto",
   acento: "bg-accent text-accent-foreground",
 } as const;
 

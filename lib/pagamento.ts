@@ -10,6 +10,10 @@
    mudar, o outro precisa mudar junto.
    ========================================================================== */
 
+/** Valor do acesso, em reais. O QR Code Pix é estático (não carrega o valor),
+    então a tela informa o valor e a pessoa o digita ao pagar. */
+export const VALOR_DO_ACESSO = 10;
+
 /** Pix copia e cola. */
 export const PIX_COPIA_E_COLA =
   "00020101021126330014br.gov.bcb.pix0111198914627905204000053039865802BR5917CAUA B P DE FARIA6008ARARUAMA62070503***630472C3";

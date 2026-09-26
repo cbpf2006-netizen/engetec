@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Bloco, TituloDaPagina } from "@/components/app/Bloco";
 import { ListaDeUsuarios } from "@/components/app/ListaDeUsuarios";
-import { listarUsuarios } from "@/lib/dados/admin";
+import { listarUsuarios, type UsuarioAdmin } from "@/lib/dados/admin";
 import { exigirAdmin } from "@/lib/dados/sessao";
 import { cn } from "@/lib/utils";
 
@@ -13,26 +13,40 @@ export const metadata: Metadata = { title: "Administrar" };
    e o Postgres recusa a leitura mesmo que alguém contorne a página. */
 
 const ABAS = [
-  { valor: "todos", rotulo: "Todos os usuários" },
+  { valor: "usuarios", rotulo: "Usuários" },
   { valor: "pendentes", rotulo: "Usuários pendentes" },
 ] as const;
+
+/** Quem lê primeiro: a própria conta (fixada no topo), depois os demais
+    administradores, depois o resto do mais novo para o mais antigo. */
+function ordenar(usuarios: UsuarioAdmin[], meuId: string): UsuarioAdmin[] {
+  const peso = (usuario: UsuarioAdmin) =>
+    usuario.id === meuId ? 0 : usuario.papel === "admin" ? 1 : 2;
+
+  return [...usuarios].sort(
+    (a, b) => peso(a) - peso(b) || b.criado_em.localeCompare(a.criado_em)
+  );
+}
 
 export default async function PaginaAdministrar({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await exigirAdmin();
+  const eu = await exigirAdmin();
 
   const parametros = await searchParams;
   const bruto = Array.isArray(parametros.aba) ? parametros.aba[0] : parametros.aba;
-  const aba = bruto === "pendentes" ? "pendentes" : "todos";
+  const aba = bruto === "pendentes" ? "pendentes" : "usuarios";
 
-  const usuarios = await listarUsuarios();
-  const pendentes = usuarios.filter((usuario) => usuario.acesso === "pendente");
-  const visiveis = aba === "pendentes" ? pendentes : usuarios;
+  const todos = await listarUsuarios();
+  const ativos = ordenar(
+    todos.filter((usuario) => usuario.acesso === "liberado"),
+    eu.id
+  );
+  const pendentes = todos.filter((usuario) => usuario.acesso === "pendente");
 
-  const contagens = { todos: usuarios.length, pendentes: pendentes.length };
+  const contagens = { usuarios: ativos.length, pendentes: pendentes.length };
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
@@ -42,11 +56,11 @@ export default async function PaginaAdministrar({
       />
 
       <Bloco
-        titulo={aba === "pendentes" ? "Usuários pendentes" : "Todos os usuários"}
+        titulo={aba === "pendentes" ? "Usuários pendentes" : "Usuários"}
         descricao={
           aba === "pendentes"
-            ? "Aguardam o pagamento. Libere depois de conferi-lo."
-            : "Todas as contas, com o status de acesso de cada uma."
+            ? "Aguardam o pagamento. Libere depois de conferi-lo, ou recuse o cadastro."
+            : "Quem já tem acesso ao Raiz."
         }
         semPadding
       >
@@ -61,7 +75,7 @@ export default async function PaginaAdministrar({
                 key={opcao.valor}
                 role="tab"
                 aria-selected={aba === opcao.valor}
-                href={opcao.valor === "todos" ? "/administrar" : "/administrar?aba=pendentes"}
+                href={opcao.valor === "usuarios" ? "/administrar" : "/administrar?aba=pendentes"}
                 scroll={false}
                 className={cn(
                   "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
@@ -82,15 +96,16 @@ export default async function PaginaAdministrar({
 
         <div className="border-t border-border">
           <ListaDeUsuarios
-            usuarios={visiveis}
+            usuarios={aba === "pendentes" ? pendentes : ativos}
+            meuId={eu.id}
+            modo={aba}
             vazio={
               aba === "pendentes"
                 ? {
                     titulo: "Nenhum usuário pendente",
-                    descricao:
-                      "Quando alguém se cadastrar e aguardar o pagamento, aparece aqui.",
+                    descricao: "Quando alguém se cadastrar e aguardar o pagamento, aparece aqui.",
                   }
-                : { titulo: "Nenhum usuário ainda", descricao: "As contas criadas aparecem aqui." }
+                : { titulo: "Nenhum usuário ainda", descricao: "Quem tiver o acesso liberado aparece aqui." }
             }
           />
         </div>

@@ -1,12 +1,13 @@
 import "server-only";
 
 /* =============================================================================
-   Chamada às Edge Functions do projeto (`cadastrar`, `alterar-email`)
+   Chamada às Edge Functions do projeto (`cadastrar`, `alterar-email`, `remover-usuario`)
 
-   Cadastro e troca de e-mail passam por funções que rodam dentro do Supabase
-   com a chave de serviço — que só existe lá, nunca neste app nem no navegador.
-   É o que permite criar a conta e trocar o e-mail sem mandar e-mail de
-   confirmação (e sem o limite de envio do Supabase).
+   Cadastro, troca de e-mail e remoção de usuário passam por funções que rodam
+   dentro do Supabase com a chave de serviço — que só existe lá, nunca neste
+   app nem no navegador. É o que permite criar a conta e trocar o e-mail sem
+   mandar e-mail de confirmação (e sem o limite de envio do Supabase), e apagar
+   uma conta junto com os dados e a foto.
 
    Devolve sempre um formato só, com a mensagem já pronta para a tela. Nada do
    corpo bruto da resposta vaza para o usuário.
@@ -17,7 +18,7 @@ export type RespostaDaFuncao = { ok: true } | { ok: false; erro: string; campo?:
 const FALHA_GENERICA = "Não foi possível concluir agora. Tente de novo em instantes.";
 
 export async function chamarFuncao(
-  nome: "cadastrar" | "alterar-email",
+  nome: "cadastrar" | "alterar-email" | "remover-usuario",
   corpo: Record<string, unknown>,
   tokenDeSessao?: string
 ): Promise<RespostaDaFuncao> {

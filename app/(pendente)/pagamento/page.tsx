@@ -9,7 +9,8 @@ import { QrCodeDePagamento } from "@/components/app/QrCodeDePagamento";
 import { Button } from "@/components/ui/button";
 import { sair } from "@/lib/acoes/autenticacao";
 import { perfilAtual } from "@/lib/dados/sessao";
-import { PIX_COPIA_E_COLA, linkDoWhatsapp } from "@/lib/pagamento";
+import { Quantia } from "@/components/app/Quantia";
+import { PIX_COPIA_E_COLA, VALOR_DO_ACESSO, linkDoWhatsapp } from "@/lib/pagamento";
 
 export const metadata: Metadata = { title: "Falta só o pagamento" };
 
@@ -53,6 +54,12 @@ export default async function PaginaDePagamento() {
               Seu acesso será liberado após a confirmação do pagamento. Pague pelo QR
               Code ou pela chave Pix e envie o comprovante pelo WhatsApp.
             </p>
+          </div>
+
+          <div className="flex flex-col items-center gap-1 rounded-xl bg-accent px-6 py-3 text-accent-foreground">
+            <span className="text-xs font-medium">Valor do acesso</span>
+            <Quantia valor={VALOR_DO_ACESSO} className="text-3xl font-semibold" />
+            <span className="text-xs opacity-80">Informe este valor ao fazer o Pix.</span>
           </div>
 
           <QrCodeDePagamento />
