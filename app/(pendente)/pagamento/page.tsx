@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Clock, MailCheck, MessageCircle } from "lucide-react";
 
@@ -75,15 +74,7 @@ export default async function PaginaDePagamento() {
             Status: pendente — aguardando a liberação pelo administrador.
           </p>
 
-          <div className="flex w-full flex-col gap-1 border-t border-border pt-4">
-            <Button
-              variant="ghost"
-              nativeButton={false}
-              render={<Link href="/" prefetch={false} />}
-            >
-              Já paguei — verificar liberação
-            </Button>
-
+          <div className="flex w-full flex-col border-t border-border pt-4">
             <form action={sair}>
               <Button type="submit" variant="ghost" className="w-full text-muted-foreground">
                 Sair da conta
