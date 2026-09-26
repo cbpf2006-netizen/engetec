@@ -55,7 +55,7 @@ export default async function LayoutDoApp({ children }: { children: React.ReactN
         <div className="flex min-w-0 flex-1 flex-col">
           <CabecalhoMobile perfil={perfil} />
 
-          <main className="mx-auto w-full max-w-[68rem] flex-1 px-4 pt-5 pb-32 sm:px-6 lg:px-8 lg:pt-8 lg:pb-16">
+          <main className="mx-auto w-full max-w-[68rem] flex-1 px-4 pt-5 pb-[calc(14.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8 lg:pb-52">
             {children}
           </main>
         </div>
