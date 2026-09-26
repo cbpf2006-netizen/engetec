@@ -69,24 +69,6 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
           quantia={resumo.saldoEmCaixa}
           icone={Wallet}
           destaque
-          contexto={
-            <span className="flex flex-col gap-1.5">
-              <span className="font-medium text-foreground/80">Valor nas carteiras</span>
-              {carteiras.length === 0 ? (
-                <span>Nenhuma carteira cadastrada.</span>
-              ) : (
-                carteiras.map((carteira) => (
-                  <span key={carteira.id} className="flex items-baseline justify-between gap-3">
-                    <span className="truncate">{carteira.nome}</span>
-                    <Quantia
-                      valor={saldos[carteira.id] ?? 0}
-                      className="shrink-0 font-semibold text-foreground"
-                    />
-                  </span>
-                ))
-              )}
-            </span>
-          }
         />
 
         <CartaoIndicador
@@ -133,6 +115,48 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
           }
         />
       </div>
+
+      {/* ------------------------------------------------------------------
+          Saldo de cada carteira. Cartão à parte do saldo total: o total é um
+          número só; aqui a pessoa vê onde o dinheiro está.
+          ------------------------------------------------------------------ */}
+      <Bloco titulo="Saldo nas carteiras" descricao="Quanto há em cada uma.">
+        {carteiras.length === 0 ? (
+          <EstadoVazio
+            icone={Wallet}
+            titulo="Nenhuma carteira cadastrada"
+            descricao="Crie uma carteira na aba Carteira ou ao registrar um lançamento."
+            compacto
+          />
+        ) : (
+          <ul className="divide-y divide-border">
+            {carteiras.map((carteira) => (
+              <li
+                key={carteira.id}
+                className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+              >
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-muted-foreground"
+                >
+                  <Wallet className="size-[1.05rem]" />
+                </span>
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {carteira.nome}
+                </span>
+                <Quantia
+                  valor={saldos[carteira.id] ?? 0}
+                  className={
+                    (saldos[carteira.id] ?? 0) < 0
+                      ? "shrink-0 text-[0.9375rem] font-semibold text-saida-texto"
+                      : "shrink-0 text-[0.9375rem] font-semibold text-foreground"
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Bloco>
 
       {/* ------------------------------------------------------------------
           Visualizações
