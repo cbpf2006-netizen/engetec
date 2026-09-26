@@ -18,7 +18,8 @@ import { Bloco } from "./Bloco";
 import { DialogoConfirmar } from "./DialogoConfirmar";
 import { DialogoConta } from "./DialogoConta";
 import { EstadoVazio } from "./EstadoVazio";
-import { data as formatarData, moeda } from "@/lib/formato";
+import { data as formatarData } from "@/lib/formato";
+import { Quantia } from "./Quantia";
 import { hoje } from "@/lib/periodo";
 import { alternarPagamento, excluirConta } from "@/lib/acoes/contas";
 import {
@@ -185,7 +186,7 @@ function Filtros({
       role="tablist"
       aria-label="Filtrar contas"
       data-pendente={pendente || undefined}
-      className="rolagem-fina flex items-center gap-0.5 overflow-x-auto rounded-xl bg-secondary p-0.5"
+      className="rolagem-fina flex items-center gap-0.5 overflow-x-auto rounded-xl bg-secondary p-1"
     >
       {FILTROS_CONTA.map((opcao) => (
         <button
@@ -195,10 +196,10 @@ function Filtros({
           aria-selected={filtro === opcao.valor}
           onClick={() => aplicar(opcao.valor)}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 rounded-[0.625rem] px-3 py-1.5 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
+            "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
             filtro === opcao.valor
-              ? "bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.06)]"
+              ? "bg-card text-foreground shadow-cartao ring-1 ring-border"
               : "text-muted-foreground hover:text-foreground"
           )}
         >
@@ -287,14 +288,13 @@ function Linha({
         </span>
       </div>
 
-      <span
+      <Quantia
+        valor={conta.valor}
         className={cn(
-          "numero shrink-0 text-sm font-semibold",
+          "shrink-0 text-[0.9375rem] font-semibold",
           paga ? "text-muted-foreground" : "text-foreground"
         )}
-      >
-        {moeda(conta.valor)}
-      </span>
+      />
 
       <DropdownMenu>
         <DropdownMenuTrigger

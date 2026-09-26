@@ -1,5 +1,6 @@
 import { corDoModelo } from "@/lib/catalogo";
-import { moeda, porcentagem } from "@/lib/formato";
+import { porcentagem } from "@/lib/formato";
+import { Quantia } from "./Quantia";
 import type { FatiaDistribuicao } from "@/lib/financas";
 import { SeloModelo } from "@/components/Icone";
 
@@ -35,7 +36,7 @@ export function Distribuicao({ fatias }: { fatias: FatiaDistribuicao[] }) {
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="truncate text-sm font-medium">{fatia.nome}</span>
-                <span className="numero shrink-0 text-sm font-semibold">{moeda(fatia.valor)}</span>
+                <Quantia valor={fatia.valor} className="shrink-0 text-sm font-semibold" />
               </div>
 
               <div className="flex items-center gap-2.5">

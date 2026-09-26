@@ -2,7 +2,8 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-import { moeda, porcentagem } from "@/lib/formato";
+import { porcentagem } from "@/lib/formato";
+import { Quantia } from "@/components/app/Quantia";
 import { corDoModelo } from "@/lib/catalogo";
 import type { FatiaDistribuicao } from "@/lib/financas";
 import { CaixaDeTooltip, Legenda } from "./base";
@@ -107,7 +108,7 @@ export function RoscaDeDistribuicao({
           <span className="text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase">
             {rotuloDoCentro}
           </span>
-          <span className="numero text-base font-semibold">{moeda(total)}</span>
+          <Quantia valor={total} className="text-base font-semibold" />
         </div>
       </div>
 

@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Bloco } from "./Bloco";
 import { DialogoConfirmar } from "./DialogoConfirmar";
 import { EstadoVazio } from "./EstadoVazio";
-import { moeda } from "@/lib/formato";
+import { Quantia } from "./Quantia";
 import { atualizarCarteira, criarCarteira, excluirCarteira } from "@/lib/acoes/carteiras";
 import type { Carteira } from "@/lib/tipos";
 
@@ -161,14 +161,13 @@ function Linha({
         </span>
       </div>
 
-      <span
+      <Quantia
+        valor={saldo}
         className={cn(
-          "numero shrink-0 text-sm font-semibold",
+          "shrink-0 text-[0.9375rem] font-semibold",
           saldo < 0 ? "text-saida-texto" : "text-foreground"
         )}
-      >
-        {moeda(saldo)}
-      </span>
+      />
 
       <DropdownMenu>
         <DropdownMenuTrigger

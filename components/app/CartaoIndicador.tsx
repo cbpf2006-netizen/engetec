@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { TrendingDown, TrendingUp, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { moeda, variacao } from "@/lib/formato";
+import { variacao } from "@/lib/formato";
+import { Quantia } from "./Quantia";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /* =============================================================================
@@ -80,7 +81,7 @@ export function CartaoIndicador({
   return (
     <article
       className={cn(
-        "group relative flex flex-col gap-4 rounded-2xl p-5 ring-1 ring-border transition-shadow duration-200 hover:ring-foreground/15",
+        "group relative flex flex-col gap-4 rounded-2xl p-5 shadow-cartao ring-1 ring-border transition-[box-shadow] duration-200 hover:ring-foreground/15",
         fundoSuave ? estilo.fundo : "bg-card",
         className
       )}
@@ -108,12 +109,12 @@ export function CartaoIndicador({
       <div className="flex flex-col gap-2">
         <p
           className={cn(
-            "numero font-semibold tracking-tight",
-            destaque ? "text-[1.875rem] leading-[1.1] sm:text-[2.125rem]" : "text-2xl leading-tight",
+            "font-semibold tracking-tight",
+            destaque ? "text-[2rem] leading-[1.1] sm:text-[2.25rem]" : "text-[1.625rem] leading-tight",
             estilo.valor
           )}
         >
-          {moeda(quantia)}
+          <Quantia valor={quantia} />
         </p>
 
         {comparacao && <Comparacao {...comparacao} />}
@@ -164,7 +165,7 @@ function Comparacao({
 
 export function CartaoIndicadorEsqueleto() {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-card p-5 ring-1 ring-border">
+    <div className="flex flex-col gap-4 rounded-2xl bg-card p-5 shadow-cartao ring-1 ring-border">
       <div className="flex items-start justify-between">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="size-9 rounded-xl" />

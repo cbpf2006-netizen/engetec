@@ -173,3 +173,27 @@ export function iniciais(nome: string | null, email: string): string {
   const partes = base.split(/[\s@.]+/).filter(Boolean);
   return (partes[0]?.[0] ?? "?").concat(partes[1]?.[0] ?? "").toUpperCase();
 }
+
+/** O mesmo texto de `moeda`, separado em símbolo, inteiro e centavos — para a
+    interface poder dar peso ao que importa (o inteiro) e recuar o resto.
+    `moeda(-1250.5)` e `partesDaMoeda(-1250.5)` descrevem a mesma string. */
+export function partesDaMoeda(valor: number): {
+  negativo: boolean;
+  simbolo: string;
+  inteiro: string;
+  centavos: string;
+} {
+  let negativo = false;
+  let simbolo = "R$";
+  let inteiro = "";
+  let centavos = "";
+
+  for (const parte of MOEDA.formatToParts(valor)) {
+    if (parte.type === "minusSign") negativo = true;
+    else if (parte.type === "currency") simbolo = parte.value;
+    else if (parte.type === "integer" || parte.type === "group") inteiro += parte.value;
+    else if (parte.type === "decimal" || parte.type === "fraction") centavos += parte.value;
+  }
+
+  return { negativo, simbolo, inteiro, centavos };
+}

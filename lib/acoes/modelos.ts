@@ -34,7 +34,7 @@ export async function criarModelo(entrada: unknown): Promise<Resultado<Modelo>> 
 
   const cor =
     (entrada as { cor?: string })?.cor ??
-    proximaCorLivre((existentes ?? []).map((m) => m.cor as string));
+    proximaCorLivre((existentes ?? []).map((m) => m.cor as string), fluxo);
 
   const ordem = Math.max(0, ...(existentes ?? []).map((m) => Number(m.ordem))) + 1;
 

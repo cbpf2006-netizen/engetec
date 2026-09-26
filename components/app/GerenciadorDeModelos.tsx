@@ -368,7 +368,7 @@ function FormularioDeModelo({
       </div>
 
       <EscolhaDeIcone fluxo={fluxo} valor={icone} aoMudar={setIcone} />
-      <EscolhaDeCor valor={cor} aoMudar={setCor} />
+      <EscolhaDeCor fluxo={fluxo} valor={cor} aoMudar={setCor} />
 
       {fluxo === "investimento" && (
         <SelecaoDeCarteira

@@ -85,7 +85,7 @@ export function BotoesFlutuantes({
           onClick={() => setAberto("saida")}
           className={cn(
             "flex h-11 items-center gap-2 rounded-full bg-card pr-4 pl-3 text-sm font-semibold text-saida-texto ring-1 ring-border",
-            "shadow-[0_4px_16px_-4px_rgb(0_0_0/0.16)] transition-transform duration-150",
+            "shadow-flutuante transition-transform duration-150",
             "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]",
             "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           )}

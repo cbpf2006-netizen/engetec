@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { Geist, Inter } from "next/font/google";
 
 import { TemaProvedor } from "@/components/TemaProvedor";
 import { Toaster } from "@/components/ui/sonner";
@@ -13,14 +13,13 @@ const inter = Inter({
   display: "swap",
 });
 
-/* Fonte-assinatura: todo valor monetário do app é composto em mono com
-   tabular-nums. Uma coluna de números precisa alinhar dígito com dígito, como
-   num livro-caixa — é o detalhe que separa "planilha" de "produto
-   financeiro". */
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-mono",
+/* Fonte dos números: todo valor monetário é composto em Geist com algarismos
+   tabulares. Uma coluna de números precisa alinhar dígito com dígito — e Geist
+   entrega isso com formas mais limpas e contemporâneas que uma monoespaçada. */
+const geist = Geist({
+  variable: "--font-numeros",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -49,7 +48,7 @@ export const viewport: Viewport = {
 
 export default function LayoutRaiz({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${plexMono.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${inter.variable} ${geist.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
         <TemaProvedor>
           {children}

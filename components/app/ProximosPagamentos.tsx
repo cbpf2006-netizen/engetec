@@ -3,7 +3,8 @@ import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { data as formatarData, moeda } from "@/lib/formato";
+import { data as formatarData } from "@/lib/formato";
+import { Quantia } from "./Quantia";
 import type { PagamentoProximo } from "@/lib/dados/painel";
 
 /* =============================================================================
@@ -43,7 +44,7 @@ export function ProximosPagamentos({ pagamentos }: { pagamentos: PagamentoProxim
               </span>
             </div>
 
-            <span className="numero shrink-0 text-sm font-semibold">{moeda(pagamento.valor)}</span>
+            <Quantia valor={pagamento.valor} className="shrink-0 text-sm font-semibold" />
           </li>
         ))}
       </ul>

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Icone, SeloModelo } from "@/components/Icone";
 import { useCarteiras } from "./CarteirasProvider";
 import { SelecaoDeCarteira } from "./SelecaoDeCarteira";
-import { CORES, ICONES_POR_FLUXO, corDoModelo } from "@/lib/catalogo";
+import { CORES, ICONES_POR_FLUXO, coresDoFluxo, corDoModelo } from "@/lib/catalogo";
 import { criarModelo } from "@/lib/acoes/modelos";
 import { ROTULO_FLUXO, type Fluxo, type Modelo } from "@/lib/tipos";
 
@@ -89,7 +89,7 @@ export function SelecaoDeModelo({
                   aria-checked={ativo}
                   onClick={() => aoSelecionar(modelo.id)}
                   className={cn(
-                    "group flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-all duration-150",
+                    "group flex items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 text-left shadow-cartao transition-all duration-150",
                     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                     "active:scale-[0.98]",
                     ativo
@@ -180,7 +180,7 @@ function CriacaoRapida({
           placeholder="Nome do modelo"
           maxLength={40}
           autoFocus
-          className="h-9 flex-1"
+          className="flex-1"
           onKeyDown={(evento) => {
             if (evento.key === "Enter" && nome.trim()) {
               evento.preventDefault();
@@ -200,7 +200,7 @@ function CriacaoRapida({
       </div>
 
       <EscolhaDeIcone fluxo={fluxo} valor={icone} aoMudar={setIcone} />
-      <EscolhaDeCor valor={cor} aoMudar={setCor} />
+      <EscolhaDeCor fluxo={fluxo} valor={cor} aoMudar={setCor} />
 
       {pedeCarteira && (
         <SelecaoDeCarteira
@@ -243,7 +243,7 @@ export function EscolhaDeIcone({
             aria-pressed={valor === apelido}
             onClick={() => aoMudar(apelido)}
             className={cn(
-              "grid size-8 place-items-center rounded-lg transition-colors",
+              "grid size-9 place-items-center rounded-lg transition-colors",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
               valor === apelido
                 ? "bg-foreground text-background"
@@ -261,15 +261,18 @@ export function EscolhaDeIcone({
 export function EscolhaDeCor({
   valor,
   aoMudar,
+  fluxo,
 }: {
   valor: string;
   aoMudar: (cor: string) => void;
+  fluxo?: Fluxo;
 }) {
+  const cores = fluxo ? coresDoFluxo(fluxo) : CORES;
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-muted-foreground">Cor</span>
       <div className="flex flex-wrap gap-1.5">
-        {CORES.map((cor) => (
+        {cores.map((cor) => (
           <button
             key={cor.apelido}
             type="button"

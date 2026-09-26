@@ -78,7 +78,7 @@ export function SelecaoDeCarteira({
                   aria-checked={ativa}
                   onClick={() => aoSelecionar(carteira.id)}
                   className={cn(
-                    "group flex items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-all duration-150",
+                    "group flex items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 text-left shadow-cartao transition-all duration-150",
                     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                     "active:scale-[0.98]",
                     ativa
@@ -146,7 +146,7 @@ function CriacaoRapida({
         placeholder="Ex.: Mão, Santander, Bradesco"
         maxLength={40}
         autoFocus
-        className="h-9 flex-1"
+        className="flex-1"
         onKeyDown={(evento) => {
           if (evento.key === "Enter" && nome.trim()) {
             evento.preventDefault();

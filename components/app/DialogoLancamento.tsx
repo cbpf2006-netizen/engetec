@@ -218,7 +218,7 @@ function Formulario({
                 aria-checked={operacao === opcao}
                 onClick={() => setOperacao(opcao)}
                 className={cn(
-                  "rounded-xl border px-3 py-2.5 text-sm font-medium transition-all duration-150 active:scale-[0.98]",
+                  "rounded-xl border bg-card px-3 py-2.5 text-sm font-medium shadow-cartao transition-all duration-150 active:scale-[0.98]",
                   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                   operacao === opcao
                     ? "border-transparent bg-investimento-suave text-investimento-texto ring-2 ring-investimento"
@@ -270,7 +270,7 @@ function Formulario({
             max="2100-12-31"
             onChange={(evento) => setData(evento.target.value)}
             aria-invalid={erros.data ? true : undefined}
-            className="h-10 w-auto flex-1"
+            className="w-auto flex-1"
           />
           {[
             { rotulo: "Hoje", valor: agora },

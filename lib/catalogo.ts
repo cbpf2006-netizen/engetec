@@ -35,6 +35,15 @@ export const CORES: { apelido: ApelidoCor; rotulo: string; variavel: string }[] 
   { apelido: "cinza", rotulo: "Cinza", variavel: "--muted-foreground" },
 ];
 
+/** Cores oferecidas ao criar um modelo. A aba de investimentos é toda em verde,
+    e um tipo roxo nela destoaria — então esses dois tons não são oferecidos ali.
+    Modelos de entrada e saída seguem com a paleta completa. */
+const SEM_ROXO: readonly ApelidoCor[] = ["violeta", "indigo"];
+
+export function coresDoFluxo(fluxo: "entrada" | "saida" | "investimento") {
+  return fluxo === "investimento" ? CORES.filter((c) => !SEM_ROXO.includes(c.apelido)) : CORES;
+}
+
 const POR_APELIDO = new Map(CORES.map((c) => [c.apelido, c]));
 
 /** Devolve `var(--serie-N)`, pronto para style ou para o `fill` do Recharts. */
@@ -44,8 +53,11 @@ export function corDoModelo(apelido: string): string {
 
 /** Próxima cor da sequência que ainda não está em uso entre os modelos do
     mesmo fluxo. Quando todas estiverem ocupadas, recomeça o rodízio. */
-export function proximaCorLivre(usadas: string[]): ApelidoCor {
-  const candidatas = CORES.filter((c) => c.apelido !== "cinza");
+export function proximaCorLivre(
+  usadas: string[],
+  fluxo?: "entrada" | "saida" | "investimento"
+): ApelidoCor {
+  const candidatas = (fluxo ? coresDoFluxo(fluxo) : CORES).filter((c) => c.apelido !== "cinza");
   const livre = candidatas.find((c) => !usadas.includes(c.apelido));
   return (livre ?? candidatas[usadas.length % candidatas.length]).apelido;
 }

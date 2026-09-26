@@ -58,7 +58,7 @@ export function BarraDePeriodo({ periodo }: { periodo: Periodo }) {
   return (
     <div
       data-pendente={pendente || undefined}
-      className="flex flex-col gap-3 rounded-2xl bg-card p-2.5 ring-1 ring-border sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-3"
+      className="flex flex-col gap-3 rounded-2xl bg-card p-2.5 shadow-cartao ring-1 ring-border sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-3"
     >
       {/* Navegação entre períodos */}
       <div className="flex items-center gap-1">
@@ -109,7 +109,7 @@ export function BarraDePeriodo({ periodo }: { periodo: Periodo }) {
         <div
           role="tablist"
           aria-label="Tamanho do período"
-          className="rolagem-fina flex flex-1 items-center gap-0.5 overflow-x-auto rounded-xl bg-secondary p-0.5"
+          className="rolagem-fina flex flex-1 items-center gap-0.5 overflow-x-auto rounded-xl bg-secondary p-1"
         >
           {PRESETS.filter((p) => p.valor !== "personalizado").map((preset) => (
             <button
@@ -119,10 +119,10 @@ export function BarraDePeriodo({ periodo }: { periodo: Periodo }) {
               aria-selected={periodo.preset === preset.valor}
               onClick={() => irPara(trocarPreset(periodo, preset.valor))}
               className={cn(
-                "min-w-fit rounded-[0.625rem] px-3 py-1.5 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
+                "min-w-fit rounded-lg px-3.5 py-2 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                 periodo.preset === preset.valor
-                  ? "bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.06)]"
+                  ? "bg-card text-foreground shadow-cartao ring-1 ring-border"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -156,10 +156,10 @@ function SeletorPersonalizado({
         role="tab"
         aria-selected={ativo}
         className={cn(
-          "flex items-center gap-1.5 rounded-[0.625rem] px-3 py-1.5 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
+          "flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[0.8125rem] font-medium whitespace-nowrap transition-all duration-150",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
           ativo
-            ? "bg-card text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.06)]"
+            ? "bg-card text-foreground shadow-cartao ring-1 ring-border"
             : "text-muted-foreground hover:text-foreground"
         )}
       >
@@ -181,7 +181,7 @@ function SeletorPersonalizado({
               value={de}
               max={ate}
               onChange={(evento) => setDe(evento.target.value)}
-              className="h-9"
+              
             />
           </div>
 
@@ -195,7 +195,7 @@ function SeletorPersonalizado({
               value={ate}
               min={de}
               onChange={(evento) => setAte(evento.target.value)}
-              className="h-9"
+              
             />
           </div>
         </div>

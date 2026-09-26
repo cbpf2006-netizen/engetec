@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { moeda } from "@/lib/formato";
+import { Quantia } from "./Quantia";
 import type { Fluxo } from "@/lib/tipos";
 
 /* =============================================================================
@@ -58,17 +58,17 @@ export function Valor({
   return (
     <span
       className={cn(
-        "numero inline-flex items-center gap-1 font-semibold",
+        "numero inline-flex items-baseline gap-1 font-semibold",
         TAMANHOS[tamanho],
         corAutomatica,
         className
       )}
     >
       {seta && fluxo !== "neutro" && fluxo !== "auto" && (
-        <Seta className="size-[0.9em] shrink-0" aria-hidden="true" />
+        <Seta className="size-[0.9em] shrink-0 self-center" aria-hidden="true" />
       )}
       {prefixo}
-      {moeda(Math.abs(quantia))}
+      <Quantia valor={Math.abs(quantia)} />
     </span>
   );
 }
