@@ -87,7 +87,7 @@ export function CartaoIndicador({
         // para não parecer chapado.
         destaque &&
           !fundoSuave &&
-          "bg-[radial-gradient(120%_120%_at_100%_0%,color-mix(in_oklab,var(--primary)_11%,transparent),transparent_60%)]",
+          "bg-[radial-gradient(120%_120%_at_100%_0%,color-mix(in_oklab,var(--primary)_5%,transparent),transparent_60%)]",
         className
       )}
     >

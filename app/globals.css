@@ -342,13 +342,13 @@ html[data-ocultar="1"] [data-valor] {
    ========================================================================== */
 
 :root {
-  --luz-a: color-mix(in oklab, var(--primary) 10%, transparent);
-  --luz-b: color-mix(in oklab, var(--investimento) 8%, transparent);
+  --luz-a: color-mix(in oklab, var(--primary) 5%, transparent);
+  --luz-b: color-mix(in oklab, var(--investimento) 4%, transparent);
 }
 
 .dark {
-  --luz-a: color-mix(in oklab, var(--primary) 26%, transparent);
-  --luz-b: color-mix(in oklab, var(--investimento) 20%, transparent);
+  --luz-a: color-mix(in oklab, var(--primary) 13%, transparent);
+  --luz-b: color-mix(in oklab, var(--investimento) 10%, transparent);
 }
 
 .fundo-luzes {
