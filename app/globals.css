@@ -246,9 +246,14 @@ body {
   background: color-mix(in oklab, var(--primary) 25%, transparent);
 }
 
-:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+/* Em @layer base de propósito: regra fora de camada vence qualquer utilitário
+   do Tailwind, e `outline-none` nos campos (que já têm halo próprio no foco)
+   deixava de funcionar — o contorno verde por dentro do campo de valor. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
 h1,
