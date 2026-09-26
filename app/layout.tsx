@@ -37,6 +37,9 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "Raiz", statusBarStyle: "default" },
   // Sem isto o Safari transforma telefones em links azuis no meio do texto.
   formatDetection: { telephone: false },
+  // O Next 16 emite só `mobile-web-app-capable`; iOS anteriores à 16.4 ainda
+  // dependem do nome com prefixo da Apple para abrir em tela cheia.
+  other: { "apple-mobile-web-app-capable": "yes" },
   robots: { index: false, follow: false },
 };
 
