@@ -5,11 +5,12 @@ import { Clock, MailCheck, MessageCircle } from "lucide-react";
 
 import LogoRaiz from "@/components/marca/LogoRaiz";
 import { SeletorDeTema } from "@/components/app/MenuDoUsuario";
+import { ChavePixCopiavel } from "@/components/app/ChavePixCopiavel";
 import { QrCodeDePagamento } from "@/components/app/QrCodeDePagamento";
 import { Button } from "@/components/ui/button";
 import { sair } from "@/lib/acoes/autenticacao";
 import { perfilAtual } from "@/lib/dados/sessao";
-import { configuracaoDePagamento, linkDoWhatsapp } from "@/lib/pagamento";
+import { PIX_COPIA_E_COLA, linkDoWhatsapp } from "@/lib/pagamento";
 
 export const metadata: Metadata = { title: "Falta só o pagamento" };
 
@@ -29,8 +30,7 @@ export default async function PaginaDePagamento() {
   if (!perfil) redirect("/login");
   if (perfil.acesso === "liberado") redirect("/");
 
-  const { qrValor, whatsapp } = configuracaoDePagamento();
-  const link = whatsapp ? linkDoWhatsapp(whatsapp, perfil.nome, perfil.email) : null;
+  const link = linkDoWhatsapp(perfil.nome, perfil.email);
 
   return (
     <div className="flex min-h-dvh flex-col px-5 py-6 sm:px-8">
@@ -51,34 +51,24 @@ export default async function PaginaDePagamento() {
               Falta só o pagamento
             </h1>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Seu acesso será liberado após a confirmação do pagamento. Faça o pagamento pelo QR
-              Code e envie o comprovante pelo WhatsApp.
+              Seu acesso será liberado após a confirmação do pagamento. Pague pelo QR
+              Code ou pela chave Pix e envie o comprovante pelo WhatsApp.
             </p>
           </div>
 
-          <QrCodeDePagamento valor={qrValor} />
+          <QrCodeDePagamento />
 
-          {link ? (
-            <Button
-              size="lg"
-              className="w-full"
-              nativeButton={false}
-              render={<a href={link} target="_blank" rel="noopener noreferrer" />}
-            >
-              <MessageCircle />
-              Enviar comprovante no WhatsApp
-            </Button>
-          ) : (
-            <div className="flex w-full flex-col gap-2">
-              <Button size="lg" className="w-full" disabled>
-                <MessageCircle />
-                Enviar comprovante no WhatsApp
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                O contato de WhatsApp ainda não foi configurado.
-              </p>
-            </div>
-          )}
+          <ChavePixCopiavel chave={PIX_COPIA_E_COLA} />
+
+          <Button
+            size="lg"
+            className="w-full"
+            nativeButton={false}
+            render={<a href={link} target="_blank" rel="noopener noreferrer" />}
+          >
+            <MessageCircle />
+            Enviar comprovante no WhatsApp
+          </Button>
 
           <p className="flex items-center gap-2 rounded-xl bg-alerta-suave px-3.5 py-2.5 text-xs text-alerta-texto">
             <Clock className="size-3.5 shrink-0" aria-hidden="true" />
