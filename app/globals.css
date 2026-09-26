@@ -331,3 +331,163 @@ html[data-ocultar="1"] [data-valor] {
 .recharts-surface:focus {
   outline: none;
 }
+
+/* =============================================================================
+   Luzes de fundo
+
+   Duas manchas verdes muito suaves, atrás de tudo e à deriva bem devagar. Só
+   gradiente radial e transform — nenhum filter: blur —, então o custo em
+   celular é mínimo. Fixas e sem interação (pointer-events: none). No claro
+   quase não se percebem; no escuro é onde dão o tom.
+   ========================================================================== */
+
+:root {
+  --luz-a: color-mix(in oklab, var(--primary) 10%, transparent);
+  --luz-b: color-mix(in oklab, var(--investimento) 8%, transparent);
+}
+
+.dark {
+  --luz-a: color-mix(in oklab, var(--primary) 26%, transparent);
+  --luz-b: color-mix(in oklab, var(--investimento) 20%, transparent);
+}
+
+.fundo-luzes {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fundo-luzes::before,
+.fundo-luzes::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform;
+}
+
+.fundo-luzes::before {
+  width: 56rem;
+  height: 56rem;
+  top: -26rem;
+  right: -18rem;
+  background: radial-gradient(closest-side, var(--luz-a), transparent);
+  animation: luz-a 28s ease-in-out infinite alternate;
+}
+
+.fundo-luzes::after {
+  width: 48rem;
+  height: 48rem;
+  bottom: -24rem;
+  left: -16rem;
+  background: radial-gradient(closest-side, var(--luz-b), transparent);
+  animation: luz-b 34s ease-in-out infinite alternate;
+}
+
+@keyframes luz-a {
+  to {
+    transform: translate3d(-7rem, 6rem, 0) scale(1.1);
+  }
+}
+
+@keyframes luz-b {
+  to {
+    transform: translate3d(8rem, -5rem, 0) scale(1.08);
+  }
+}
+
+/* =============================================================================
+   Tela de abertura (celular / app instalado)
+
+   Fundo verde-escuro com a logo à frente. É só CSS: entra, fica pouco mais de
+   um segundo e some sozinha — funciona antes de o JavaScript carregar e não
+   deixa a tela presa se ele nunca carregar. Um script no <body> a desliga
+   quando não cabe (computador, ou já mostrada nesta sessão).
+   ========================================================================== */
+
+#abertura {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(120% 90% at 50% 28%, #14532d 0%, #0b2e1a 52%, #061a0e 100%);
+  color: #f2fbf5;
+  animation: abertura-sai 1.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+html[data-sem-abertura] #abertura {
+  display: none;
+}
+
+#abertura .abertura-halo {
+  position: absolute;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgb(34 197 94 / 0.28), transparent);
+  animation: abertura-halo 1.6s ease-in-out infinite alternate;
+}
+
+#abertura .abertura-marca {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: abertura-marca 0.9s var(--ease-out) both;
+}
+
+@keyframes abertura-sai {
+  0%,
+  70% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes abertura-marca {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes abertura-halo {
+  from {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+/* =============================================================================
+   Entrada em cascata
+
+   Os blocos da página entram um após o outro, de baixo para cima, a cada
+   navegação (app/(app)/template.tsx remonta o wrapper). Só opacity e
+   transform; 55 ms entre um e outro, no máximo 8 blocos.
+   ========================================================================== */
+
+.cascata > * > * {
+  animation: surgir 460ms var(--ease-out) both;
+}
+.cascata > * > *:nth-child(2) { animation-delay: 55ms; }
+.cascata > * > *:nth-child(3) { animation-delay: 110ms; }
+.cascata > * > *:nth-child(4) { animation-delay: 165ms; }
+.cascata > * > *:nth-child(5) { animation-delay: 220ms; }
+.cascata > * > *:nth-child(6) { animation-delay: 275ms; }
+.cascata > * > *:nth-child(7) { animation-delay: 330ms; }
+.cascata > * > *:nth-child(n + 8) { animation-delay: 385ms; }

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 /* Glifo-assinatura: uma raiz se ramificando a partir de um caule —
    o mesmo traço aparece (menor, mais discreto) em estados vazios e
    de carregamento pelo app inteiro. */
-function GlifoRaiz({ className }: { className?: string }) {
+export function GlifoRaiz({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"

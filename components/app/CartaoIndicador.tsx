@@ -81,8 +81,13 @@ export function CartaoIndicador({
   return (
     <article
       className={cn(
-        "group relative flex flex-col gap-4 rounded-2xl p-5 shadow-cartao ring-1 ring-border transition-[box-shadow] duration-200 hover:ring-foreground/15",
+        "group relative flex flex-col gap-4 rounded-2xl p-5 shadow-cartao ring-1 ring-border transition-[box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-flutuante hover:ring-foreground/15",
         fundoSuave ? estilo.fundo : "bg-card",
+        // Cartão-herói: um brilho verde bem contido no canto, só o suficiente
+        // para não parecer chapado.
+        destaque &&
+          !fundoSuave &&
+          "bg-[radial-gradient(120%_120%_at_100%_0%,color-mix(in_oklab,var(--primary)_11%,transparent),transparent_60%)]",
         className
       )}
     >

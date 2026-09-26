@@ -4,6 +4,8 @@ import { Geist, Inter } from "next/font/google";
 import { TemaProvedor } from "@/components/TemaProvedor";
 import { Toaster } from "@/components/ui/sonner";
 import { RegistroServiceWorker } from "@/components/RegistroServiceWorker";
+import { AberturaDoApp, SCRIPT_DA_ABERTURA } from "@/components/AberturaDoApp";
+import { IMAGENS_DE_ABERTURA } from "@/lib/abertura";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,7 +36,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   // iOS: abre em tela cheia quando instalado pela Tela de Início. O ícone de
   // toque vem de app/apple-icon.png (convenção do Next).
-  appleWebApp: { capable: true, title: "Raiz", statusBarStyle: "default" },
+  appleWebApp: {
+    capable: true,
+    title: "Raiz",
+    statusBarStyle: "default",
+    // Tela de abertura do app instalado no iPhone: verde-escuro com a logo.
+    startupImage: IMAGENS_DE_ABERTURA,
+  },
   // Sem isto o Safari transforma telefones em links azuis no meio do texto.
   formatDetection: { telephone: false },
   // O Next 16 emite só `mobile-web-app-capable`; iOS anteriores à 16.4 ainda
@@ -60,6 +68,9 @@ export default function LayoutRaiz({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-BR" className={`${inter.variable} ${geist.variable}`} suppressHydrationWarning>
       <body className="min-h-dvh antialiased">
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_DA_ABERTURA }} />
+        <AberturaDoApp />
+        <div className="fundo-luzes" aria-hidden="true" />
         <TemaProvedor>
           {children}
           <Toaster position="top-center" offset={16} mobileOffset={12} />
