@@ -56,6 +56,7 @@ export default async function PaginaInicio({ searchParams }: { searchParams: Par
         titulo={`${saudacao()}, ${primeiroNome}.`}
         apoio="Seu caixa, o que entrou, o que saiu e o que virou patrimônio."
         acao={<AlternarValores />}
+        acaoNoCanto
       />
 
       <BarraDePeriodo periodo={periodo} />

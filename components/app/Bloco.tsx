@@ -70,18 +70,28 @@ export function TituloDaPagina({
   titulo,
   apoio,
   acao,
+  acaoNoCanto = false,
 }: {
   titulo: string;
   apoio?: ReactNode;
   acao?: ReactNode;
+  /** Prende a ação no canto superior direito, mesmo no celular. Sem isto, a
+      ação quebra para uma linha própria quando o título é longo. */
+  acaoNoCanto?: boolean;
 }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4">
-      <div className="flex flex-col gap-1">
+    <header
+      className={
+        acaoNoCanto
+          ? "flex items-start justify-between gap-4"
+          : "flex flex-wrap items-end justify-between gap-4"
+      }
+    >
+      <div className="flex min-w-0 flex-col gap-1">
         <h1 className="text-[1.375rem] font-semibold tracking-tight sm:text-[1.75rem]">{titulo}</h1>
         {apoio && <p className="text-sm text-muted-foreground">{apoio}</p>}
       </div>
-      {acao && <div className="flex items-center gap-2">{acao}</div>}
+      {acao && <div className="flex shrink-0 items-center gap-2">{acao}</div>}
     </header>
   );
 }
