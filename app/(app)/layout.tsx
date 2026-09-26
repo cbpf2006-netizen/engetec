@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { AvisoDeInstalacao } from "@/components/app/AvisoDeInstalacao";
 import { BarraLateral, CabecalhoMobile } from "@/components/app/BarraLateral";
 import { NavegacaoInferior } from "@/components/app/NavegacaoInferior";
 import { BotoesFlutuantes } from "@/components/app/AcoesDeLancamento";
@@ -61,6 +62,7 @@ export default async function LayoutDoApp({ children }: { children: React.ReactN
           <CabecalhoMobile perfil={perfil} />
 
           <main className="mx-auto w-full max-w-[68rem] flex-1 px-4 pt-5 pb-[calc(14.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:pt-8 lg:pb-52">
+            <AvisoDeInstalacao />
             {children}
           </main>
         </div>

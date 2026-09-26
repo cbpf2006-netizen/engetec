@@ -32,6 +32,11 @@ export const metadata: Metadata = {
     "Acompanhe entradas, saídas, investimentos e contas a pagar em um só lugar, com o saldo sempre em dia.",
   applicationName: "Raiz",
   manifest: "/manifest.json",
+  // iOS: abre em tela cheia quando instalado pela Tela de Início. O ícone de
+  // toque vem de app/apple-icon.png (convenção do Next).
+  appleWebApp: { capable: true, title: "Raiz", statusBarStyle: "default" },
+  // Sem isto o Safari transforma telefones em links azuis no meio do texto.
+  formatDetection: { telephone: false },
   robots: { index: false, follow: false },
 };
 
@@ -44,6 +49,8 @@ export const viewport: Viewport = {
   // O app tem campos de valor: impedir o zoom prejudicaria quem precisa dele.
   initialScale: 1,
   width: "device-width",
+  // Faz env(safe-area-inset-*) valer no iPhone (barra inferior, entalhe).
+  viewportFit: "cover",
 };
 
 export default function LayoutRaiz({ children }: { children: React.ReactNode }) {
