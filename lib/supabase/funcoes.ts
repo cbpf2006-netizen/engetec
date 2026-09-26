@@ -18,7 +18,7 @@ export type RespostaDaFuncao = { ok: true } | { ok: false; erro: string; campo?:
 const FALHA_GENERICA = "Não foi possível concluir agora. Tente de novo em instantes.";
 
 export async function chamarFuncao(
-  nome: "cadastrar" | "alterar-email" | "remover-usuario",
+  nome: "cadastrar" | "alterar-email" | "remover-usuario" | "excluir-conta",
   corpo: Record<string, unknown>,
   tokenDeSessao?: string
 ): Promise<RespostaDaFuncao> {

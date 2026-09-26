@@ -12,6 +12,7 @@ import { CampoSenha } from "@/components/auth/campos";
 import { Avatar } from "./Avatar";
 import { Bloco } from "./Bloco";
 import { DialogoTrocaDeEmail } from "./DialogoTrocaDeEmail";
+import { BotaoExcluirConta } from "./ExcluirConta";
 import { mascaraTelefone, soDigitos } from "@/lib/formato";
 import { atualizarPerfil } from "@/lib/acoes/perfil";
 import { alterarSenha, atualizarTelefone, enviarFoto, removerFoto } from "@/lib/acoes/conta";
@@ -31,6 +32,7 @@ export function PerfilCompleto({ perfil }: { perfil: Perfil }) {
       <BlocoDosDados perfil={perfil} />
       <BlocoDoEmail email={perfil.email} />
       <BlocoDaSenha />
+      <BlocoDaExclusao ehAdmin={perfil.papel === "admin"} />
     </>
   );
 }
@@ -351,6 +353,33 @@ function BlocoDaSenha() {
           </Button>
         </div>
       </form>
+    </Bloco>
+  );
+}
+
+/* =============================================================================
+   Excluir conta
+
+   O administrador não vê o botão: sem ele o app ficaria sem quem libere
+   acessos. A função no servidor também recusa, então esconder aqui é só
+   clareza — a regra não depende da tela.
+   ========================================================================== */
+
+function BlocoDaExclusao({ ehAdmin }: { ehAdmin: boolean }) {
+  return (
+    <Bloco
+      titulo="Excluir conta"
+      descricao="Apaga sua conta e todos os seus dados. Não há como desfazer."
+    >
+      {ehAdmin ? (
+        <p className="text-sm text-muted-foreground">
+          A conta de administrador não pode ser excluída por aqui.
+        </p>
+      ) : (
+        <div>
+          <BotaoExcluirConta />
+        </div>
+      )}
     </Bloco>
   );
 }

@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { contextoOuNulo } from "@/lib/dados/sessao";
 import { chamarFuncao } from "@/lib/supabase/funcoes";
 import {
   erroDeValidacao,
+  esquemaExcluirConta,
   esquemaNovoEmail,
   esquemaTelefone,
   esquemaTrocaDeSenha,
@@ -214,4 +216,35 @@ export async function pedirTrocaDeEmail(entrada: unknown): Promise<Resultado> {
 
   revalidarPerfil();
   return sucesso();
+}
+
+/* =============================================================================
+   Excluir a própria conta
+
+   Apaga a conta e todos os dados dela, sem volta. Quem executa é a função
+   `excluir-conta` do Supabase, que valida o token E confere a senha por conta
+   própria, e recusa o administrador (o app não pode ficar sem um). Depois o
+   e-mail fica livre: a pessoa pode se cadastrar de novo e recomeça pendente.
+   ========================================================================== */
+
+export async function excluirMinhaConta(entrada: unknown): Promise<Resultado> {
+  const analise = esquemaExcluirConta.safeParse(entrada);
+  if (!analise.success) return erroDeValidacao(analise.error);
+
+  const contexto = await contextoOuNulo();
+  if (!contexto) return falha(SEM_SESSAO);
+  const { supabase } = contexto;
+
+  const { data: sessao } = await supabase.auth.getSession();
+  const token = sessao.session?.access_token;
+  if (!token) return falha(SEM_SESSAO);
+
+  const resposta = await chamarFuncao("excluir-conta", { senha: analise.data.senha }, token);
+  if (!resposta.ok) return falha(resposta.erro, resposta.campo);
+
+  // A conta já não existe: só limpa os cookies deste navegador.
+  await supabase.auth.signOut({ scope: "local" });
+
+  revalidatePath("/", "layout");
+  redirect("/cadastro");
 }

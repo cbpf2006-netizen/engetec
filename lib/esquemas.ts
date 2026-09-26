@@ -202,6 +202,11 @@ export const esquemaTrocaDeSenha = z
     path: ["nova"],
   });
 
+/** Exclusão da própria conta: a senha é exigida porque não há volta. */
+export const esquemaExcluirConta = z.object({
+  senha: z.string().min(1, "Informe sua senha para confirmar."),
+});
+
 /** Troca de e-mail: a senha atual é exigida porque a confirmação vai só para o
     endereço NOVO — sem ela, quem pegasse uma sessão aberta poderia redirecionar
     a conta e depois pedir a recuperação de senha nesse endereço. */
