@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Lock, ScanFace } from "lucide-react";
 
 import LogoRaiz from "@/components/marca/LogoRaiz";
@@ -97,22 +97,61 @@ export function BloqueioDoApp({ children }: { children: ReactNode }) {
 }
 
 function TelaDeBloqueio() {
-  const [tentando, setTentando] = useState(false);
+  // Já nasce "tentando": o Face ID é pedido sozinho assim que a tela aparece.
+  const [tentando, setTentando] = useState(true);
   const [falhou, setFalhou] = useState(false);
+  const emAndamento = useRef(false);
 
-  async function desbloquear() {
+  // Uma chamada ao autenticador por vez: duas ao mesmo tempo cancelam uma à
+  // outra. Devolve null quando já há uma em andamento.
+  const pedir = useCallback(async (): Promise<boolean | null> => {
+    if (emAndamento.current) return null;
+    emAndamento.current = true;
+    const passou = await verificarBloqueio();
+    emAndamento.current = false;
+    return passou;
+  }, []);
+
+  // Pede o desbloqueio ao abrir a tela e de novo cada vez que o app volta a
+  // ficar à vista enquanto ainda está trancado (ex.: cancelou e voltou). A
+  // tentativa automática que falha em silêncio só devolve o botão; erro em
+  // vermelho é para quem tocou.
+  useEffect(() => {
+    const automatico = () => {
+      void pedir().then((passou) => {
+        if (passou === null) return;
+        if (passou) {
+          iniciarUso();
+          definir(false);
+        } else {
+          setTentando(false);
+        }
+      });
+    };
+
+    automatico();
+
+    const aoVoltar = () => {
+      if (document.visibilityState === "visible") automatico();
+    };
+    document.addEventListener("visibilitychange", aoVoltar);
+    return () => document.removeEventListener("visibilitychange", aoVoltar);
+  }, [pedir]);
+
+  function desbloquear() {
     setTentando(true);
     setFalhou(false);
 
-    const passou = await verificarBloqueio();
-
-    setTentando(false);
-    if (passou) {
-      iniciarUso();
-      definir(false);
-    } else {
-      setFalhou(true);
-    }
+    void pedir().then((passou) => {
+      if (passou === null) return;
+      if (passou) {
+        iniciarUso();
+        definir(false);
+      } else {
+        setTentando(false);
+        setFalhou(true);
+      }
+    });
   }
 
   return (
@@ -130,7 +169,9 @@ function TelaDeBloqueio() {
         </span>
         <h1 className="text-xl font-semibold tracking-tight">Raiz bloqueado</h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Confirme com o Face ID, a digital ou a senha do aparelho para continuar.
+          {tentando
+            ? "Aguardando o Face ID, a digital ou a senha do aparelho…"
+            : "Confirme com o Face ID, a digital ou a senha do aparelho para continuar."}
         </p>
       </div>
 
