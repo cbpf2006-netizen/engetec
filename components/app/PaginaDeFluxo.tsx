@@ -110,11 +110,16 @@ export async function PaginaDeFluxo({
         icone={fluxo === "entrada" ? ArrowUpRight : ArrowDownLeft}
         tom={fluxo}
         destaque
-        comparacao={{
-          fracao: variacaoRelativa(total, totalAnterior),
-          rotulo: "vs. período anterior",
-          melhorSubindo: textos.melhorSubindo,
-        }}
+        // Na aba de entradas o cartão mostra só o valor.
+        comparacao={
+          fluxo === "entrada"
+            ? undefined
+            : {
+                fracao: variacaoRelativa(total, totalAnterior),
+                rotulo: "vs. período anterior",
+                melhorSubindo: textos.melhorSubindo,
+              }
+        }
       />
 
       {distribuicao.length > 0 && (
