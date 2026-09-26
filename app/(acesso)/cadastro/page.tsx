@@ -9,7 +9,7 @@ export default function PaginaDeCadastro() {
   return (
     <CascaDeAcesso
       titulo="Criar sua conta"
-      descricao="Leva menos de um minuto. Já começamos com os modelos de entrada, saída e investimento prontos para usar."
+      descricao="Leva menos de um minuto. Você começa com tudo em branco e monta as suas categorias e carteiras do seu jeito."
     >
       <FormularioCadastro />
     </CascaDeAcesso>

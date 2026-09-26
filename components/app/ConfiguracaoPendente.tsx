@@ -23,7 +23,7 @@ const PASSOS = [
   {
     titulo: "Execute e recarregue esta página",
     detalhe:
-      "O script cria as tabelas, liga o Row Level Security e prepara os modelos padrão de cada nova conta.",
+      "O script cria as tabelas e liga o Row Level Security.",
   },
 ];
 

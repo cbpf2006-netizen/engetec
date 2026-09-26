@@ -13,6 +13,8 @@ import type { Modelo } from "@/lib/tipos";
    uma frase o que fazer e põe os dois botões que destravam tudo.
 
    Sem tour, sem passo 1 de 4: dois lançamentos e o painel de verdade aparece.
+   A conta nasce sem modelo nem carteira; o primeiro lançamento já cria os
+   dois na própria janela de registro.
    ========================================================================== */
 
 const CAMINHOS = [
@@ -95,8 +97,8 @@ export function PrimeiroAcesso({
       </ul>
 
       <p className="text-sm text-muted-foreground">
-        Os modelos de entrada, saída e investimento já vêm prontos — você pode renomear, recolorir
-        ou criar os seus em{" "}
+        Sua conta começa sem modelos nem carteiras: ao registrar o primeiro lançamento você cria os
+        seus na hora, ou os gerencia em{" "}
         <Button
           variant="link"
           size="sm"
