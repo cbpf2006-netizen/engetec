@@ -453,7 +453,7 @@ function BlocoDoBloqueio({ perfil }: { perfil: Perfil }) {
   return (
     <Bloco
       titulo="Bloqueio do app"
-      descricao="Pede o Face ID, a digital ou a senha do aparelho ao voltar ao Raiz depois de 5 minutos fora."
+      descricao="Pede o Face ID, a digital ou a senha do aparelho sempre que você abrir o Raiz de novo, e ao voltar depois de 1 minuto fora."
     >
       {suportado === null ? null : suportado ? (
         <div className="flex flex-wrap items-center gap-3">

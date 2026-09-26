@@ -1,7 +1,16 @@
 /* =============================================================================
    Bloqueio do app com a tela do aparelho (Face ID, digital ou senha)
 
-   Depois de LIMITE_MS fora do app, ao voltar pede a confirmação do aparelho.
+   Duas regras, as duas pedem a confirmação do aparelho:
+
+     1. App FECHADO e aberto de novo (a aba/janela foi encerrada): bloqueia
+        sempre, na hora, por menos que tenha sido o intervalo.
+     2. App só em segundo plano (a pessoa foi para outro app e voltou, sem
+        fechar): bloqueia se passou LIMITE_MS fora — 1 minuto.
+
+   Como distinguir "fechou" de "só saiu": sessionStorage. Ele sobrevive a ir para
+   segundo plano e voltar, e some quando a aba/janela é encerrada. Sem a marca
+   dele na abertura, o app foi fechado no meio.
    Usa WebAuthn com autenticador da plataforma e `userVerification: "required"`:
    é o que faz o iPhone abrir o Face ID / Touch ID e cair na senha do aparelho
    quando a biometria não está disponível ou falha.
@@ -19,10 +28,28 @@
    pode trancar ninguém fora do app.
    ========================================================================== */
 
-export const LIMITE_MS = 5 * 60 * 1000;
+export const LIMITE_MS = 60 * 1000;
 
 const CH_CREDENCIAL = "raiz:bloqueio-credencial";
 const CH_VISTO = "raiz:bloqueio-visto";
+const CH_SESSAO = "raiz:bloqueio-sessao";
+
+function lerSessao(): boolean {
+  try {
+    return window.sessionStorage.getItem(CH_SESSAO) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function gravarSessao(valor: boolean): void {
+  try {
+    if (valor) window.sessionStorage.setItem(CH_SESSAO, "1");
+    else window.sessionStorage.removeItem(CH_SESSAO);
+  } catch {
+    /* sem sessionStorage: cada abertura conta como app fechado */
+  }
+}
 
 function ler(chave: string): string | null {
   try {
@@ -64,9 +91,26 @@ export function passouDoLimite(): boolean {
   return Number.isFinite(visto) && visto > 0 && Date.now() - visto >= LIMITE_MS;
 }
 
-/** Deve abrir trancado? Só se o bloqueio estiver ligado E o limite estourado. */
+/** Começa (ou renova) o uso desbloqueado: marca esta aba como já aberta e o
+    instante de agora. Chamado ao ligar o bloqueio, ao desbloquear e na primeira
+    abertura sem histórico (logo depois de entrar na conta). */
+export function iniciarUso(): void {
+  gravarSessao(true);
+  marcarVisto();
+}
+
+/** Deve abrir/voltar trancado?
+    Precisa haver um uso anterior registrado (`visto`): sem ele — primeira vez,
+    ou logo depois de entrar na conta — não há o que proteger e não trava
+    ninguém na cara de quem acabou de digitar a senha. Havendo, tranca se a
+    aba foi fechada (sem a marca da sessão) OU se passou do limite fora. */
 export function deveTrancar(): boolean {
-  return bloqueioAtivo() && passouDoLimite();
+  if (!bloqueioAtivo()) return false;
+
+  const visto = Number(ler(CH_VISTO));
+  if (!Number.isFinite(visto) || visto <= 0) return false;
+
+  return !lerSessao() || passouDoLimite();
 }
 
 /* ---------------------------------------------------------------- WebAuthn */
@@ -136,7 +180,7 @@ export async function ativarBloqueio(usuario: {
     if (!credencial) return false;
 
     gravar(CH_CREDENCIAL, paraBase64Url(credencial.rawId));
-    marcarVisto();
+    iniciarUso();
     return true;
   } catch {
     return false;
@@ -146,6 +190,7 @@ export async function ativarBloqueio(usuario: {
 export function desativarBloqueio(): void {
   gravar(CH_CREDENCIAL, null);
   gravar(CH_VISTO, null);
+  gravarSessao(false);
 }
 
 /** Pede a confirmação do aparelho. true = a pessoa passou. */
@@ -175,4 +220,6 @@ export const SCRIPT_DE_PRE_BLOQUEIO = `(function(){try{var c=localStorage.getIte
   CH_CREDENCIAL
 )});var v=Number(localStorage.getItem(${JSON.stringify(
   CH_VISTO
-)}));if(c&&v>0&&Date.now()-v>=${LIMITE_MS}){document.documentElement.setAttribute('data-bloqueado','1')}}catch(e){}})();`;
+)}));var s=sessionStorage.getItem(${JSON.stringify(
+  CH_SESSAO
+)})==='1';if(c&&v>0&&(!s||Date.now()-v>=${LIMITE_MS})){document.documentElement.setAttribute('data-bloqueado','1')}}catch(e){}})();`;

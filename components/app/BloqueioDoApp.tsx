@@ -7,18 +7,21 @@ import LogoRaiz from "@/components/marca/LogoRaiz";
 import { Button } from "@/components/ui/button";
 import { sair } from "@/lib/acoes/autenticacao";
 import {
+  bloqueioAtivo,
   deveTrancar,
+  desativarBloqueio,
+  iniciarUso,
   marcarVisto,
   verificarBloqueio,
-  desativarBloqueio,
 } from "@/lib/bloqueio";
 
 /* =============================================================================
    Bloqueio do app
 
-   Envolve o app inteiro. Quando o bloqueio está ligado neste aparelho e a
-   pessoa ficou mais de 5 minutos fora, mostra uma tela de desbloqueio em vez
-   do conteúdo. Ver lib/bloqueio.ts para o que este bloqueio é e não é.
+   Envolve o app inteiro. Com o bloqueio ligado neste aparelho, mostra a tela de
+   desbloqueio em vez do conteúdo quando o app foi FECHADO e aberto de novo
+   (sempre), ou quando ficou mais de 1 minuto em segundo plano. Ver
+   lib/bloqueio.ts para as regras e para o que este bloqueio é e não é.
 
    O estado vive fora do React (um módulo) porque quem o muda são eventos do
    navegador — a página ir para segundo plano e voltar —, não interações com a
@@ -77,6 +80,10 @@ function lerEstado(): boolean {
   if (trancado === null) {
     trancado = deveTrancar();
     marcarNoHtml(trancado);
+
+    // Abriu sem precisar trancar (primeira vez, ou acabou de entrar na conta):
+    // registra o uso, para o próximo fechar-e-abrir já cair no bloqueio.
+    if (!trancado && bloqueioAtivo()) iniciarUso();
   }
   return trancado;
 }
@@ -101,7 +108,7 @@ function TelaDeBloqueio() {
 
     setTentando(false);
     if (passou) {
-      marcarVisto();
+      iniciarUso();
       definir(false);
     } else {
       setFalhou(true);
