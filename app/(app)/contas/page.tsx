@@ -29,13 +29,14 @@ export default async function PaginaDeContas({
   const [todas, modelos] = await Promise.all([listarContas("todas"), listarModelos("saida")]);
 
   const agora = hoje();
-  const resumo = resumirContas(todas, agora, somarDias(agora, DIAS_DE_AVISO));
+  const contasEmAberto = todas.filter((c) => c.situacao !== "pago");
+  const resumo = resumirContas(contasEmAberto, agora, somarDias(agora, DIAS_DE_AVISO));
 
   const contagens: Record<FiltroContas, number> = {
-    todas: todas.length,
-    pendente: todas.filter((c) => c.situacao === "pendente").length,
-    atrasado: todas.filter((c) => c.situacao === "atrasado").length,
-    pago: todas.filter((c) => c.situacao === "pago").length,
+    todas: contasEmAberto.length,
+    pendente: contasEmAberto.filter((c) => c.situacao === "pendente").length,
+    atrasado: contasEmAberto.filter((c) => c.situacao === "atrasado").length,
+    pago: 0,
   };
 
   const visiveis = (filtro === "todas" ? todas : todas.filter((c) => c.situacao === filtro)).filter(

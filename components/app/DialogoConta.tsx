@@ -79,7 +79,7 @@ function Formulario({
   const [valor, setValor] = useState(
     conta ? mascaraMoeda(String(Math.round(conta.valor * 100))) : ""
   );
-  const [vencimento, setVencimento] = useState(conta?.vencimento ?? "");
+  const [vencimento, setVencimento] = useState(conta?.vencimento ?? hoje());
   const [modeloId, setModeloId] = useState<string | null>(conta?.modelo_id ?? null);
   const [observacao, setObservacao] = useState(conta?.observacao ?? "");
   const [erros, setErros] = useState<Erros>({});
@@ -147,14 +147,24 @@ function Formulario({
         <Label htmlFor="conta-vencimento">
           Vencimento <span className="font-normal text-muted-foreground">(opcional)</span>
         </Label>
-        <Input
-          id="conta-vencimento"
-          type="date"
-          value={vencimento}
-          onChange={(evento) => setVencimento(evento.target.value)}
-          aria-invalid={erros.vencimento ? true : undefined}
-          className="h-11"
-        />
+        <div className="flex gap-2">
+          <Input
+            id="conta-vencimento"
+            type="date"
+            value={vencimento}
+            onChange={(evento) => setVencimento(evento.target.value)}
+            aria-invalid={erros.vencimento ? true : undefined}
+            className="h-11 flex-1"
+          />
+          <Button
+            type="button"
+            variant={vencimento ? "outline" : "default"}
+            size="lg"
+            onClick={() => setVencimento("")}
+          >
+            Sem vencimento
+          </Button>
+        </div>
         {erros.vencimento && <p className="text-xs text-destructive">{erros.vencimento}</p>}
       </div>
 
