@@ -38,7 +38,9 @@ export default async function PaginaDeContas({
     pago: todas.filter((c) => c.situacao === "pago").length,
   };
 
-  const visiveis = filtro === "todas" ? todas : todas.filter((c) => c.situacao === filtro);
+  const visiveis = (filtro === "todas" ? todas : todas.filter((c) => c.situacao === filtro)).filter(
+    (c) => c.situacao !== "pago"
+  );
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">

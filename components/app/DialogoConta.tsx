@@ -16,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CampoValor } from "./CampoValor";
-import { SelecaoDeModelo } from "./SelecaoDeModelo";
 import { mascaraMoeda, paraNumero } from "@/lib/formato";
 import { hoje } from "@/lib/periodo";
 import { atualizarConta, criarConta } from "@/lib/acoes/contas";
@@ -80,7 +79,7 @@ function Formulario({
   const [valor, setValor] = useState(
     conta ? mascaraMoeda(String(Math.round(conta.valor * 100))) : ""
   );
-  const [vencimento, setVencimento] = useState(conta?.vencimento ?? hoje());
+  const [vencimento, setVencimento] = useState(conta?.vencimento ?? "");
   const [modeloId, setModeloId] = useState<string | null>(conta?.modelo_id ?? null);
   const [observacao, setObservacao] = useState(conta?.observacao ?? "");
   const [erros, setErros] = useState<Erros>({});
@@ -94,7 +93,6 @@ function Formulario({
     if (!valor.trim() || !Number.isFinite(numero) || numero <= 0) {
       problemas.valor = "Informe um valor maior que zero.";
     }
-    if (!vencimento) problemas.vencimento = "Informe o vencimento.";
 
     setErros(problemas);
     if (Object.keys(problemas).length > 0) return;
@@ -146,7 +144,9 @@ function Formulario({
       <CampoValor valor={valor} aoMudar={setValor} erro={erros.valor} />
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="conta-vencimento">Vencimento</Label>
+        <Label htmlFor="conta-vencimento">
+          Vencimento <span className="font-normal text-muted-foreground">(opcional)</span>
+        </Label>
         <Input
           id="conta-vencimento"
           type="date"
@@ -157,16 +157,6 @@ function Formulario({
         />
         {erros.vencimento && <p className="text-xs text-destructive">{erros.vencimento}</p>}
       </div>
-
-      <SelecaoDeModelo
-        fluxo="saida"
-        modelos={modelos}
-        selecionado={modeloId}
-        aoSelecionar={(id) => setModeloId(id === modeloId ? null : id)}
-      />
-      <p className="-mt-3 text-xs text-muted-foreground">
-        Opcional. Ao marcar como paga, a saída entra com este modelo.
-      </p>
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="conta-observacao">

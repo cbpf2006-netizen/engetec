@@ -81,7 +81,7 @@ export type Conta = {
   nome: string;
   modelo_id: string | null;
   valor: number;
-  vencimento: string;
+  vencimento: string | null;
   status: StatusConta;
   pago_em: string | null;
   transacao_id: string | null;
@@ -102,7 +102,6 @@ export const FILTROS_CONTA: { valor: FiltroContas; rotulo: string }[] = [
   { valor: "todas", rotulo: "Todas" },
   { valor: "pendente", rotulo: "Pendentes" },
   { valor: "atrasado", rotulo: "Atrasadas" },
-  { valor: "pago", rotulo: "Pagas" },
 ];
 
 export function ehFiltroConta(valor: string | undefined): valor is FiltroContas {

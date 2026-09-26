@@ -69,7 +69,7 @@ export const esquemaConta = z.object({
     .max(60, "O nome passou de 60 caracteres."),
   modelo_id: modeloId,
   valor,
-  vencimento: dataIso,
+  vencimento: z.union([dataIso, z.literal("")]).transform((v) => (v === "" ? null : v)).nullable(),
   observacao,
 });
 
