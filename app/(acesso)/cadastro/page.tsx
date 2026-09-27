@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CascaDeAcesso } from "@/components/auth/CascaDeAcesso";
 import { FormularioCadastro } from "@/components/auth/formularios";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Criar conta" };
 
@@ -14,7 +15,15 @@ export default async function PaginaDeCadastro({
   const bruto = Array.isArray(parametros.ref) ? parametros.ref[0] : parametros.ref;
   // Vem do link de indicação (/comecar?ref=código); repassado adiante para
   // pré-selecionar "quem te indicou" no formulário.
-  const codigoDeIndicacao = bruto?.trim().toLowerCase() || undefined;
+  let codigoDeIndicacao = bruto?.trim().toLowerCase() || undefined;
+
+  // Sem link de indicação: pré-seleciona a conta administradora em vez de
+  // "ninguém me indicou" (ver public.codigo_indicacao_padrao()).
+  if (!codigoDeIndicacao) {
+    const supabase = await createClient();
+    const { data } = await supabase.rpc("codigo_indicacao_padrao");
+    codigoDeIndicacao = (data as string | null) ?? undefined;
+  }
 
   return (
     <CascaDeAcesso

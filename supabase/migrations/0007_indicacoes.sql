@@ -171,3 +171,27 @@ $$;
 
 revoke all on function public.minhas_indicacoes() from public, anon;
 grant execute on function public.minhas_indicacoes() to authenticated;
+
+-- =============================================================================
+-- Indicador padrão — quem aparece pré-selecionado em "quem te indicou" quando
+-- ninguém chegou por um link de indicação (a conta administradora, dona do
+-- produto, em vez de "ninguém"). Se não houver administrador liberado, o
+-- cadastro simplesmente cai de volta em "ninguém me indicou".
+-- =============================================================================
+
+create or replace function public.codigo_indicacao_padrao()
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select p.codigo_indicacao
+    from public.perfis p
+   where p.papel = 'admin' and p.acesso = 'liberado'
+   order by p.criado_em asc
+   limit 1;
+$$;
+
+revoke all on function public.codigo_indicacao_padrao() from public;
+grant execute on function public.codigo_indicacao_padrao() to anon, authenticated;
