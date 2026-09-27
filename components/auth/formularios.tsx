@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState, useSyncExternalStore } from "react";
+import { useActionState, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 import { Aviso, BotaoEnviar, CampoSenha, CampoTexto } from "./campos";
@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/select";
 import { lerEmailSalvo } from "@/lib/login-salvo";
 import { mascaraTelefone } from "@/lib/formato";
-import { createClient } from "@/lib/supabase/client";
-import type { Indicador } from "@/lib/tipos";
 import {
   cadastrar,
   definirNovaSenha,
@@ -120,33 +118,11 @@ export function FormularioCadastro({
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
 
-  // "Quem te indicou" vem de uma lista fechada — só contas com acesso
-  // liberado — em vez de um nome digitado à mão. Carregada do banco porque o
-  // cadastro ainda não tem sessão nenhuma (a lista é pública de propósito, ver
-  // supabase/migrations/0008_indicacao_por_nome.sql). A escolha vale pelo
-  // nome mesmo (exatamente como cadastrado), não por um código.
-  const [indicadores, setIndicadores] = useState<Indicador[]>([]);
-  const [nomeEscolhido, setNomeEscolhido] = useState(SEM_INDICADOR);
-
-  useEffect(() => {
-    let vivo = true;
-
-    createClient()
-      .rpc("listar_indicadores")
-      .then(({ data }) => {
-        if (!vivo || !data) return;
-        const lista = data as Indicador[];
-        setIndicadores(lista);
-
-        if (nomeDeIndicacao && lista.some((i) => i.nome === nomeDeIndicacao)) {
-          setNomeEscolhido(nomeDeIndicacao);
-        }
-      });
-
-    return () => {
-      vivo = false;
-    };
-  }, [nomeDeIndicacao]);
+  // "Quem te indicou" já vem resolvido do servidor: o nome de quem
+  // compartilhou o link (?ref=nome) ou, sem link, a conta administradora
+  // (ver public.nome_indicador_padrao()). Não é mais uma lista aberta de
+  // todo mundo com acesso liberado — só essa opção e "Nenhum".
+  const [nomeEscolhido, setNomeEscolhido] = useState(nomeDeIndicacao ?? SEM_INDICADOR);
 
   if (estado?.aviso) {
     return (
@@ -225,33 +201,31 @@ export function FormularioCadastro({
         erro={estado?.campo === "confirmacao" ? estado.erro : undefined}
       />
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="quem-indicou">Quem te indicou?</Label>
-        <Select
-          value={nomeEscolhido}
-          onValueChange={(valor) => setNomeEscolhido(String(valor))}
-        >
-          <SelectTrigger id="quem-indicou" className="w-full">
-            <SelectValue placeholder="Selecione quem te indicou" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={SEM_INDICADOR}>Ninguém me indicou</SelectItem>
-            {indicadores.map((indicador) => (
-              <SelectItem key={indicador.id} value={indicador.nome}>
-                {indicador.nome}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <input
-          type="hidden"
-          name="nome_indicador"
-          value={nomeEscolhido === SEM_INDICADOR ? "" : nomeEscolhido}
-        />
-        {estado?.campo === "nome_indicador" && (
-          <p className="text-xs text-destructive">{estado.erro}</p>
-        )}
-      </div>
+      {nomeDeIndicacao && (
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="quem-indicou">Quem te indicou?</Label>
+          <Select
+            value={nomeEscolhido}
+            onValueChange={(valor) => setNomeEscolhido(String(valor))}
+          >
+            <SelectTrigger id="quem-indicou" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={nomeDeIndicacao}>{nomeDeIndicacao}</SelectItem>
+              <SelectItem value={SEM_INDICADOR}>Nenhum</SelectItem>
+            </SelectContent>
+          </Select>
+          <input
+            type="hidden"
+            name="nome_indicador"
+            value={nomeEscolhido === SEM_INDICADOR ? "" : nomeEscolhido}
+          />
+          {estado?.campo === "nome_indicador" && (
+            <p className="text-xs text-destructive">{estado.erro}</p>
+          )}
+        </div>
+      )}
 
       <BotaoEnviar carregando="Criando conta…">Criar conta</BotaoEnviar>
 

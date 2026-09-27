@@ -151,13 +151,6 @@ export type Indicado = {
   criado_em: string;
 };
 
-/** Uma conta que PODE ser escolhida como "quem te indicou" no cadastro — só
-    id e nome, nunca e-mail nem telefone. A escolha vale pelo nome mesmo. */
-export type Indicador = {
-  id: string;
-  nome: string;
-};
-
 /** Retorno padrão de toda Server Action de escrita. Erros viram mensagem
     pronta para o usuário — a interface nunca mostra texto do Postgres.
 
