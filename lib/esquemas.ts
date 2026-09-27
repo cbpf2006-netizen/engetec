@@ -155,6 +155,16 @@ const telefoneObrigatorio = esquemaTelefone.refine(
   "Informe o telefone com DDD."
 );
 
+/** O código de QUEM indicou — nunca um nome livre. Vem de uma lista fechada
+    (só contas com acesso liberado aparecem nela), então o formato é sempre o
+    mesmo: hexadecimal curto. Vazio = ninguém indicou. */
+export const esquemaCodigoDeIndicacao = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .transform((texto) => texto || null)
+  .refine((codigo) => codigo === null || /^[0-9a-f]{6,10}$/.test(codigo), "Selecione quem te indicou.");
+
 export const esquemaCadastro = z
   .object({
     nome: z
@@ -166,11 +176,7 @@ export const esquemaCadastro = z
     telefone: telefoneObrigatorio,
     senha: esquemaSenha,
     confirmacao: z.string(),
-    indicado_por: z
-      .string()
-      .trim()
-      .max(80, "Quem indicou passou de 80 caracteres.")
-      .transform((texto) => texto || null),
+    codigo_indicacao: esquemaCodigoDeIndicacao,
   })
   .refine((dados) => dados.senha === dados.confirmacao, {
     message: "As duas senhas não são iguais.",

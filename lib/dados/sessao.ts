@@ -62,7 +62,7 @@ export async function perfilAtual(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("perfis")
-    .select("id, nome, telefone, foto_path, papel, acesso")
+    .select("id, nome, telefone, foto_path, papel, acesso, indicado_por, codigo_indicacao")
     .eq("id", usuario.id)
     .maybeSingle();
 
@@ -82,6 +82,9 @@ export async function perfilAtual(): Promise<Perfil | null> {
     foto_url: fotoPath
       ? supabase.storage.from("avatars").getPublicUrl(fotoPath).data.publicUrl
       : null,
+    indicado_por: (data?.indicado_por as string | null | undefined) ?? null,
+    // Só falta em contas de antes da migration de indicações; nunca no uso normal.
+    codigo_indicacao: (data?.codigo_indicacao as string | null | undefined) ?? "",
   };
 }
 

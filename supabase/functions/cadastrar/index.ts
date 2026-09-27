@@ -11,8 +11,12 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  * verify_jwt está desligado porque o cadastro é anônimo por natureza (e as
  * chaves "publishable" do projeto não são JWT). Quem protege o que importa é o
  * banco: a conta nasce com acesso PENDENTE e sem papel de administrador, e só o
- * administrador libera. Aqui são aceitos apenas nome, telefone e indicação —
- * papel e acesso jamais vêm do corpo da requisição.
+ * administrador libera. Aqui são aceitos apenas nome, telefone e o código de
+ * quem indicou — papel e acesso jamais vêm do corpo da requisição.
+ *
+ * O código de indicação é resolvido pelo trigger `ao_criar_usuario` no banco,
+ * não aqui: um código que não bate com ninguém de acesso liberado
+ * simplesmente não vira indicação. Esta função só repassa o texto adiante.
  */
 
 const CABECALHOS = {
@@ -42,7 +46,7 @@ Deno.serve(async (req: Request) => {
   const email = String(corpo.email ?? "").trim().toLowerCase();
   const senha = String(corpo.senha ?? "");
   const telefone = String(corpo.telefone ?? "").replace(/\D/g, "");
-  const indicadoPor = String(corpo.indicado_por ?? "").trim();
+  const codigoIndicacao = String(corpo.codigo_indicacao ?? "").trim().toLowerCase();
 
   if (nome.length < 2 || nome.length > 60) {
     return resposta({ erro: "Informe seu nome.", campo: "nome" }, 400);
@@ -56,8 +60,8 @@ Deno.serve(async (req: Request) => {
   if (senha.length < 8 || senha.length > 72) {
     return resposta({ erro: "A senha precisa de pelo menos 8 caracteres.", campo: "senha" }, 400);
   }
-  if (indicadoPor.length > 80) {
-    return resposta({ erro: "Quem indicou passou de 80 caracteres.", campo: "indicado_por" }, 400);
+  if (codigoIndicacao && !/^[0-9a-f]{6,10}$/.test(codigoIndicacao)) {
+    return resposta({ erro: "Selecione quem te indicou.", campo: "codigo_indicacao" }, 400);
   }
 
   const admin = createClient(
@@ -71,7 +75,7 @@ Deno.serve(async (req: Request) => {
     password: senha,
     email_confirm: true,
     // Lido pelo trigger ao_criar_usuario. Só estes três campos.
-    user_metadata: { nome, telefone, indicado_por: indicadoPor || null },
+    user_metadata: { nome, telefone, codigo_indicacao: codigoIndicacao || null },
   });
 
   if (error) {

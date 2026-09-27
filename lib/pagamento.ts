@@ -12,7 +12,14 @@
 
 /** Valor do acesso, em reais. O QR Code Pix é estático (não carrega o valor),
     então a tela informa o valor e a pessoa o digita ao pagar. */
-export const VALOR_DO_ACESSO = 10;
+export const VALOR_DO_ACESSO = 9.99;
+
+/** Preço "de tabela" só para o anúncio (oferta de lançamento) — nunca é o
+    valor cobrado de verdade, que é sempre VALOR_DO_ACESSO. */
+export const VALOR_DE_TABELA = 49.99;
+
+/** Quanto quem indica ganha por cada pessoa indicada que paga o acesso. */
+export const VALOR_POR_INDICACAO = 5;
 
 /** Pix copia e cola. */
 export const PIX_COPIA_E_COLA =

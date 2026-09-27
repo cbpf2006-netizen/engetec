@@ -137,6 +137,26 @@ export type Perfil = {
   papel: "admin" | "usuario";
   /** "pendente" até o administrador confirmar o pagamento e liberar. */
   acesso: "pendente" | "liberado";
+  /** Nome de quem indicou esta conta, resolvido no cadastro. Nulo se ninguém. */
+  indicado_por: string | null;
+  /** Código próprio da conta para o link de indicação (/comecar?ref=código). */
+  codigo_indicacao: string;
+};
+
+/** Uma conta que esta pessoa indicou — o que a aba Indicações lista. */
+export type Indicado = {
+  id: string;
+  nome: string;
+  acesso: "pendente" | "liberado";
+  criado_em: string;
+};
+
+/** Uma conta que PODE ser escolhida como "quem te indicou" no cadastro — só
+    id, nome e o código, nunca e-mail nem telefone. */
+export type Indicador = {
+  id: string;
+  nome: string;
+  codigo_indicacao: string;
 };
 
 /** Retorno padrão de toda Server Action de escrita. Erros viram mensagem

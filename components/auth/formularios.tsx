@@ -1,11 +1,21 @@
 "use client";
 
-import { useActionState, useState, useSyncExternalStore } from "react";
+import { useActionState, useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 import { Aviso, BotaoEnviar, CampoSenha, CampoTexto } from "./campos";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { lerEmailSalvo } from "@/lib/login-salvo";
 import { mascaraTelefone } from "@/lib/formato";
+import { createClient } from "@/lib/supabase/client";
+import type { Indicador } from "@/lib/tipos";
 import {
   cadastrar,
   definirNovaSenha,
@@ -94,7 +104,14 @@ export function FormularioEntrar({
   );
 }
 
-export function FormularioCadastro() {
+const SEM_INDICADOR = "nenhum";
+
+export function FormularioCadastro({
+  codigoDeIndicacao,
+}: {
+  /** Código do link /comecar?ref=código, se foi por ele que a pessoa chegou. */
+  codigoDeIndicacao?: string;
+}) {
   const [estado, acao] = useActionState(cadastrar, ERRO_INICIAL);
 
   // Controlados: o React 19 limpa os campos não controlados depois de cada
@@ -102,7 +119,33 @@ export function FormularioCadastro() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [indicadoPor, setIndicadoPor] = useState("");
+
+  // "Quem te indicou" vem de uma lista fechada — só contas com acesso
+  // liberado — em vez de um nome digitado à mão. Carregada do banco porque o
+  // cadastro ainda não tem sessão nenhuma (a lista é pública de propósito, ver
+  // supabase/migrations/0007_indicacoes.sql).
+  const [indicadores, setIndicadores] = useState<Indicador[]>([]);
+  const [codigoEscolhido, setCodigoEscolhido] = useState(SEM_INDICADOR);
+
+  useEffect(() => {
+    let vivo = true;
+
+    createClient()
+      .rpc("listar_indicadores")
+      .then(({ data }) => {
+        if (!vivo || !data) return;
+        const lista = data as Indicador[];
+        setIndicadores(lista);
+
+        if (codigoDeIndicacao && lista.some((i) => i.codigo_indicacao === codigoDeIndicacao)) {
+          setCodigoEscolhido(codigoDeIndicacao);
+        }
+      });
+
+    return () => {
+      vivo = false;
+    };
+  }, [codigoDeIndicacao]);
 
   if (estado?.aviso) {
     return (
@@ -147,7 +190,6 @@ export function FormularioCadastro() {
         required
         value={email}
         onChange={(evento) => setEmail(evento.target.value)}
-        dica="É com ele que você entra e recupera a senha."
         erro={estado?.campo === "email" ? estado.erro : undefined}
       />
 
@@ -182,16 +224,33 @@ export function FormularioCadastro() {
         erro={estado?.campo === "confirmacao" ? estado.erro : undefined}
       />
 
-      <CampoTexto
-        id="indicado_por"
-        rotulo="Quem te indicou?"
-        placeholder="Nome de quem indicou o Raiz"
-        maxLength={80}
-        value={indicadoPor}
-        onChange={(evento) => setIndicadoPor(evento.target.value)}
-        dica="Se ninguém indicou, deixe em branco."
-        erro={estado?.campo === "indicado_por" ? estado.erro : undefined}
-      />
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="quem-indicou">Quem te indicou?</Label>
+        <Select
+          value={codigoEscolhido}
+          onValueChange={(valor) => setCodigoEscolhido(String(valor))}
+        >
+          <SelectTrigger id="quem-indicou" className="w-full">
+            <SelectValue placeholder="Selecione quem te indicou" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={SEM_INDICADOR}>Ninguém me indicou</SelectItem>
+            {indicadores.map((indicador) => (
+              <SelectItem key={indicador.id} value={indicador.codigo_indicacao}>
+                {indicador.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <input
+          type="hidden"
+          name="codigo_indicacao"
+          value={codigoEscolhido === SEM_INDICADOR ? "" : codigoEscolhido}
+        />
+        {estado?.campo === "codigo_indicacao" && (
+          <p className="text-xs text-destructive">{estado.erro}</p>
+        )}
+      </div>
 
       <BotaoEnviar carregando="Criando conta…">Criar conta</BotaoEnviar>
 

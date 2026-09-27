@@ -4,16 +4,17 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Check,
-  Download,
   Eye,
-  EyeOff,
+  Gift,
   HelpCircle,
   Lock,
+  Palette,
   QrCode,
   Receipt,
   ScanFace,
   ShieldCheck,
   Smartphone,
+  Tag,
   TrendingDown,
   TrendingUp,
   UserPlus,
@@ -23,7 +24,13 @@ import {
 
 import { GlifoRaiz } from "@/components/marca/LogoRaiz";
 import { Button } from "@/components/ui/button";
-import { WHATSAPP_DO_COMPROVANTE } from "@/lib/pagamento";
+import { moeda } from "@/lib/formato";
+import {
+  VALOR_DE_TABELA,
+  VALOR_DO_ACESSO,
+  VALOR_POR_INDICACAO,
+  WHATSAPP_DO_COMPROVANTE,
+} from "@/lib/pagamento";
 
 export const metadata: Metadata = {
   title: "Raiz — Organize suas finanças",
@@ -74,14 +81,14 @@ const RECURSOS = [
     texto: "Cadastre o que vence todo mês e saiba o que está atrasado antes que vire problema.",
   },
   {
-    icone: EyeOff,
-    titulo: "Ocultar valores",
-    texto: "Um toque e todo número vira ••••, para abrir o app perto de qualquer pessoa.",
+    icone: Gift,
+    titulo: "Indique e ganhe",
+    texto: "Compartilhe seu link e ganhe R$ 5 por cada pessoa que indicar e pagar o acesso.",
   },
   {
-    icone: ScanFace,
-    titulo: "Bloqueio com Face ID",
-    texto: "O app tranca sozinho e só reabre com o rosto, a digital ou a senha do aparelho.",
+    icone: Palette,
+    titulo: "Claro ou escuro",
+    texto: "O app se adapta ao seu tema preferido, ou some junto com o sistema do aparelho.",
   },
 ] as const;
 
@@ -96,7 +103,7 @@ const PASSOS = [
     numero: "2",
     icone: QrCode,
     titulo: "Pague o acesso",
-    texto: "R$ 10 por Pix, com QR Code ou chave copia e cola.",
+    texto: `${moeda(VALOR_DO_ACESSO)} por Pix, com QR Code ou chave copia e cola.`,
   },
   {
     numero: "3",
@@ -124,7 +131,7 @@ const ANTES_E_DEPOIS = {
 const PERGUNTAS = [
   {
     pergunta: "Preciso pagar todo mês?",
-    resposta: "Não. O pagamento de R$ 10 é único e dá acesso ao app, sem mensalidade.",
+    resposta: `Não. O pagamento de ${moeda(VALOR_DO_ACESSO)} é único e dá acesso ao app, sem mensalidade.`,
   },
   {
     pergunta: "Funciona no Android também?",
@@ -146,7 +153,16 @@ const PERGUNTAS = [
   },
 ] as const;
 
-export default function PaginaDeApresentacao() {
+export default async function PaginaDeApresentacao({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>;
+}) {
+  // ?ref=código chega de um link de indicação (ver LinkDeIndicacao) e segue
+  // até o cadastro, para pré-selecionar quem indicou — sem passar pelo app.
+  const { ref } = await searchParams;
+  const linkCadastro = ref ? `/cadastro?ref=${encodeURIComponent(ref)}` : "/cadastro";
+
   return (
     <div className="min-h-dvh bg-[#081f13] text-[#f4fbf6]">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -196,7 +212,7 @@ export default function PaginaDeApresentacao() {
                 size="lg"
                 className="bg-[#22c55e] text-[#06210f] shadow-[0_10px_30px_-10px_rgb(34_197_94/0.55)] hover:bg-[#22c55e]/90"
                 nativeButton={false}
-                render={<Link href="/cadastro" />}
+                render={<Link href={linkCadastro} />}
               >
                 Criar minha conta
               </Button>
@@ -214,8 +230,9 @@ export default function PaginaDeApresentacao() {
             </div>
 
             <p className="text-xs text-[#8fc9ab]">
-              Acesso por <strong className="numero font-semibold text-[#f4fbf6]">R$ 10</strong> — sem
-              mensalidade escondida.
+              De <span className="numero line-through opacity-70">{moeda(VALOR_DE_TABELA)}</span> por{" "}
+              <strong className="numero font-semibold text-[#f4fbf6]">{moeda(VALOR_DO_ACESSO)}</strong> —
+              sem mensalidade escondida.
             </p>
           </div>
 
@@ -279,6 +296,17 @@ export default function PaginaDeApresentacao() {
               </ul>
             </div>
           </div>
+
+          <div className="mt-8 flex justify-center">
+            <Button
+              size="lg"
+              className="bg-[#22c55e] text-[#06210f] shadow-[0_10px_30px_-10px_rgb(34_197_94/0.55)] hover:bg-[#22c55e]/90"
+              nativeButton={false}
+              render={<Link href={linkCadastro} />}
+            >
+              Quero organizar minhas finanças
+            </Button>
+          </div>
         </section>
 
         {/* ---------------------------------------------------------------- Recursos */}
@@ -330,6 +358,18 @@ export default function PaginaDeApresentacao() {
               </li>
             ))}
           </ol>
+
+          <div className="mt-8 flex justify-center">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+              nativeButton={false}
+              render={<Link href={linkCadastro} />}
+            >
+              Criar minha conta
+            </Button>
+          </div>
         </section>
 
         {/* ---------------------------------------------------------------- Segurança */}
@@ -371,14 +411,19 @@ export default function PaginaDeApresentacao() {
         {/* ---------------------------------------------------------------- Preço + CTA final */}
         <section className="py-14 sm:py-20">
           <div className="flex flex-col items-center gap-6 rounded-[1.75rem] bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-8 text-center ring-1 ring-white/10 sm:p-12">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1 text-xs font-medium text-[#a7f3d0] ring-1 ring-white/10">
-              <Download className="size-3.5" aria-hidden="true" />
-              Web app — instala direto do navegador
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22c55e]/15 px-3 py-1 text-xs font-semibold text-[#4ade80] ring-1 ring-[#22c55e]/25">
+              <Tag className="size-3.5" aria-hidden="true" />
+              Oferta de lançamento
             </span>
 
-            <p className="numero text-5xl font-semibold tracking-tight text-white sm:text-6xl">
-              R$ 10
-            </p>
+            <div className="flex items-end gap-3">
+              <p className="numero text-2xl font-medium text-[#8fc9ab] line-through opacity-70">
+                {moeda(VALOR_DE_TABELA)}
+              </p>
+              <p className="numero text-5xl font-semibold tracking-tight text-white sm:text-6xl">
+                {moeda(VALOR_DO_ACESSO)}
+              </p>
+            </div>
             <p className="max-w-sm text-sm leading-relaxed text-[#a9d6bd]">
               Um pagamento único dá acesso ao Raiz. Sem cartão de crédito, sem assinatura, sem
               pegadinha.
@@ -388,10 +433,15 @@ export default function PaginaDeApresentacao() {
               size="lg"
               className="bg-[#22c55e] text-[#06210f] shadow-[0_10px_30px_-10px_rgb(34_197_94/0.55)] hover:bg-[#22c55e]/90"
               nativeButton={false}
-              render={<Link href="/cadastro" />}
+              render={<Link href={linkCadastro} />}
             >
               Criar minha conta agora
             </Button>
+
+            <span className="inline-flex items-center gap-1.5 text-xs text-[#8fc9ab]">
+              <Gift className="size-3.5 text-[#4ade80]" aria-hidden="true" />
+              Depois, indique amigos e ganhe {moeda(VALOR_POR_INDICACAO)} por cada um que pagar.
+            </span>
 
             <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-[#8fc9ab]">
               {["Sem downloads em loja", "Funciona no Android e no iPhone", "Seus dados, só seus"].map(

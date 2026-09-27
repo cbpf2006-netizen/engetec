@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { LogOut, Monitor, Moon, ShieldCheck, Sun, UserRound } from "lucide-react";
+import { Gift, LogOut, Monitor, Moon, ShieldCheck, Sun, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -111,6 +111,11 @@ export function MenuDoUsuario({
         <DropdownMenuItem render={<Link href="/perfil" />}>
           <UserRound />
           Perfil
+        </DropdownMenuItem>
+
+        <DropdownMenuItem render={<Link href="/indicacoes" />}>
+          <Gift />
+          Indicações
         </DropdownMenuItem>
 
         {/* Só o administrador vê esta opção. A área em si também recusa os
