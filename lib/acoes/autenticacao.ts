@@ -111,7 +111,7 @@ export async function cadastrar(
     telefone: formulario.get("telefone") ?? "",
     senha: formulario.get("senha"),
     confirmacao: formulario.get("confirmacao") ?? "",
-    codigo_indicacao: formulario.get("codigo_indicacao") ?? "",
+    nome_indicador: formulario.get("nome_indicador") ?? "",
   });
 
   if (!analise.success) {
@@ -130,7 +130,7 @@ export async function cadastrar(
     email: analise.data.email,
     telefone: analise.data.telefone,
     senha: analise.data.senha,
-    codigo_indicacao: analise.data.codigo_indicacao,
+    nome_indicador: analise.data.nome_indicador,
   });
 
   if (!criada.ok) return { erro: criada.erro, campo: criada.campo };

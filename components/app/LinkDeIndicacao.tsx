@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 /* =============================================================================
    Link de indicação
 
-   O link aponta para a página de apresentação (/comecar?ref=código), não
+   O link aponta para a página de apresentação (/comecar?ref=nome), não
    direto para o cadastro: quem recebe o link ainda não sabe o que é o Raiz —
-   primeiro vê do que se trata, depois decide criar a conta.
+   primeiro vê do que se trata, depois decide criar a conta. Leva o nome de
+   quem indicou, exatamente como está cadastrado, não um código.
 
    Mesmo padrão de cópia do Pix copia e cola (ChavePixCopiavel): o campo fica
    visível e selecionável, para funcionar mesmo se o navegador bloquear a
@@ -49,11 +50,11 @@ async function copiar(texto: string): Promise<boolean> {
 const semAssinatura = () => () => {};
 const lerOrigem = () => window.location.origin;
 
-export function LinkDeIndicacao({ codigo }: { codigo: string }) {
+export function LinkDeIndicacao({ nome }: { nome: string }) {
   // No servidor (e na primeira pintura no cliente) cai no caminho relativo,
   // que já funciona para copiar; após hidratar, vira o link absoluto.
   const origem = useSyncExternalStore(semAssinatura, lerOrigem, () => "");
-  const link = `${origem}/comecar?ref=${codigo}`;
+  const link = `${origem}/comecar?ref=${encodeURIComponent(nome)}`;
   const [estado, setEstado] = useState<"parado" | "copiado" | "falhou">("parado");
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
 

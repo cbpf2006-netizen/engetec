@@ -139,7 +139,7 @@ export type Perfil = {
   acesso: "pendente" | "liberado";
   /** Nome de quem indicou esta conta, resolvido no cadastro. Nulo se ninguém. */
   indicado_por: string | null;
-  /** Código próprio da conta para o link de indicação (/comecar?ref=código). */
+  /** Código próprio da conta, sem uso no link de indicação (esse usa o nome). */
   codigo_indicacao: string;
 };
 
@@ -152,11 +152,10 @@ export type Indicado = {
 };
 
 /** Uma conta que PODE ser escolhida como "quem te indicou" no cadastro — só
-    id, nome e o código, nunca e-mail nem telefone. */
+    id e nome, nunca e-mail nem telefone. A escolha vale pelo nome mesmo. */
 export type Indicador = {
   id: string;
   nome: string;
-  codigo_indicacao: string;
 };
 
 /** Retorno padrão de toda Server Action de escrita. Erros viram mensagem

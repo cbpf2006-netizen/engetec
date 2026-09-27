@@ -13,16 +13,17 @@ export default async function PaginaDeCadastro({
 }) {
   const parametros = await searchParams;
   const bruto = Array.isArray(parametros.ref) ? parametros.ref[0] : parametros.ref;
-  // Vem do link de indicação (/comecar?ref=código); repassado adiante para
-  // pré-selecionar "quem te indicou" no formulário.
-  let codigoDeIndicacao = bruto?.trim().toLowerCase() || undefined;
+  // Vem do link de indicação (/comecar?ref=nome); repassado adiante para
+  // pré-selecionar "quem te indicou" no formulário. Sem lowercase: precisa
+  // bater exatamente com o nome cadastrado.
+  let nomeDeIndicacao = bruto?.trim() || undefined;
 
   // Sem link de indicação: pré-seleciona a conta administradora em vez de
-  // "ninguém me indicou" (ver public.codigo_indicacao_padrao()).
-  if (!codigoDeIndicacao) {
+  // "ninguém me indicou" (ver public.nome_indicador_padrao()).
+  if (!nomeDeIndicacao) {
     const supabase = await createClient();
-    const { data } = await supabase.rpc("codigo_indicacao_padrao");
-    codigoDeIndicacao = (data as string | null) ?? undefined;
+    const { data } = await supabase.rpc("nome_indicador_padrao");
+    nomeDeIndicacao = (data as string | null) ?? undefined;
   }
 
   return (
@@ -30,7 +31,7 @@ export default async function PaginaDeCadastro({
       titulo="Criar sua conta"
       descricao="Leva menos de um minuto. Você começa com tudo em branco e monta as suas categorias e carteiras do seu jeito."
     >
-      <FormularioCadastro codigoDeIndicacao={codigoDeIndicacao} />
+      <FormularioCadastro nomeDeIndicacao={nomeDeIndicacao} />
     </CascaDeAcesso>
   );
 }

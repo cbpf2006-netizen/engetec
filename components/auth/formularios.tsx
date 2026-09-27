@@ -104,13 +104,13 @@ export function FormularioEntrar({
   );
 }
 
-const SEM_INDICADOR = "nenhum";
+const SEM_INDICADOR = "__nenhum__";
 
 export function FormularioCadastro({
-  codigoDeIndicacao,
+  nomeDeIndicacao,
 }: {
-  /** Código do link /comecar?ref=código, se foi por ele que a pessoa chegou. */
-  codigoDeIndicacao?: string;
+  /** Nome do link /comecar?ref=nome, se foi por ele que a pessoa chegou. */
+  nomeDeIndicacao?: string;
 }) {
   const [estado, acao] = useActionState(cadastrar, ERRO_INICIAL);
 
@@ -123,9 +123,10 @@ export function FormularioCadastro({
   // "Quem te indicou" vem de uma lista fechada — só contas com acesso
   // liberado — em vez de um nome digitado à mão. Carregada do banco porque o
   // cadastro ainda não tem sessão nenhuma (a lista é pública de propósito, ver
-  // supabase/migrations/0007_indicacoes.sql).
+  // supabase/migrations/0008_indicacao_por_nome.sql). A escolha vale pelo
+  // nome mesmo (exatamente como cadastrado), não por um código.
   const [indicadores, setIndicadores] = useState<Indicador[]>([]);
-  const [codigoEscolhido, setCodigoEscolhido] = useState(SEM_INDICADOR);
+  const [nomeEscolhido, setNomeEscolhido] = useState(SEM_INDICADOR);
 
   useEffect(() => {
     let vivo = true;
@@ -137,15 +138,15 @@ export function FormularioCadastro({
         const lista = data as Indicador[];
         setIndicadores(lista);
 
-        if (codigoDeIndicacao && lista.some((i) => i.codigo_indicacao === codigoDeIndicacao)) {
-          setCodigoEscolhido(codigoDeIndicacao);
+        if (nomeDeIndicacao && lista.some((i) => i.nome === nomeDeIndicacao)) {
+          setNomeEscolhido(nomeDeIndicacao);
         }
       });
 
     return () => {
       vivo = false;
     };
-  }, [codigoDeIndicacao]);
+  }, [nomeDeIndicacao]);
 
   if (estado?.aviso) {
     return (
@@ -227,8 +228,8 @@ export function FormularioCadastro({
       <div className="flex flex-col gap-2">
         <Label htmlFor="quem-indicou">Quem te indicou?</Label>
         <Select
-          value={codigoEscolhido}
-          onValueChange={(valor) => setCodigoEscolhido(String(valor))}
+          value={nomeEscolhido}
+          onValueChange={(valor) => setNomeEscolhido(String(valor))}
         >
           <SelectTrigger id="quem-indicou" className="w-full">
             <SelectValue placeholder="Selecione quem te indicou" />
@@ -236,7 +237,7 @@ export function FormularioCadastro({
           <SelectContent>
             <SelectItem value={SEM_INDICADOR}>Ninguém me indicou</SelectItem>
             {indicadores.map((indicador) => (
-              <SelectItem key={indicador.id} value={indicador.codigo_indicacao}>
+              <SelectItem key={indicador.id} value={indicador.nome}>
                 {indicador.nome}
               </SelectItem>
             ))}
@@ -244,10 +245,10 @@ export function FormularioCadastro({
         </Select>
         <input
           type="hidden"
-          name="codigo_indicacao"
-          value={codigoEscolhido === SEM_INDICADOR ? "" : codigoEscolhido}
+          name="nome_indicador"
+          value={nomeEscolhido === SEM_INDICADOR ? "" : nomeEscolhido}
         />
-        {estado?.campo === "codigo_indicacao" && (
+        {estado?.campo === "nome_indicador" && (
           <p className="text-xs text-destructive">{estado.erro}</p>
         )}
       </div>

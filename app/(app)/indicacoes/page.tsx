@@ -32,7 +32,7 @@ export default async function PaginaDeIndicacoes() {
         titulo="Seu link de indicação"
         descricao="Quem entra por ele já chega sabendo o que é o Raiz — e, ao criar a conta, você já aparece como quem indicou."
       >
-        <LinkDeIndicacao codigo={perfil.codigo_indicacao} />
+        <LinkDeIndicacao nome={perfil.nome?.trim() || perfil.email.split("@")[0]} />
       </Bloco>
 
       <CartaoIndicador
