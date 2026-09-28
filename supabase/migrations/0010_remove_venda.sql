@@ -103,8 +103,9 @@ $$;
 -- =============================================================================
 
 drop function if exists public.admin_liberar_acesso(uuid);
+drop function if exists public.admin_listar_usuarios();
 
-create or replace function public.admin_listar_usuarios()
+create function public.admin_listar_usuarios()
 returns table (
   id uuid,
   nome text,
@@ -141,6 +142,9 @@ begin
    order by u.created_at desc;
 end;
 $$;
+
+revoke all on function public.admin_listar_usuarios() from public, anon;
+grant execute on function public.admin_listar_usuarios() to authenticated;
 
 -- =============================================================================
 -- Sistema de indicação: sai por completo
