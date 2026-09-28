@@ -9,15 +9,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
  * Supabase não entra na conta.
  *
  * verify_jwt está desligado porque o cadastro é anônimo por natureza (e as
- * chaves "publishable" do projeto não são JWT). Quem protege o que importa é o
- * banco: a conta nasce com acesso PENDENTE e sem papel de administrador, e só o
- * administrador libera. Aqui são aceitos apenas nome, telefone e o nome de
- * quem indicou — papel e acesso jamais vêm do corpo da requisição.
- *
- * Quem indicou é resolvido pelo trigger `ao_criar_usuario` no banco, pelo
- * nome exato de uma conta com acesso liberado — não aqui: um nome que não
- * bate com ninguém simplesmente não vira indicação. Esta função só repassa
- * o texto adiante.
+ * chaves "publishable" do projeto não são JWT). Aqui são aceitos apenas
+ * nome, telefone e senha — papel e acesso jamais vêm do corpo da requisição.
  */
 
 const CABECALHOS = {
@@ -47,7 +40,6 @@ Deno.serve(async (req: Request) => {
   const email = String(corpo.email ?? "").trim().toLowerCase();
   const senha = String(corpo.senha ?? "");
   const telefone = String(corpo.telefone ?? "").replace(/\D/g, "");
-  const nomeIndicador = String(corpo.nome_indicador ?? "").trim();
 
   if (nome.length < 2 || nome.length > 60) {
     return resposta({ erro: "Informe seu nome.", campo: "nome" }, 400);
@@ -61,9 +53,6 @@ Deno.serve(async (req: Request) => {
   if (senha.length < 8 || senha.length > 72) {
     return resposta({ erro: "A senha precisa de pelo menos 8 caracteres.", campo: "senha" }, 400);
   }
-  if (nomeIndicador.length > 60) {
-    return resposta({ erro: "Selecione quem te indicou.", campo: "nome_indicador" }, 400);
-  }
 
   const admin = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -75,8 +64,8 @@ Deno.serve(async (req: Request) => {
     email,
     password: senha,
     email_confirm: true,
-    // Lido pelo trigger ao_criar_usuario. Só estes três campos.
-    user_metadata: { nome, telefone, nome_indicador: nomeIndicador || null },
+    // Lido pelo trigger ao_criar_usuario.
+    user_metadata: { nome, telefone },
   });
 
   if (error) {

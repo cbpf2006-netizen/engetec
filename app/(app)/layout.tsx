@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { AvisoDeInstalacao } from "@/components/app/AvisoDeInstalacao";
 import { BloqueioDoApp } from "@/components/app/BloqueioDoApp";
 import { SCRIPT_DE_PRE_BLOQUEIO } from "@/lib/bloqueio";
@@ -47,10 +46,6 @@ export default async function LayoutDoApp({ children }: { children: React.ReactN
     if (schemaAusente(erro)) return <ConfiguracaoPendente />;
     throw erro;
   }
-
-  // Conta sem acesso liberado não usa o app: vai para a tela de pagamento.
-  // (O banco também recusa — esta é só a parte que o usuário enxerga.)
-  if (perfil && perfil.acesso !== "liberado") redirect("/pagamento");
 
   // `perfilAtual` redireciona quem não está autenticado; o null aqui é só
   // para o TypeScript.

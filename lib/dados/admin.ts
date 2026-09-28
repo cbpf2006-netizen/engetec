@@ -16,7 +16,6 @@ export type UsuarioAdmin = {
   nome: string | null;
   email: string;
   telefone: string | null;
-  indicado_por: string | null;
   papel: "admin" | "usuario";
   acesso: "pendente" | "liberado";
   email_confirmado: boolean;

@@ -1,39 +1,24 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
-import { BadgeCheck, Phone, ShieldCheck, Trash2, UserRoundCheck, UserRoundX, Users } from "lucide-react";
-import { toast } from "sonner";
+import { useState, type ReactNode } from "react";
+import { BadgeCheck, Phone, ShieldCheck, Trash2, Users } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Avatar } from "./Avatar";
 import { DialogoConfirmar } from "./DialogoConfirmar";
 import { EstadoVazio } from "./EstadoVazio";
-import { liberarAcesso, removerUsuario } from "@/lib/acoes/admin";
+import { removerUsuario } from "@/lib/acoes/admin";
 import { mascaraTelefone } from "@/lib/formato";
 import type { UsuarioAdmin } from "@/lib/dados/admin";
 
 /* =============================================================================
    Lista de usuários (área Administrar)
 
-   Duas listas com ações diferentes:
-     · Usuários — quem já tem acesso. A ação é REMOVER.
-     · Pendentes — quem espera o pagamento. As ações são LIBERAR e RECUSAR.
-
-   Linhas em vez de tabela: no celular uma tabela de sete colunas viraria
-   rolagem lateral.
-
-   Remover e recusar apagam a conta e os dados dela, sem volta — por isso as
-   duas pedem confirmação e dizem o que vai embora. A própria conta e a de
-   qualquer administrador não têm o botão (a função no servidor também recusa).
+   Todo mundo com acesso, uma linha cada, com a ação REMOVER — a própria conta
+   e a de qualquer outro administrador não têm o botão (a função no servidor
+   também recusa). Remover apaga a conta e os dados dela sem volta, por isso
+   pede confirmação e diz o que vai embora.
    ========================================================================== */
 
 function dataDoCadastro(iso: string): string {
@@ -48,22 +33,18 @@ function dataDoCadastro(iso: string): string {
 export function ListaDeUsuarios({
   usuarios,
   meuId,
-  modo,
   vazio,
 }: {
   usuarios: UsuarioAdmin[];
   meuId: string;
-  modo: "usuarios" | "pendentes";
   vazio: { titulo: string; descricao: string };
 }) {
-  const [paraLiberar, setParaLiberar] = useState<UsuarioAdmin | null>(null);
   const [paraRemover, setParaRemover] = useState<UsuarioAdmin | null>(null);
 
   if (usuarios.length === 0) {
     return <EstadoVazio icone={Users} titulo={vazio.titulo} descricao={vazio.descricao} />;
   }
 
-  const recusando = modo === "pendentes";
   const nomeDoAlvo = paraRemover?.nome?.trim() || paraRemover?.email || "";
 
   return (
@@ -74,26 +55,18 @@ export function ListaDeUsuarios({
             key={usuario.id}
             usuario={usuario}
             ehVoce={usuario.id === meuId}
-            modo={modo}
-            aoLiberar={() => setParaLiberar(usuario)}
             aoRemover={() => setParaRemover(usuario)}
           />
         ))}
       </ul>
 
-      <DialogoDeLiberacao usuario={paraLiberar} aoFechar={() => setParaLiberar(null)} />
-
       <DialogoConfirmar
         aberto={paraRemover !== null}
         aoMudarAberto={(aberto) => !aberto && setParaRemover(null)}
-        titulo={recusando ? `Recusar ${nomeDoAlvo}?` : `Remover ${nomeDoAlvo}?`}
-        descricao={
-          recusando
-            ? "A conta é removida e a pessoa não terá acesso. Se ela pagar depois, precisará se cadastrar de novo."
-            : "A conta e todos os dados dela — lançamentos, carteiras, modelos e foto — serão apagados. Não há como desfazer."
-        }
-        rotuloDoBotao={recusando ? "Recusar" : "Remover"}
-        mensagemDeSucesso={recusando ? "Cadastro recusado." : "Usuário removido."}
+        titulo={`Remover ${nomeDoAlvo}?`}
+        descricao="A conta e todos os dados dela — lançamentos, carteiras, modelos e foto — serão apagados. Não há como desfazer."
+        rotuloDoBotao="Remover"
+        mensagemDeSucesso="Usuário removido."
         acao={async () =>
           paraRemover
             ? removerUsuario(paraRemover.id)
@@ -107,14 +80,10 @@ export function ListaDeUsuarios({
 function Linha({
   usuario,
   ehVoce,
-  modo,
-  aoLiberar,
   aoRemover,
 }: {
   usuario: UsuarioAdmin;
   ehVoce: boolean;
-  modo: "usuarios" | "pendentes";
-  aoLiberar: () => void;
   aoRemover: () => void;
 }) {
   const nome = usuario.nome?.trim() || usuario.email.split("@")[0];
@@ -146,39 +115,22 @@ function Linha({
                 {mascaraTelefone(usuario.telefone)}
               </span>
             )}
-            {usuario.indicado_por && <span>Indicado por {usuario.indicado_por}</span>}
             <span>Cadastro em {dataDoCadastro(usuario.criado_em)}</span>
-            {modo === "usuarios" && usuario.liberado_em && (
-              <span>Liberado em {dataDoCadastro(usuario.liberado_em)}</span>
-            )}
           </span>
         </div>
       </div>
 
-      {modo === "pendentes" ? (
-        <div className="flex gap-2 sm:shrink-0">
-          <Button type="button" variant="outline" size="sm" onClick={aoRemover}>
-            <UserRoundX />
-            Recusar
-          </Button>
-          <Button type="button" size="sm" onClick={aoLiberar}>
-            <UserRoundCheck />
-            Liberar acesso
-          </Button>
-        </div>
-      ) : (
-        !protegido && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="text-destructive hover:text-destructive sm:shrink-0"
-            onClick={aoRemover}
-          >
-            <Trash2 />
-            Remover
-          </Button>
-        )
+      {!protegido && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="text-destructive hover:text-destructive sm:shrink-0"
+          onClick={aoRemover}
+        >
+          <Trash2 />
+          Remover
+        </Button>
       )}
     </li>
   );
@@ -208,52 +160,5 @@ function Selo({
       {Icone && <Icone className="size-3" aria-hidden="true" />}
       {children}
     </span>
-  );
-}
-
-function DialogoDeLiberacao({
-  usuario,
-  aoFechar,
-}: {
-  usuario: UsuarioAdmin | null;
-  aoFechar: () => void;
-}) {
-  const [enviando, iniciar] = useTransition();
-
-  function confirmar() {
-    if (!usuario) return;
-
-    iniciar(async () => {
-      const resultado = await liberarAcesso(usuario.id);
-      if (!resultado.ok) {
-        toast.error(resultado.erro);
-        return;
-      }
-      toast.success("Acesso liberado.");
-      aoFechar();
-    });
-  }
-
-  return (
-    <Dialog open={usuario !== null} onOpenChange={(aberto) => !aberto && !enviando && aoFechar()}>
-      <DialogContent className="gap-5 p-5 sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Liberar acesso?</DialogTitle>
-          <DialogDescription>
-            {usuario?.nome?.trim() || usuario?.email} passa a usar o Raiz assim que você confirmar.
-            Só libere depois de conferir o pagamento.
-          </DialogDescription>
-        </DialogHeader>
-
-        <DialogFooter className="-mx-5 -mb-5 px-5 py-4">
-          <Button type="button" variant="outline" size="lg" disabled={enviando} onClick={aoFechar}>
-            Cancelar
-          </Button>
-          <Button type="button" size="lg" disabled={enviando} onClick={confirmar}>
-            {enviando ? "Liberando…" : "Confirmar e liberar"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }

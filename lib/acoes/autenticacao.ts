@@ -111,7 +111,6 @@ export async function cadastrar(
     telefone: formulario.get("telefone") ?? "",
     senha: formulario.get("senha"),
     confirmacao: formulario.get("confirmacao") ?? "",
-    nome_indicador: formulario.get("nome_indicador") ?? "",
   });
 
   if (!analise.success) {
@@ -120,17 +119,13 @@ export async function cadastrar(
   }
 
   // A conta é criada pela função `cadastrar` do Supabase, já com o e-mail
-  // marcado como confirmado: nenhum e-mail é enviado. Só nome, telefone e o
-  // código de quem indicou seguem — papel e acesso jamais saem daqui (a conta
-  // nasce pendente e só o administrador libera). O código, se houver, é
-  // resolvido no banco: um código que não bate com ninguém liberado
-  // simplesmente não vira indicação, sem erro para quem está se cadastrando.
+  // marcado como confirmado: nenhum e-mail é enviado. Só nome, telefone e
+  // senha seguem — papel e acesso jamais saem daqui.
   const criada = await chamarFuncao("cadastrar", {
     nome: analise.data.nome,
     email: analise.data.email,
     telefone: analise.data.telefone,
     senha: analise.data.senha,
-    nome_indicador: analise.data.nome_indicador,
   });
 
   if (!criada.ok) return { erro: criada.erro, campo: criada.campo };
@@ -148,8 +143,7 @@ export async function cadastrar(
   }
 
   revalidatePath("/", "layout");
-  // Conta nova nasce pendente: o lugar dela é a tela de pagamento.
-  redirect("/pagamento");
+  redirect("/");
 }
 
 export async function sair(): Promise<void> {

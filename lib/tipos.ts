@@ -135,20 +135,9 @@ export type Perfil = {
   foto_url: string | null;
   /** "admin" vê a área Administrar. Definido só no banco — nunca pelo cliente. */
   papel: "admin" | "usuario";
-  /** "pendente" até o administrador confirmar o pagamento e liberar. */
+  /** Toda conta liberada desde o cadastro; o campo segue existindo por baixo
+      para o dia em que o administrador precisar suspender alguém. */
   acesso: "pendente" | "liberado";
-  /** Nome de quem indicou esta conta, resolvido no cadastro. Nulo se ninguém. */
-  indicado_por: string | null;
-  /** Código próprio da conta, sem uso no link de indicação (esse usa o nome). */
-  codigo_indicacao: string;
-};
-
-/** Uma conta que esta pessoa indicou — o que a aba Indicações lista. */
-export type Indicado = {
-  id: string;
-  nome: string;
-  acesso: "pendente" | "liberado";
-  criado_em: string;
 };
 
 /** Retorno padrão de toda Server Action de escrita. Erros viram mensagem

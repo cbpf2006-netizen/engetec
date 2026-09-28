@@ -4,14 +4,6 @@ import { useActionState, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 
 import { Aviso, BotaoEnviar, CampoSenha, CampoTexto } from "./campos";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { lerEmailSalvo } from "@/lib/login-salvo";
 import { mascaraTelefone } from "@/lib/formato";
 import {
@@ -102,14 +94,7 @@ export function FormularioEntrar({
   );
 }
 
-const SEM_INDICADOR = "__nenhum__";
-
-export function FormularioCadastro({
-  nomeDeIndicacao,
-}: {
-  /** Nome do link /comecar?ref=nome, se foi por ele que a pessoa chegou. */
-  nomeDeIndicacao?: string;
-}) {
+export function FormularioCadastro() {
   const [estado, acao] = useActionState(cadastrar, ERRO_INICIAL);
 
   // Controlados: o React 19 limpa os campos não controlados depois de cada
@@ -117,12 +102,6 @@ export function FormularioCadastro({
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
-
-  // "Quem te indicou" já vem resolvido do servidor: o nome de quem
-  // compartilhou o link (?ref=nome) ou, sem link, a conta administradora
-  // (ver public.nome_indicador_padrao()). Não é mais uma lista aberta de
-  // todo mundo com acesso liberado — só essa opção e "Nenhum".
-  const [nomeEscolhido, setNomeEscolhido] = useState(nomeDeIndicacao ?? SEM_INDICADOR);
 
   if (estado?.aviso) {
     return (
@@ -200,32 +179,6 @@ export function FormularioCadastro({
         minLength={8}
         erro={estado?.campo === "confirmacao" ? estado.erro : undefined}
       />
-
-      {nomeDeIndicacao && (
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="quem-indicou">Quem te indicou?</Label>
-          <Select
-            value={nomeEscolhido}
-            onValueChange={(valor) => setNomeEscolhido(String(valor))}
-          >
-            <SelectTrigger id="quem-indicou" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={nomeDeIndicacao}>{nomeDeIndicacao}</SelectItem>
-              <SelectItem value={SEM_INDICADOR}>Nenhum</SelectItem>
-            </SelectContent>
-          </Select>
-          <input
-            type="hidden"
-            name="nome_indicador"
-            value={nomeEscolhido === SEM_INDICADOR ? "" : nomeEscolhido}
-          />
-          {estado?.campo === "nome_indicador" && (
-            <p className="text-xs text-destructive">{estado.erro}</p>
-          )}
-        </div>
-      )}
 
       <BotaoEnviar carregando="Criando conta…">Criar conta</BotaoEnviar>
 
